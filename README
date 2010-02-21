@@ -102,10 +102,10 @@ PLATFORMS AND DEPENDENCIES
 
 DOWNLOAD
 	
-	WiiC is available at Lab Rococo Web Site (http://labrococo.dis.uniroma1.it).
+	WiiC is available at SourceForge (http://wiic.sf.net).
 	In order to download, you need Subversion, and to type:
 
-		svn co http://labrococo.dis.uniroma1.it/svn/software/trunk/wiic <WIIC_HOME>
+		svn co https://wiic.svn.sourceforge.net/svnroot/wiic <WIIC_HOME>
 
 
 COMPILING
