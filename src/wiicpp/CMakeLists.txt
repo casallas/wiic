@@ -1,6 +1,6 @@
 INCLUDE_DIRECTORIES(${CMAKE_CURRENT_SOURCE_DIR}/../wiic)
-ADD_LIBRARY(wiiusecpp SHARED wiiusecpp.cpp)
-TARGET_LINK_LIBRARIES(wiiusecpp wiic)
+ADD_LIBRARY(wiiusecpp SHARED wiicpp.cpp)
+TARGET_LINK_LIBRARIES(wiicpp wiic)
 
-INSTALL(TARGETS	wiiusecpp DESTINATION /usr/local/lib)
-INSTALL(FILES wiiusecpp.h DESTINATION /usr/local/include)
+INSTALL(TARGETS	wiicpp DESTINATION /usr/local/lib)
+INSTALL(FILES wiicpp.h DESTINATION /usr/local/include)
