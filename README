@@ -11,15 +11,16 @@ http://wiic.sf.net
 
 ABOUT
 
-	WiiC is a library written in C that extends the well known Wiiuse library, 
+	WiiC is a C/C++ library that extends the well known Wiiuse library, 
 	used to control several Nintendo Wii remotes, and its C++ wrapper
 	WiiuseCpp, all in a single library.
 	While Wiiuse supports Linux and Windows platforms, my aim was
 	to port it for Mac platforms, withdrawing the Windows support. 
 	WiiC fixes some Wiiuse minor bugs, and adds support to Motion Plus
 	and Balance Board.
-	WiiC also maintain Wiiuse support for motion sensing, IR tracking, 
-	nunchuk, classic controller, and the Guitar Hero 3 controller. 
+	WiiC also supports all the Wiiuse functionality, such as: 
+	motion sensing, IR tracking, nunchuk, classic controller, 
+	and the Guitar Hero 3 controller. 
 	Single threaded and nonblocking makes a light weight and clean API.
 
 	Distributed under the GPL and LGPL.
@@ -103,7 +104,9 @@ PLATFORMS AND DEPENDENCIES
 DOWNLOAD
 	
 	WiiC is available at SourceForge (http://wiic.sf.net).
-	In order to download, you need Subversion, and to type:
+	In order to download, you can download the latest release
+	(http://www.sourceforge.net/projects/wiic/files), or you
+	can check it out via Subversion, typing:
 
 		svn co https://wiic.svn.sourceforge.net/svnroot/wiic <WIIC_HOME>
 
@@ -127,8 +130,8 @@ COMPILING
 		selected to compile.
 
 		libwiic.so is installed to /usr/local/lib
-		libwiiusecpp.so is installed to /usr/local/lib
-		wiic-example and wiiusecpp-example are installed to /usr/local/bin
+		libwiicpp.so is installed to /usr/local/lib
+		wiic-example and wiicpp-example are installed to /usr/local/bin
 		Headers file are installed in /usr/local/include
 
 		If you want to generate documentation, then type:
@@ -152,8 +155,8 @@ COMPILING
 		selected to compile.
 
 		libwiic.dylib is installed to /usr/local/lib
-		libwiiusecpp.dylib is installed to /usr/local/lib
-		wiic-example and wiiusecpp-example are installed to /usr/local/bin
+		libwiicpp.dylib is installed to /usr/local/lib
+		wiic-example and wiicpp-example are installed to /usr/local/bin
 		Headers file are installed in /usr/local/include
 
 		If you want to generate documentation, then type:
@@ -164,10 +167,10 @@ COMPILING
 USING THE LIBRARY IN A THIRD PARTY APPLICATION
 
 	To use the library in your own program you must first compile WiiC as a module.
-	Include include/wiic.h in any file that uses WiiC.
+	Include wiic.h in any file that uses the WiiC C layer, or wiicpp.h in any C++ file.
 
-	For Linux you must link libwiic.so ( -lwiic ) for the C library, or libwiiusecpp.so ( -lwiiusecpp ) for the C++ library.
-	For Mac you must link libwiic.dylib ( -lwiic ) for the C library, or libwiiusecpp.dylib ( -lwiiusecpp ) for the C++ library.
+	For Linux you must link libwiic.so ( -lwiic ) for the C library, or libwiicpp.so ( -lwiicpp ) for the C++ library.
+	For Mac you must link libwiic.dylib ( -lwiic ) for the C library, or libwiicpp.dylib ( -lwiicpp ) for the C++ library.
 
 
 
