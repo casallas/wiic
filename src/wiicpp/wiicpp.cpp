@@ -33,7 +33,7 @@
  */
 
 #include <iostream>
-#include "wiiusecpp.h"
+#include "wiicpp.h"
 
 using namespace std;
 

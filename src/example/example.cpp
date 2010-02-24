@@ -39,7 +39,7 @@
 #include <unistd.h>
 #endif
 
-#include <wiiusecpp.h>
+#include <wiicpp.h>
 
 int LED_MAP[4] = {CWiimote::LED_1, CWiimote::LED_2, CWiimote::LED_3, CWiimote::LED_4};
 
