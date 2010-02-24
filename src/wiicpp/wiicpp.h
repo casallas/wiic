@@ -1,5 +1,5 @@
 /*
- *    wiiusecpp.h
+ *    wiicpp.h
  *
  *		This file is part of WiiC, written by:
  *			Gabriele Randelli
@@ -30,8 +30,8 @@
  *
  */
 
-#ifndef WIIUSECPP_H_
-#define WIIUSECPP_H_
+#ifndef WIICPP_H_
+#define WIICPP_H_
 
 #include <vector>
 #include <wiic.h>
@@ -501,4 +501,4 @@ private:
     std::vector<CWiimote> mpWiimotesVector;
 };
 
-#endif /* WIIUSECPP_H_ */
+#endif /* WIICPP_H_ */

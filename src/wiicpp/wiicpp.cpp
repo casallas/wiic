@@ -1,5 +1,5 @@
 /*
- *    wiiusecpp.cpp
+ *    wiicpp.cpp
  *
  *		This file is part of WiiC, written by:
  *			Gabriele Randelli
