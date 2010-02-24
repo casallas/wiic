@@ -97,7 +97,6 @@
 #include "wiic_macros.h"
 #include "wiic_structs.h"
 #include "wiic_functions.h"
-#include "wiic_doc.h"
 
 
 #endif /* WIIC_H_INCLUDED */
