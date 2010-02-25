@@ -139,7 +139,7 @@ void HandleEvent(CWiimote &wm)
         printf("%s Home pressed\n", prefixString);
     }
 
-    // if(the accelerometer is turned on then print angles
+    // if the accelerometer is turned on then print angles
     if(wm.isUsingACC())
     {
         float pitch, roll, yaw, a_pitch, a_roll;
@@ -148,14 +148,16 @@ void HandleEvent(CWiimote &wm)
         printf("%s wiimote roll = %f [%f]\n", prefixString, roll, a_roll);
         printf("%s wiimote pitch = %f [%f]\n", prefixString, pitch, a_pitch);
         printf("%s wiimote yaw = %f\n", prefixString, yaw);
-        if(wm.isUsingMotionPlus()) {
-        	float roll_rate, pitch_rate, yaw_rate;
-        	wm.ExpansionDevice.MotionPlus.Gyroscope.GetRates(roll_rate,pitch_rate,yaw_rate);
+    }
 
-            printf("%s motion plus roll rate = %f\n", prefixString,roll_rate);
-        	printf("%s motion plus pitch rate = %f\n", prefixString,pitch_rate);
-        	printf("%s motion plus yaw rate = %f\n", prefixString,yaw_rate);
-        }
+	// if the Motion Plus is turned on then print angles
+    if(wm.isUsingMotionPlus()) {
+    	float roll_rate, pitch_rate, yaw_rate;
+    	wm.ExpansionDevice.MotionPlus.Gyroscope.GetRates(roll_rate,pitch_rate,yaw_rate);
+
+        printf("%s motion plus roll rate = %f\n", prefixString,roll_rate);
+    	printf("%s motion plus pitch rate = %f\n", prefixString,pitch_rate);
+    	printf("%s motion plus yaw rate = %f\n", prefixString,yaw_rate);
     }
 
     // if(IR tracking is on then print the coordinates
@@ -368,13 +370,16 @@ void HandleStatus(CWiimote &wm)
 {
     printf("\n");
     printf("--- CONTROLLER STATUS [wiimote id %i] ---\n\n", wm.GetID());
-    printf("\n");
 
     printf("attachment: %i\n", wm.ExpansionDevice.GetType());
     printf("speaker: %i\n", wm.isUsingSpeaker());
     printf("ir: %i\n", wm.isUsingIR());
     printf("leds: %i %i %i %i\n", wm.isLEDSet(1), wm.isLEDSet(2), wm.isLEDSet(3), wm.isLEDSet(4));
     printf("battery: %f %%\n", wm.GetBatteryLevel());
+
+	printf("\nPress PLUS (MINUS) to enable (disable) accelerometers\n");
+	printf("Press RIGHT (LEFT) to enable (disable) Motion Plus (gyroscopes)\n");
+	printf("Press UP (DOWN) to enable (disable) IR camera (requires some IR led)\n");
 }
 
 void HandleDisconnect(CWiimote &wm)

@@ -129,6 +129,7 @@ int motion_plus_handshake(struct wiimote_t* wm, byte* data, unsigned short len)
 	WIIMOTE_DISABLE_STATE(wm, WIIMOTE_STATE_EXP_HANDSHAKE);
 
 	unsigned int val = (data[2] << 24) | (data[3] << 16) | (data[4] << 8) | data[5];
+	printf("ID MP: %u %u %u %u\n",data[2],data[3],data[4],data[5]);
 	if(val == EXP_ID_CODE_MOTION_PLUS) {
 		/* handshake done */
 		wm->event = WIIUSE_MOTION_PLUS_INSERTED;
@@ -147,6 +148,7 @@ int motion_plus_handshake(struct wiimote_t* wm, byte* data, unsigned short len)
 	}
 	else {
 		WIIUSE_ERROR("Unable to activate Motion Plus");
+		wiic_set_motion_plus(wm,0);
 		return 0;
 	}
 	
@@ -168,7 +170,7 @@ void wiic_set_motion_plus(struct wiimote_t *wm, int status)
 	// If we're handshaking other expansions, than skip this
 	if(WIIMOTE_IS_SET(wm,WIIMOTE_STATE_EXP_HANDSHAKE))
 		return;
-	
+
 	WIIMOTE_ENABLE_STATE(wm, WIIMOTE_STATE_EXP_HANDSHAKE);
 	if(status) {
 		// We initialize the motion plus
@@ -190,6 +192,7 @@ void wiic_set_motion_plus(struct wiimote_t *wm, int status)
 		WIIMOTE_DISABLE_STATE(wm,WIIMOTE_STATE_MOTION_PLUS);
 		val = 0x55;
 		wiiuse_write_data(wm,WM_MOTION_PLUS_DISABLE,&val,1);
+		WIIMOTE_DISABLE_STATE(wm, WIIMOTE_STATE_EXP_HANDSHAKE);
 	}
 }
 
