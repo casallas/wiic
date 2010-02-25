@@ -257,8 +257,8 @@ void handle_ctrl_status(struct wiimote_t* wm) {
 	printf("leds:            %i %i %i %i\n", WIIUSE_IS_LED_SET(wm, 1), WIIUSE_IS_LED_SET(wm, 2), WIIUSE_IS_LED_SET(wm, 3), WIIUSE_IS_LED_SET(wm, 4));
 	printf("battery:         %f %%\n", wm->battery_level);
 	
-	printf("\nPress PLUS (MINUS) to enable (disable) accelerometers\n");
-	printf("Press RIGHT (LEFT) to enable (disable) Motion Plus (gyroscopes)\n");
+	printf("\nPress PLUS (MINUS) to enable (disable) Motion Sensing Report (only accelerometers)\n");
+	printf("Press RIGHT (LEFT) to enable (disable) Motion Plus (requires Motion Sensing enabled)\n");
 	printf("Press UP (DOWN) to enable (disable) IR camera (requires some IR led)\n");
 }
 

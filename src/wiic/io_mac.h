@@ -76,6 +76,7 @@
 {
 	// Buffer to store incoming data from the Wiimote
 	NSData* receivedMsg;
+	unsigned int msgLength;
 	
 	// Reference to the relative wiimote struct (used only to complete handshaking)
 	wiimote* _wm;
@@ -86,6 +87,7 @@
 - (IOReturn) connectToWiimote:(wiimote*) wm;
 - (void) l2capChannelData:(IOBluetoothL2CAPChannel*) channel data:(byte *) data length:(NSUInteger) length;
 - (byte*) getNextMsg;
+- (unsigned int) getMsgLength;
 - (void) disconnected:(IOBluetoothUserNotification*) notification fromDevice:(IOBluetoothDevice*) device;
 - (BOOL) isReading;
 - (void) setReading:(BOOL) flag;

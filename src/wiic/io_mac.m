@@ -194,6 +194,7 @@ static int max_num_wiimotes = 0;
 {
 	self = [super init];
 	receivedMsg = [[NSData alloc] init];
+	msgLength = 0;
 	_wm = 0;
 	isReading = NO;
 	return self;
@@ -292,7 +293,6 @@ static int max_num_wiimotes = 0;
 - (void) l2capChannelData:(IOBluetoothL2CAPChannel*) channel data:(byte *) data length:(NSUInteger) length 
 {
 	NSAutoreleasePool *pool = [[NSAutoreleasePool alloc] init];
-	int i;
 
 	// This is done in case the output channel woke up this handler
 	if(!data) {
@@ -308,31 +308,37 @@ static int max_num_wiimotes = 0;
 	if(WIIMOTE_IS_SET(_wm, WIIMOTE_STATE_HANDSHAKE))
 		propagate_event(_wm, data[1], data+2);
 
-	receivedMsg = [[NSData dataWithBytes:data length:sizeof(data)] retain];
+	receivedMsg = [[NSData dataWithBytes:data length:length] retain];
+	msgLength = length;
 	
     // Stop the main loop after reading
     [self setReading:NO];
 	[pool release];
 }
 
+- (unsigned int) getMsgLength
+{
+	return msgLength;
+}
+
 - (void) l2capChannelReconfigured:(IOBluetoothL2CAPChannel*) l2capChannel
 {
-      NSLog(@"l2capChannelReconfigured");
+      //NSLog(@"l2capChannelReconfigured");
 }
 
 - (void) l2capChannelWriteComplete:(IOBluetoothL2CAPChannel*) l2capChannel refcon:(void*) refcon status:(IOReturn) error
 {
-      NSLog(@"l2capChannelWriteComplete");
+      //NSLog(@"l2capChannelWriteComplete");
 }
 
 - (void) l2capChannelQueueSpaceAvailable:(IOBluetoothL2CAPChannel*) l2capChannel
 {
-      NSLog(@"l2capChannelQueueSpaceAvailable");
+      //NSLog(@"l2capChannelQueueSpaceAvailable");
 }
 
 - (void) l2capChannelOpenComplete:(IOBluetoothL2CAPChannel*) l2capChannel status:(IOReturn) error
 {
-	NSLog(@"l2capChannelOpenComplete (PSM:0x%x)", [l2capChannel getPSM]);
+	//NSLog(@"l2capChannelOpenComplete (PSM:0x%x)", [l2capChannel getPSM]);
 }
 
 
@@ -551,12 +557,13 @@ int wiiuse_io_read(struct wiimote_t* wm)
 		return 0;
 	}
 	byte* buffer = [deviceHandler getNextMsg];
-
-	if(!buffer)
+	unsigned int length = [deviceHandler getMsgLength];
+		
+	if(!buffer || !length)
 		return 0;
-
-	if(sizeof(buffer) < sizeof(wm->event_buf)) 
-		memcpy(wm->event_buf,buffer,sizeof(buffer));
+		
+	if(length < sizeof(wm->event_buf)) 
+		memcpy(wm->event_buf,buffer,length);
 	else {
 		WIIUSE_DEBUG("Received data are more than the buffer.... strange! (id %i)", wm->unid);
 		memcpy(wm->event_buf,buffer,sizeof(wm->event_buf));

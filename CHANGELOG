@@ -8,6 +8,15 @@ http://www.dis.uniroma1.i/~randelli/wiic/
 
 
 ---------------------------
+v0.31 -- 25 Feb 2010
+---------------------------
+
+	Fixed:
+		- [Mac] Motion Plus bug
+		- [Mac] Now NSRunLoop is used instead of CFRunLoop
+		- [Mac] Pressing the power button on the Wiimote now works
+
+---------------------------
 v0.30 -- 19 Feb 2010
 ---------------------------
 

@@ -428,7 +428,7 @@ int main(int argc, char** argv)
     // Connect to the wiimote
     std::vector<CWiimote>& wiimotes = wii.Connect();
 
-    printf("Connected to %u wiimotes\n", wiimotes.size());
+    printf("Connected to %u wiimotes\n", (unsigned int)wiimotes.size());
 
     // Setup the wiimotes
     for(index = 0, i = wiimotes.begin(); i != wiimotes.end(); ++i, ++index)

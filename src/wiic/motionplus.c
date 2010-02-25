@@ -129,7 +129,7 @@ int motion_plus_handshake(struct wiimote_t* wm, byte* data, unsigned short len)
 	WIIMOTE_DISABLE_STATE(wm, WIIMOTE_STATE_EXP_HANDSHAKE);
 
 	unsigned int val = (data[2] << 24) | (data[3] << 16) | (data[4] << 8) | data[5];
-	printf("ID MP: %u %u %u %u\n",data[2],data[3],data[4],data[5]);
+
 	if(val == EXP_ID_CODE_MOTION_PLUS) {
 		/* handshake done */
 		wm->event = WIIUSE_MOTION_PLUS_INSERTED;
