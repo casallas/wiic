@@ -179,9 +179,7 @@ void wiiuse_disconnected(struct wiimote_t* wm) {
 	WIIMOTE_DISABLE_STATE(wm, WIIMOTE_STATE_CONNECTED);
 
 	/* reset a bunch of stuff */
-	#ifdef WIN32
-		wm->dev_handle = 0;
-	#elif MACOSX // MacOSX
+	#if MACOSX // MacOSX
 		if(wm->inputCh) {
 			IOBluetoothObjectRelease(wm->inputCh);
 			wm->inputCh = 0;
@@ -203,7 +201,6 @@ void wiiuse_disconnected(struct wiimote_t* wm) {
 	wm->btns_held = 0;
 	wm->btns_released = 0;
 	memset(wm->event_buf, 0, sizeof(wm->event_buf));
-
 	wm->event = WIIUSE_DISCONNECT;
 }
 

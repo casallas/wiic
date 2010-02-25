@@ -1,13 +1,17 @@
 /*
  *	example.cpp
  *
- *	Written By:
+ *	This file is part of WiiC, written by:
+ *		Gabriele Randelli
+ *		Email: randelli@dis.uniroma1.it
+ *
+ *	Copyright 2010
+ *
+ *	This file is based on WiiuseCpp, written By:
  *		James Thomas
  *		Email: jt@missioncognition.net
  *
  *	Copyright 2009
- *
- *	This file is part of wiiusecpp.
  *
  *	This program is free software; you can redistribute it and/or modify
  *	it under the terms of the GNU General Public License as published by
@@ -24,22 +28,13 @@
  *
  */
 
-/*
- * Note:  This C++ example follows the example.c program distributed with
- * 	      the wiiuse library.
- *        See http://www.wiiuse.net to get the wiiuse library which is required
- *        to build this package.  A SWIG based Python wrapper for this C++ library
- *        is available from http://www.missioncognition.net.
- */
-
+#include <iostream>
 #include <stdio.h>
 #include <stdlib.h>
-
-#ifndef WIN32
 #include <unistd.h>
-#endif
-
 #include <wiicpp.h>
+
+using namespace std;
 
 int LED_MAP[4] = {CWiimote::LED_1, CWiimote::LED_2, CWiimote::LED_3, CWiimote::LED_4};
 
@@ -446,13 +441,7 @@ int main(int argc, char** argv)
 
         //Rumble for 0.2 seconds as a connection ack
         wiimote.SetRumbleMode(CWiimote::ON);
-
-#ifndef WIN32
         usleep(200000);
-#else
-        Sleep(200);
-#endif
-
         wiimote.SetRumbleMode(CWiimote::OFF);
     }
 
@@ -482,6 +471,7 @@ int main(int argc, char** argv)
                     case CWiimote::EVENT_STATUS:
                         HandleStatus(wiimote);
                         break;
+
                     case CWiimote::EVENT_DISCONNECT:
                     case CWiimote::EVENT_UNEXPECTED_DISCONNECT:
                         HandleDisconnect(wiimote);
@@ -491,25 +481,35 @@ int main(int argc, char** argv)
                     case CWiimote::EVENT_READ_DATA:
                         HandleReadData(wiimote);
                         break;
+
                     case CWiimote::EVENT_NUNCHUK_INSERTED:
                         HandleNunchukInserted(wiimote);
                         reloadWiimotes = 1;
                         break;
+
                     case CWiimote::EVENT_CLASSIC_CTRL_INSERTED:
                         HandleClassicInserted(wiimote);
                         reloadWiimotes = 1;
                         break;
+
                     case CWiimote::EVENT_GUITAR_HERO_3_CTRL_INSERTED:
                         HandleGH3Inserted(wiimote);
                         reloadWiimotes = 1;
                         break;
+
+					case CWiimote::EVENT_MOTION_PLUS_INSERTED:
+						cout << "Motion Plus inserted." << endl;
+						break;
+						
                     case CWiimote::EVENT_NUNCHUK_REMOVED:
                     case CWiimote::EVENT_CLASSIC_CTRL_REMOVED:
                     case CWiimote::EVENT_GUITAR_HERO_3_CTRL_REMOVED:
-                        printf("An expansion was removed.\n");
+					case CWiimote::EVENT_MOTION_PLUS_REMOVED:
+                        cout << "An expansion was removed." << endl;
                         HandleStatus(wiimote);
                         reloadWiimotes = 1;
                         break;
+
                     default:
                         break;
                 }

@@ -39,6 +39,7 @@
 
 #import <arpa/inet.h>				/* htons() */
 #import <IOBluetooth/objc/IOBluetoothDevice.h>
+#import <IOBluetooth/objc/IOBluetoothHostController.h>
 #import <IOBluetooth/objc/IOBluetoothDeviceInquiry.h>
 #import <IOBluetooth/objc/IOBluetoothL2CAPChannel.h>
 
@@ -61,7 +62,7 @@
 - (void) setDiscovering:(BOOL) flag;
 - (void) setWiimoteStruct:(wiimote**) wiimote_struct;
 - (int) getFoundWiimotes;
-- (IOReturn) start:(unsigned int) timeout maxWiimotes:(unsigned int) wiimotes;
+- (IOReturn) start:(unsigned int) timeout maxWiimotes:(unsigned int) wiimotesNum;
 - (IOReturn) stop;
 - (IOReturn) close;
 - (void) retrieveWiimoteInfo:(IOBluetoothDevice*) device;
@@ -78,6 +79,7 @@
 	
 	// Reference to the relative wiimote struct (used only to complete handshaking)
 	wiimote* _wm;
+	BOOL isReading;
 }
 
 - (IOBluetoothL2CAPChannel *) openL2CAPChannelWithPSM:(BluetoothL2CAPPSM) psm device:(IOBluetoothDevice*) device delegate:(id) delegate;
@@ -85,6 +87,8 @@
 - (void) l2capChannelData:(IOBluetoothL2CAPChannel*) channel data:(byte *) data length:(NSUInteger) length;
 - (byte*) getNextMsg;
 - (void) disconnected:(IOBluetoothUserNotification*) notification fromDevice:(IOBluetoothDevice*) device;
+- (BOOL) isReading;
+- (void) setReading:(BOOL) flag;
 @end
 
 #endif /* IO_MAC_H */

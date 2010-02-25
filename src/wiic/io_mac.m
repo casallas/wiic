@@ -45,13 +45,14 @@ static int max_num_wiimotes = 0;
 {
 	self = [super init];
 	foundWiimotes = 0;
+	isDiscovering = NO;
 	if (self != nil) { 
 		/* 
 		 * Calling IOBluetoothLocalDeviceAvailable has two advantages:
 		 * 1. it sets up a event source in the run loop (bug for C version of the bluetooth api)
 		 * 2. it checks for the availability of the BT hardware
 		 */
-		if (!IOBluetoothLocalDeviceAvailable ())
+		if (![IOBluetoothHostController defaultController])
 		{
 			[self release];
 			self = nil;
@@ -72,7 +73,7 @@ static int max_num_wiimotes = 0;
 	return isDiscovering;
 }
 
-- (void) setIsDiscovering:(BOOL) flag
+- (void) setDiscovering:(BOOL) flag
 {
 	isDiscovering = flag;
 }
@@ -87,9 +88,9 @@ static int max_num_wiimotes = 0;
 	return foundWiimotes;
 }
 
-- (IOReturn) start:(unsigned int) timeout maxWiimotes:(unsigned int) wiimotes
+- (IOReturn) start:(unsigned int) timeout maxWiimotes:(unsigned int) wiimotesNum
 {
-	if (!IOBluetoothLocalDeviceAvailable()) {
+	if (![IOBluetoothHostController defaultController]) {
 		WIIUSE_ERROR("Unable to find any bluetooth receiver on your host.");
 		return kIOReturnNotAttached;
 	}
@@ -101,7 +102,7 @@ static int max_num_wiimotes = 0;
 	}
 	
 	[self close];
-	maxWiimotes = wiimotes;
+	maxWiimotes = wiimotesNum;
 	foundWiimotes = 0;
 
 	inquiry = [IOBluetoothDeviceInquiry inquiryWithDelegate:self];
@@ -117,7 +118,7 @@ static int max_num_wiimotes = 0;
 	if (status == kIOReturnSuccess) {
 		[inquiry retain];
 	} else {
-		[inquiry close];
+		[self close];
 		WIIUSE_ERROR("Unable to search for bluetooth devices.");
 	}
 	
@@ -156,7 +157,7 @@ static int max_num_wiimotes = 0;
 
 - (void) deviceInquiryStarted:(IOBluetoothDeviceInquiry*) sender
 {
-	[self setIsDiscovering:YES];
+	[self setDiscovering:YES];
 }
 
 - (void) deviceInquiryDeviceFound:(IOBluetoothDeviceInquiry *) sender device:(IOBluetoothDevice *) device
@@ -170,20 +171,18 @@ static int max_num_wiimotes = 0;
 - (void) deviceInquiryComplete:(IOBluetoothDeviceInquiry*) sender error:(IOReturn) error aborted:(BOOL) aborted
 {	
 	// The inquiry has completed, we can now process what we have found
-	[self setIsDiscovering:NO];
+	[self setDiscovering:NO];
 
 	// We stop the search because of errors
 	if ((error != kIOReturnSuccess) && !aborted) {
 		foundWiimotes = 0;
-		[inquiry close];
-		CFRunLoopStop(CFRunLoopGetCurrent());
+		[self close];
 		WIIUSE_ERROR("Search not completed, because of unexpected errors. This error can be due to a short search timeout.");
 		return;
 	}
 	
 	foundWiimotes = [[inquiry foundDevices] count];
 	WIIUSE_INFO("Found %i Wiimote device(s).", foundWiimotes);
-	CFRunLoopStop(CFRunLoopGetCurrent());
 }
 
 @end
@@ -196,6 +195,7 @@ static int max_num_wiimotes = 0;
 	self = [super init];
 	receivedMsg = [[NSData alloc] init];
 	_wm = 0;
+	isReading = NO;
 	return self;
 }
 
@@ -214,7 +214,17 @@ static int max_num_wiimotes = 0;
 	if(!receivedMsg)
 		return 0;
 
-	return [receivedMsg bytes];
+	return (byte*)[receivedMsg bytes];
+}
+
+- (BOOL) isReading
+{
+	return isReading;
+}
+
+- (void) setReading:(BOOL) flag
+{
+	isReading = flag;
 }
 
 - (IOBluetoothL2CAPChannel*) openL2CAPChannelWithPSM:(BluetoothL2CAPPSM) psm device:(IOBluetoothDevice*) device delegate:(id) delegate
@@ -241,7 +251,7 @@ static int max_num_wiimotes = 0;
 	outCh = [self openL2CAPChannelWithPSM:WM_OUTPUT_CHANNEL device:device delegate:self];
 	if (!outCh) {
 		WIIUSE_ERROR("Unable to open L2CAP output channel (id %i).", wm->unid);
-		[self closeConnection];
+		[device closeConnection];
 		return kIOReturnNotOpen;
 	}
 	wm->outputCh = [[outCh retain] getL2CAPChannelRef];
@@ -250,7 +260,7 @@ static int max_num_wiimotes = 0;
 	inCh = [self openL2CAPChannelWithPSM:WM_INPUT_CHANNEL device:device delegate:self];
 	if (!inCh) {
 		WIIUSE_ERROR("Unable to open L2CAP input channel (id %i).", wm->unid);
-		[self closeConnection];
+		[device closeConnection];
 		return kIOReturnNotOpen;
 	}
 	wm->inputCh = [[inCh retain] getL2CAPChannelRef];
@@ -259,7 +269,7 @@ static int max_num_wiimotes = 0;
 	IOBluetoothUserNotification* disconnectNotification = [device registerForDisconnectNotification:self selector:@selector(disconnected:fromDevice:)];
 	if(!disconnectNotification) {
 		WIIUSE_ERROR("Unable to register disconnection handler (id %i).", wm->unid);
-		[self closeConnection];
+		[device closeConnection];
 		return kIOReturnNotOpen;
 	}
 	
@@ -273,9 +283,7 @@ static int max_num_wiimotes = 0;
 #pragma mark IOBluetoothL2CAPChannel delegates
 - (void) disconnected:(IOBluetoothUserNotification*) notification fromDevice:(IOBluetoothDevice*) device
 {
-	// If the device disconnected, we also close this part of the connection
-	//wiiuse_disconnect(_wm) ;
-
+	[self setReading:NO];
 	// The wiimote_t struct must be re-initialized due to the disconnection
 	wiiuse_disconnected(_wm) ;
 }
@@ -288,7 +296,7 @@ static int max_num_wiimotes = 0;
 
 	// This is done in case the output channel woke up this handler
 	if(!data) {
-	    CFRunLoopStop(CFRunLoopGetCurrent());
+	    [self setReading:NO];
 		[pool release];
 		return;
 	}
@@ -303,7 +311,7 @@ static int max_num_wiimotes = 0;
 	receivedMsg = [[NSData dataWithBytes:data length:sizeof(data)] retain];
 	
     // Stop the main loop after reading
-    CFRunLoopStop(CFRunLoopGetCurrent());
+    [self setReading:NO];
 	[pool release];
 }
 
@@ -357,7 +365,9 @@ int wiiuse_find(struct wiimote_t** wm, int max_wiimotes, int timeout)
 	[search setWiimoteStruct:wm];
 	[search start:timeout maxWiimotes:max_wiimotes];
 	
-	CFRunLoopRun();
+	NSRunLoop *theRL = [NSRunLoop currentRunLoop];
+	while ([search isDiscovering] && [theRL runMode:NSDefaultRunLoopMode beforeDate:[NSDate distantFuture]]);
+	
 	found_wiimotes = [search getFoundWiimotes];
 
 	[search release];
@@ -416,7 +426,7 @@ void wiiuse_disconnect(struct wiimote_t* wm)
 	if(wm->device) {
 		IOBluetoothDevice* device = [IOBluetoothDevice withDeviceRef:wm->device];
 		error = [device closeConnection];
-		[device setDelegate:nil];
+
 		if(error != kIOReturnSuccess) 
 			WIIUSE_ERROR("Unable to close the device connection (id %i).", wm->unid);			
 		usleep(10000);
@@ -527,15 +537,19 @@ int wiiuse_io_read(struct wiimote_t* wm)
             return 0;
 
 	NSAutoreleasePool *pool = [[NSAutoreleasePool alloc] init];
-	
+
+	WiiConnect* deviceHandler = (WiiConnect*)(wm->connectionHandler);
+		
     // Run the main loop to get bt data
-    CFRunLoopRun();
+    [deviceHandler setReading:YES];
+	NSRunLoop *theRL = [NSRunLoop currentRunLoop];
+	while ([deviceHandler isReading] && [theRL runMode:NSDefaultRunLoopMode beforeDate:[NSDate distantFuture]]);
+	//FIXME This must be solved, because it is blocking!!!! (Use a thread with another RunLoop)
 
 	if(!(wm->connectionHandler)) {
 		WIIUSE_ERROR("Unable to find the connection handler (id %i).", wm->unid);
 		return 0;
 	}
-	WiiConnect* deviceHandler = (WiiConnect*)(wm->connectionHandler);
 	byte* buffer = [deviceHandler getNextMsg];
 
 	if(!buffer)

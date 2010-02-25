@@ -1,7 +1,13 @@
 /*
  *	wiiuse
  *
- *	Written By:
+ *	This file is part of WiiC, written by:
+ *		Gabriele Randelli
+ *		Email: randelli@dis.uniroma1.it
+ *
+ *	Copyright 2010
+ *
+ *	This file is based on Wiiuse, written By:
  *		Michael Laforest	< para >
  *		Email: < thepara (--AT--) g m a i l [--DOT--] com >
  *
@@ -36,11 +42,7 @@
 
 #include <stdio.h>
 #include <stdlib.h>
-
-#ifndef WIN32
-	#include <unistd.h>
-#endif
-
+#include <unistd.h>
 #include "wiic.h"
 
 
@@ -338,11 +340,7 @@ int main(int argc, char** argv) {
 	 */
 	wiiuse_set_leds(wiimotes[0], WIIMOTE_LED_1);
 	wiiuse_rumble(wiimotes[0], 1);
-	#ifndef WIN32
-		usleep(200000);
-	#else
-		Sleep(200);
-	#endif
+	usleep(200000);
 	wiiuse_rumble(wiimotes[0], 0);
 
 	/*
