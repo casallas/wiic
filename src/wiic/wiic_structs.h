@@ -287,6 +287,7 @@ typedef struct motion_plus_t {
 	struct ang3f_t angle_rate_gyro;		/**< current gyro angle rate */
 	struct orient_t orient;				/**< current orientation on each axis using Motion Plus gyroscopes */
 	byte acc_mode;						/**< Fast/slow rotation mode for roll, pitch and yaw (0 if rotating fast, 1 if slow or still) */
+	int raw_gyro_threshold;			/**< threshold for gyroscopes to generate an event */
 } motion_plus_t;
 
 
@@ -333,6 +334,10 @@ typedef struct wiimote_state_t {
 	struct vec3b_t exp_accel;
 	float exp_r_shoulder;
 	float exp_l_shoulder;
+	
+	/* motion_plus_t */
+	byte mp_acc_mode;
+	struct ang3s_t mp_raw_gyro;
 
 	/* ir_t */
 	int ir_ax;

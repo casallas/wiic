@@ -39,14 +39,9 @@
 
 #include <stdio.h>
 
-#ifndef WIN32
-	#include <sys/time.h>
-	#include <unistd.h>
-	#include <errno.h>
-#else
-	#include <winsock2.h>
-#endif
-
+#include <sys/time.h>
+#include <unistd.h>
+#include <errno.h>
 #include <sys/types.h>
 #include <stdlib.h>
 #include <math.h>
@@ -577,13 +572,6 @@ static void event_status(struct wiimote_t* wm, byte* msg) {
 		exp_changed = 1;
 	}
 
-	#ifdef WIN32
-	if (!attachment) {
-		WIIUSE_DEBUG("Setting timeout to normal %i ms.", wm->normal_timeout);
-		wm->timeout = wm->normal_timeout;
-	}
-	#endif
-
 	/*
 	 *	From now on the remote will only send status packets.
 	 *	We need to send a WIIMOTE_CMD_REPORT_TYPE packet to
@@ -596,7 +584,7 @@ static void event_status(struct wiimote_t* wm, byte* msg) {
 		 */
 		WIIMOTE_DISABLE_STATE(wm, WIIMOTE_STATE_IR);
 		wiiuse_set_ir(wm, 1);
-	} else
+	} else 
 		wiiuse_set_report_type(wm);
 }
 
@@ -655,12 +643,6 @@ void handshake_expansion(struct wiimote_t* wm, byte* data, unsigned short len) {
 
 		if (WIIMOTE_IS_SET(wm, WIIMOTE_STATE_EXP))
 			disable_expansion(wm);
-
-		/* increase the timeout until the handshake completes */
-		#ifdef WIN32
-		WIIUSE_DEBUG("Setting timeout to expansion %i ms.", wm->exp_timeout);
-		wm->timeout = wm->exp_timeout;
-		#endif
 
 		wiiuse_write_data(wm, WM_EXP_MEM_ENABLE, &buf, 1);
 
@@ -802,6 +784,13 @@ static void save_state(struct wiimote_t* wm) {
 			wm->lstate.exp_r_shoulder = wm->exp.gh3.whammy_bar;
 			wm->lstate.exp_btns = wm->exp.gh3.btns;
 			break;
+			
+		case EXP_MOTION_PLUS:
+			wm->lstate.mp_acc_mode = wm->exp.mp.acc_mode;
+			wm->lstate.mp_raw_gyro.r = wm->exp.mp.raw_gyro.r;
+			wm->lstate.mp_raw_gyro.p = wm->exp.mp.raw_gyro.p;
+			wm->lstate.mp_raw_gyro.y = wm->exp.mp.raw_gyro.y;
+			break;
 
 		case EXP_NONE:
 			break;
@@ -851,6 +840,23 @@ static int state_changed(struct wiimote_t* wm) {
 					}															\
 				} while (0)
 
+	#define CROSS_THRESH_RATE(last, now, thresh)								\
+				do {															\
+					if (WIIMOTE_IS_FLAG_SET(wm, WIIUSE_ORIENT_THRESH)) {		\
+						if ((diff_f(last.r, now.r) >= thresh) ||				\
+							(diff_f(last.p, now.p) >= thresh) ||				\
+							(diff_f(last.y, now.y) >= thresh))					\
+						{														\
+							last = now;											\
+							return 1;											\
+						}														\
+					} else {													\
+						if (last.r != now.r)		return 1;					\
+						if (last.p != now.p)		return 1;					\
+						if (last.y != now.y)		return 1;					\
+					}															\
+				} while (0)
+				
 	/* ir */
 	if (WIIUSE_USING_IR(wm)) {
 		STATE_CHANGED(wm->lstate.ir_ax, wm->ir.ax);
@@ -896,6 +902,15 @@ static int state_changed(struct wiimote_t* wm) {
 			STATE_CHANGED(wm->lstate.exp_ljs_mag, wm->exp.gh3.js.mag);
 			STATE_CHANGED(wm->lstate.exp_r_shoulder, wm->exp.gh3.whammy_bar);
 			STATE_CHANGED(wm->lstate.exp_btns, wm->exp.gh3.btns);
+			break;
+		}
+		case EXP_MOTION_PLUS:
+		{
+			/* acceleration mode */
+			STATE_CHANGED(wm->lstate.mp_acc_mode, wm->exp.mp.acc_mode);
+
+			/* raw gyro rate */
+ 			CROSS_THRESH_RATE(wm->lstate.mp_raw_gyro, wm->exp.mp.raw_gyro, wm->exp.mp.raw_gyro_threshold);
 			break;
 		}
 		case EXP_NONE:

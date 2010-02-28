@@ -108,7 +108,7 @@ void motion_plus_event(struct motion_plus_t* mp, byte* msg)
 		!(mp->cal_gyro.r) && !(mp->cal_gyro.p) && !(mp->cal_gyro.y)) {
 		wiic_calibrate_motion_plus(mp);	
 	}
-	
+				
 	// Calculate angular rates in deg/sec and performs some simple filtering
 	calculate_gyro_rates(mp);
 }
@@ -145,6 +145,7 @@ int motion_plus_handshake(struct wiimote_t* wm, byte* data, unsigned short len)
 		wm->exp.mp.orient.roll = 0.0;
 		wm->exp.mp.orient.pitch = 0.0;
 		wm->exp.mp.orient.yaw = 0.0;
+		wm->exp.mp.raw_gyro_threshold = 10;
 	}
 	else {
 		WIIUSE_ERROR("Unable to activate Motion Plus");

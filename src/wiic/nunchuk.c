@@ -114,10 +114,6 @@ int nunchuk_handshake(struct wiimote_t* wm, struct nunchuk_t* nc, byte* data, un
 	/* handshake done */
 	wm->exp.type = EXP_NUNCHUK;
 
-	#ifdef WIN32
-	wm->timeout = WIIMOTE_DEFAULT_TIMEOUT;
-	#endif
-
 	return 1;
 }
 

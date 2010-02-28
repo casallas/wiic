@@ -371,10 +371,6 @@ void HandleStatus(CWiimote &wm)
     printf("ir: %i\n", wm.isUsingIR());
     printf("leds: %i %i %i %i\n", wm.isLEDSet(1), wm.isLEDSet(2), wm.isLEDSet(3), wm.isLEDSet(4));
     printf("battery: %f %%\n", wm.GetBatteryLevel());
-
-	printf("\nPress PLUS (MINUS) to enable (disable) accelerometers\n");
-	printf("Press RIGHT (LEFT) to enable (disable) Motion Plus (gyroscopes)\n");
-	printf("Press UP (DOWN) to enable (disable) IR camera (requires some IR led)\n");
 }
 
 void HandleDisconnect(CWiimote &wm)
@@ -414,21 +410,20 @@ int main(int argc, char** argv)
     int numFound;
     int index;
 
-    printf("Searching for wiimotes... Turn them on!\n");
+    cout << "Searching for wiimotes... Turn them on!" << endl;
 
     //Find the wiimote
     numFound = wii.Find(5);
     
     // Search for up to five seconds;
 
-    printf("Found %d wiimotes\n", numFound);
-
-    printf("Connecting to wiimotes...\n");
+    cout << "Found " << numFound << " wiimotes" << endl;
+    cout << "Connecting to wiimotes..." << endl;
 
     // Connect to the wiimote
     std::vector<CWiimote>& wiimotes = wii.Connect();
 
-    printf("Connected to %u wiimotes\n", (unsigned int)wiimotes.size());
+	cout << "Connected to " << (unsigned int)wiimotes.size() << " wiimotes" << endl;
 
     // Setup the wiimotes
     for(index = 0, i = wiimotes.begin(); i != wiimotes.end(); ++i, ++index)
@@ -444,6 +439,10 @@ int main(int argc, char** argv)
         usleep(200000);
         wiimote.SetRumbleMode(CWiimote::OFF);
     }
+
+	cout << "\nPress PLUS (MINUS) to enable (disable) Motion Sensing Report (only accelerometers)" << endl;
+	cout << "Press RIGHT (LEFT) to enable (disable) Motion Plus (requires Motion Sensing enabled)" << endl;
+	cout << "Press UP (DOWN) to enable (disable) IR camera (requires some IR led)" << endl;
 
     do
     {

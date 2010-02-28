@@ -686,16 +686,12 @@ CWii::CWii()
 {
     mpWiimoteArraySize = 4;
     mpWiimoteArray = wiiuse_init(mpWiimoteArraySize);
-    cout << "wiiusecpp / pywii by Jim Thomas (jt@missioncognition.net)" << endl;
-    cout << "Download from http://missioncognition.net/" << endl;
 }
 
 CWii::CWii(int MaxNumWiimotes)
 {
     mpWiimoteArraySize = MaxNumWiimotes;
     mpWiimoteArray = wiiuse_init(mpWiimoteArraySize);
-    cout << "wiiusecpp / pywii by Jim Thomas (jt@missioncognition.net)" << endl;
-    cout << "Download from http://missioncognition.net/" << endl;
 }
 
 CWii::~CWii()
