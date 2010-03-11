@@ -40,12 +40,7 @@
 
 #include <stdio.h>
 #include <stdlib.h>
-
-#ifndef WIN32
-	#include <unistd.h>
-#else
-	#include <Winsock2.h>
-#endif
+#include <unistd.h>
 
 #include "definitions.h"
 #include "wiic_internal.h"
