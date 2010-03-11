@@ -367,7 +367,7 @@ int main(int argc, char** argv) {
 	 *	when the wiimote has things to report.
 	 */
 	while (!exiting) {
-		if (wiiuse_poll(wiimotes, MAX_WIIMOTES)) {
+		if (wiiuse_poll(wiimotes, connected)) {
 			/*
 			 *	This happens if something happened on any wiimote.
 			 *	So go through each one and check if anything happened.
