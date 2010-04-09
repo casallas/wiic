@@ -37,6 +37,8 @@
 #import <stdlib.h>
 #import <unistd.h>
 
+#define BLUETOOTH_VERSION_USE_CURRENT
+
 #import <arpa/inet.h>				/* htons() */
 #import <IOBluetooth/objc/IOBluetoothDevice.h>
 #import <IOBluetooth/objc/IOBluetoothHostController.h>
