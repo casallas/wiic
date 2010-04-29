@@ -264,7 +264,7 @@ void propagate_event(struct wiimote_t* wm, byte event, byte* msg) {
 			wm->accel.x = msg[2];
 			wm->accel.y = msg[3];
 			wm->accel.z = msg[4];
-
+			
 			/* calculate the remote orientation */
 			calculate_orientation(&wm->accel_calib, &wm->accel, &wm->orient, WIIMOTE_IS_FLAG_SET(wm, WIIUSE_SMOOTHING));
 
@@ -397,7 +397,7 @@ void wiiuse_pressed_buttons(struct wiimote_t* wm, byte* msg) {
 	 * report will be sent.
 	 */
 	wm->btns_held = (now & wm->btns);
-
+	
 	/* were pressed or were held & not pressed now, then released */
 	wm->btns_released = ((wm->btns | wm->btns_held) & ~now);
 
