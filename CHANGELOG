@@ -4,8 +4,20 @@
 -
 ---------------------------
 
-http://www.dis.uniroma1.i/~randelli/wiic/
+http://wiic.sf.net
 
+
+---------------------------
+v0.40 -- 17 May 2010
+---------------------------
+
+	Fixed:
+		- [Mac] Fix for IOBluetoothHostController 
+		- [Mac] wiiuse_poll is now non-blocking on Mac platforms too
+
+	Changed:
+		- [Linux/Mac] Removed old Windows stuff
+		- [Mac] Changed environment variable
 
 ---------------------------
 v0.31 -- 25 Feb 2010

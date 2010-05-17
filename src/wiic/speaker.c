@@ -50,11 +50,7 @@ void wiic_set_speaker(struct wiimote_t* wm, int status)
 	wiiuse_set_report_type(wm);
 	
 	/* wait for the wiimote to catch up */
-	#ifndef WIN32
-		usleep(50000);
-	#else
-		Sleep(50);
-	#endif
+	usleep(50000);
 
 	WIIUSE_DEBUG("Enabled speakers for wiimote id %i.", wm->unid);
 }

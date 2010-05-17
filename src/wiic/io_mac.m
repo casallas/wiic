@@ -30,7 +30,7 @@
  *	@file
  *	@brief Handles device I/O for Mac.
  */
-#ifdef MACOSX
+#ifdef __APPLE__
 
 #import "io_mac.h"
 
@@ -197,6 +197,7 @@ static int max_num_wiimotes = 0;
 	msgLength = 0;
 	_wm = 0;
 	isReading = NO;
+	timeout = NO;
 	return self;
 }
 
@@ -227,6 +228,45 @@ static int max_num_wiimotes = 0;
 {
 	isReading = flag;
 }
+
+- (void) timeout:(NSTimer *)timer 
+{
+	timeout = YES;
+	printf("sto staccando %d\n",timeout);
+}
+
+- (BOOL) isTimeout
+{
+	return timeout;
+}
+
+- (void) setTimeout:(BOOL) flag
+{
+	timeout = flag;
+}
+
+- (void) startTimerThread
+{
+	NSAutoreleasePool* pool = [[NSAutoreleasePool alloc] init];
+	NSRunLoop* runLoop = [NSRunLoop currentRunLoop];
+	
+	// Timer 
+	sleep(1);
+	[self setTimeout:YES];
+	
+	// We also have to stop the loop of the main thread
+	[self performSelectorOnMainThread:@selector(wakeUpMainThreadRunloop:) withObject:nil waitUntilDone:NO]; 
+	
+	[pool release];
+}
+
+- (void) wakeUpMainThreadRunloop:(id)arg
+{
+    // This method is executed on main thread!
+    // It doesn't need to do anything actually, just having it run will
+    // make sure the main thread stops running the runloop
+}
+
 
 - (IOBluetoothL2CAPChannel*) openL2CAPChannelWithPSM:(BluetoothL2CAPPSM) psm device:(IOBluetoothDevice*) device delegate:(id) delegate
 {
@@ -298,6 +338,7 @@ static int max_num_wiimotes = 0;
 	if(!data) {
 	    [self setReading:NO];
 		[pool release];
+		length = 0;
 		return;
 	}
 
@@ -311,7 +352,7 @@ static int max_num_wiimotes = 0;
 	receivedMsg = [[NSData dataWithBytes:data length:length] retain];
 	msgLength = length;
 	
-    // Stop the main loop after reading
+    // This is done when a message is successfully received. Stop the main loop after reading
     [self setReading:NO];
 	[pool release];
 }
@@ -545,13 +586,23 @@ int wiiuse_io_read(struct wiimote_t* wm)
 	NSAutoreleasePool *pool = [[NSAutoreleasePool alloc] init];
 
 	WiiConnect* deviceHandler = (WiiConnect*)(wm->connectionHandler);
-		
-    // Run the main loop to get bt data
-    [deviceHandler setReading:YES];
-	NSRunLoop *theRL = [NSRunLoop currentRunLoop];
-	while ([deviceHandler isReading] && [theRL runMode:NSDefaultRunLoopMode beforeDate:[NSDate distantFuture]]);
-	//FIXME This must be solved, because it is blocking!!!! (Use a thread with another RunLoop)
 
+    // Run the main loop to get bt data
+	[deviceHandler setReading:YES];
+	[deviceHandler setTimeout:NO];
+
+	// We start the thread which manages the timeout to implement a non-blocking read 
+	[NSThread detachNewThreadSelector:@selector(startTimerThread) toTarget:deviceHandler withObject:nil];
+	
+	NSRunLoop *theRL = [NSRunLoop currentRunLoop];
+	// Two possible events: we receive and incoming message or there is a timeour
+	while([deviceHandler isReading] && ![deviceHandler isTimeout])
+		[theRL runMode:NSDefaultRunLoopMode beforeDate:[NSDate distantFuture]];
+
+	// In this case we have no incoming data (TIMEOUT)
+	if([deviceHandler isTimeout])
+		return 0;
+	
 	if(!(wm->connectionHandler)) {
 		WIIUSE_ERROR("Unable to find the connection handler (id %i).", wm->unid);
 		return 0;

@@ -81,7 +81,7 @@ static int state_changed(struct wiimote_t* wm);
 int wiiuse_poll(struct wiimote_t** wm, int wiimotes) {
 	int evnt = 0;
 
-	#if MACOSX
+	#if __APPLE__
 		/*
 		 *	MACOSX
 		 */

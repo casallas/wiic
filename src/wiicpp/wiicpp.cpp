@@ -756,16 +756,6 @@ std::vector<CWiimote>& CWii::GetWiimotes(int Refresh)
     return mpWiimotesVector;
 }
 
-void CWii::SetBluetoothStack(CWii::BTStacks Type)
-{
-    wiiuse_set_bluetooth_stack((struct wiimote_t**) mpWiimoteArray, mpWiimoteArraySize, (win_bt_stack_t) Type);
-}
-
-void CWii::SetTimeout(int NormalTimeout, int ExpTimeout)
-{
-    wiiuse_set_timeout((struct wiimote_t**) mpWiimoteArray, mpWiimoteArraySize, NormalTimeout, ExpTimeout);
-}
-
 int CWii::Find(int Timeout)
 {
     return wiiuse_find((struct wiimote_t**) mpWiimoteArray, mpWiimoteArraySize, Timeout);

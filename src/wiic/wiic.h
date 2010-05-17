@@ -41,14 +41,11 @@
 #ifndef WIIC_H_INCLUDED
 #define WIIC_H_INCLUDED
 
-#ifdef _WIN32
-	/* windows */
-	#include <windows.h>
-#elif MACOSX
+#ifdef __APPLE__
 	/* mac */
 	#include <CoreFoundation/CoreFoundation.h>
 	#include <IOBluetooth/IOBluetoothUserLib.h>
-#else
+#elif
 	/* nix */
 	#include <bluetooth/bluetooth.h>
 #endif
@@ -65,28 +62,14 @@
  */
 #define MAX_PAYLOAD			32
 
-/*
- *	This is left over from an old hack, but it may actually
- *	be a useful feature to keep so it wasn't removed.
- */
-#ifdef WIN32
-	#define WIIMOTE_DEFAULT_TIMEOUT		10
-	#define WIIMOTE_EXP_TIMEOUT			10
-#endif
-
 /*****************************************
  *
  *	Include API specific stuff
  *
  *****************************************/
 
-#ifdef _WIN32
-	#define WIIUSE_EXPORT_DECL __declspec(dllexport)
-	#define WIIUSE_IMPORT_DECL __declspec(dllimport)
-#else
-	#define WIIUSE_EXPORT_DECL
-	#define WIIUSE_IMPORT_DECL
-#endif
+#define WIIUSE_EXPORT_DECL
+#define WIIUSE_IMPORT_DECL
 
 #ifdef WIIUSE_COMPILE_LIB
 	#define WIIUSE_EXPORT WIIUSE_EXPORT_DECL

@@ -466,12 +466,6 @@ private:
 class CWii
 {
 public:
-    enum BTStacks
-    {
-        STACK_UNKNOWN = WIIUSE_STACK_UNKNOWN,
-        STACK_MS = WIIUSE_STACK_MS,
-        STACK_BLUESOLEIL = WIIUSE_STACK_BLUESOLEIL
-    };
 
     CWii();
     CWii(int MaxNumCWiimotes);
@@ -483,9 +477,6 @@ public:
 
     CWiimote& GetByID(int ID, int Refresh=1);
     std::vector<CWiimote>& GetWiimotes(int Refresh=1);
-
-    void SetBluetoothStack(BTStacks Type);
-    void SetTimeout(int NormalTimeout, int ExpTimeout);
 
     int Find(int timeout);
     std::vector<CWiimote>& Connect();

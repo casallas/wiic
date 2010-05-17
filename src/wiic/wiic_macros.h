@@ -56,6 +56,7 @@
 #define WIIMOTE_STATE_EXP_HANDSHAKE			0x04000	/* Added to handle handshaking concurrency between Motion Plus and other expansion types */
 #define WIIMOTE_STATE_EXP_FAILED			0x08000
 #define WIIMOTE_STATE_MOTION_PLUS			0x10000 /**< MotionPlus state flag, set when the MotionPlus is used */	
+#define WIIMOTE_STATE_SPEAKER_MUTE			0x20000 /**< Speaker Mute */	
 
 #define WIIMOTE_INIT_STATES					(WIIMOTE_STATE_IR_SENS_LVL3)
 

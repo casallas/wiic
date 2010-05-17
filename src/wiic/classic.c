@@ -38,10 +38,6 @@
 #include <stdlib.h>
 #include <math.h>
 
-#ifdef WIN32
-	#include <Winsock2.h>
-#endif
-
 #include "definitions.h"
 #include "wiic_internal.h"
 #include "dynamics.h"
@@ -114,10 +110,6 @@ int classic_ctrl_handshake(struct wiimote_t* wm, struct classic_ctrl_t* cc, byte
 
 	/* handshake done */
 	wm->exp.type = EXP_CLASSIC;
-
-	#ifdef WIN32
-	wm->timeout = WIIMOTE_DEFAULT_TIMEOUT;
-	#endif
 
 	return 1;
 }

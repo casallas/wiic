@@ -38,7 +38,6 @@
 #define DEFINITIONS_H_INCLUDED
 
 /* this is WiiC - used to distinguish from third party programs using wiic.h */
-#include "os.h"
 
 #define WIIMOTE_PI			3.14159265f
 
@@ -52,16 +51,7 @@
 #define WIIUSE_INFO(fmt, ...)		fprintf(stderr, "[INFO] " fmt "\n", ##__VA_ARGS__)
 
 #ifdef WITH_WIIUSE_DEBUG
-	#ifdef WIN32
-		#define WIIUSE_DEBUG(fmt, ...)		do {																				\
-												char* file = __FILE__;															\
-												int i = strlen(file) - 1;														\
-												for (; i && (file[i] != '\\'); --i);											\
-												fprintf(stderr, "[DEBUG] %s:%i: " fmt "\n", file+i+1, __LINE__, ##__VA_ARGS__);	\
-											} while (0)
-	#else
-		#define WIIUSE_DEBUG(fmt, ...)	fprintf(stderr, "[DEBUG] " __FILE__ ":%i: " fmt "\n", __LINE__, ##__VA_ARGS__)
-	#endif
+	#define WIIUSE_DEBUG(fmt, ...)	fprintf(stderr, "[DEBUG] " __FILE__ ":%i: " fmt "\n", __LINE__, ##__VA_ARGS__)
 #else
 	#define WIIUSE_DEBUG(fmt, ...)
 #endif

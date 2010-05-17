@@ -37,7 +37,7 @@
 #import <stdlib.h>
 #import <unistd.h>
 
-#define BLUETOOTH_VERSION_USE_CURRENT
+#define BLUETOOTH_VERSION_USE_CURRENT 
 
 #import <arpa/inet.h>				/* htons() */
 #import <IOBluetooth/objc/IOBluetoothDevice.h>
@@ -83,6 +83,7 @@
 	// Reference to the relative wiimote struct (used only to complete handshaking)
 	wiimote* _wm;
 	BOOL isReading;
+	BOOL timeout;
 }
 
 - (IOBluetoothL2CAPChannel *) openL2CAPChannelWithPSM:(BluetoothL2CAPPSM) psm device:(IOBluetoothDevice*) device delegate:(id) delegate;
@@ -93,6 +94,11 @@
 - (void) disconnected:(IOBluetoothUserNotification*) notification fromDevice:(IOBluetoothDevice*) device;
 - (BOOL) isReading;
 - (void) setReading:(BOOL) flag;
+- (void) timeout:(NSTimer *) timer; 
+- (BOOL) isTimeout;
+- (void) setTimeout:(BOOL) flag;
+- (void) startTimerThread;
+- (void) wakeUpMainThreadRunloop:(id)arg;
 @end
 
 #endif /* IO_MAC_H */

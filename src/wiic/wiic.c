@@ -121,20 +121,14 @@ struct wiimote_t** wiiuse_init(int wiimotes) {
 
 		wm[i]->unid = i+1;
 
-		#ifdef WIN32
-			wm[i]->dev_handle = 0;
-			wm[i]->stack = WIIUSE_STACK_UNKNOWN;
-			wm[i]->normal_timeout = WIIMOTE_DEFAULT_TIMEOUT;
-			wm[i]->exp_timeout = WIIMOTE_EXP_TIMEOUT;
-			wm[i]->timeout = wm[i]->normal_timeout;
-		#elif MACOSX
+		#ifdef __APPLE__
 			wm[i]->device = 0;
 			wm[i]->address = 0;
 			wm[i]->inputCh = 0;
 			wm[i]->outputCh = 0;
 			wm[i]->disconnectionRef = 0;
 			wm[i]->connectionHandler = 0;
-		#else
+		#elif LINUX
 			wm[i]->bdaddr = *BDADDR_ANY;
 			wm[i]->out_sock = -1;
 			wm[i]->in_sock = -1;	
@@ -174,7 +168,7 @@ void wiiuse_disconnected(struct wiimote_t* wm) {
 	WIIMOTE_DISABLE_STATE(wm, WIIMOTE_STATE_CONNECTED);
 
 	/* reset a bunch of stuff */
-	#if MACOSX // MacOSX
+	#if __APPLE__ // MacOSX
 		if(wm->inputCh) {
 			IOBluetoothObjectRelease(wm->inputCh);
 			wm->inputCh = 0;
@@ -571,12 +565,8 @@ int wiiuse_send(struct wiimote_t* wm, byte report_type, byte* msg, int len) {
 	byte buf[32];		/* no payload is better than this */
 	int rumble = 0;
 
-	#ifndef WIN32
-		buf[0] = WM_SET_REPORT | WM_BT_OUTPUT;
-		buf[1] = report_type;
-	#else
-		buf[0] = report_type;
-	#endif
+	buf[0] = WM_SET_REPORT | WM_BT_OUTPUT;
+	buf[1] = report_type;
 
 	switch (report_type) {
 		case WM_CMD_LED:
@@ -593,39 +583,23 @@ int wiiuse_send(struct wiimote_t* wm, byte report_type, byte* msg, int len) {
 			break;
 	}
 
-	#ifndef WIN32
-		memcpy(buf+2, msg, len);
-		if (rumble) 
-			buf[2] |= 0x01;
-		else 
-			buf[2] &= 0xFE;	// Fix for Wiiuse bug
-	#else
-		memcpy(buf+1, msg, len);
-		if (rumble)
-			buf[1] |= 0x01;
-		else
-			buf[1] ^= 0x01;	// Fix for Wiiuse bug
-	#endif
+	memcpy(buf+2, msg, len);
+	if (rumble) 
+		buf[2] |= 0x01;
+	else 
+		buf[2] &= 0xFE;	// Fix for Wiiuse bug
 
 	#ifdef WITH_WIIUSE_DEBUG
 	{
 		int x = 2;
 		printf("[DEBUG] (id %i) SEND: (%x) %.2x ", wm->unid, buf[0], buf[1]);
-		#ifndef WIN32
 		for (; x < len+2; ++x)
-		#else
-		for (; x < len+1; ++x)
-		#endif
 			printf("%.2x ", buf[x]);
 		printf("\n");
 	}
 	#endif
 
-	#ifndef WIN32
-		return wiiuse_io_write(wm, buf, len+2);
-	#else
-		return wiiuse_io_write(wm, buf, len+1);
-	#endif
+	return wiiuse_io_write(wm, buf, len+2);
 }
 
 
@@ -686,25 +660,6 @@ float wiiuse_set_smooth_alpha(struct wiimote_t* wm, float alpha) {
 
 
 /**
- *	@brief	Set the bluetooth stack type to use.
- *
- *	@param wm		Array of wiimote_t structures.
- *	@param wiimotes	Number of objects in the wm array.
- *	@param type		The type of bluetooth stack to use.
- */
-void wiiuse_set_bluetooth_stack(struct wiimote_t** wm, int wiimotes, enum win_bt_stack_t type) {
-	#ifdef WIN32
-	int i;
-
-	if (!wm)	return;
-
-	for (i = 0; i < wiimotes; ++i)
-		wm[i]->stack = type;
-	#endif
-}
-
-
-/**
  *	@brief	Set the orientation event threshold.
  *
  *	@param wm			Pointer to a wiimote_t structure.
@@ -746,24 +701,3 @@ void wiiuse_resync(struct wiimote_t* wm) {
 	wiiuse_handshake(wm, NULL, 0);
 }
 
-
-/**
- *	@brief Set the normal and expansion handshake timeouts.
- *
- *	@param wm				Array of wiimote_t structures.
- *	@param wiimotes			Number of objects in the wm array.
- *	@param normal_timeout	The timeout in milliseconds for a normal read.
- *	@param exp_timeout		The timeout in millisecondsd to wait for an expansion handshake.
- */
-void wiiuse_set_timeout(struct wiimote_t** wm, int wiimotes, byte normal_timeout, byte exp_timeout) {
-	#ifdef WIN32
-	int i;
-
-	if (!wm)	return;
-
-	for (i = 0; i < wiimotes; ++i) {
-		wm[i]->normal_timeout = normal_timeout;
-		wm[i]->exp_timeout = exp_timeout;
-	}
-	#endif
-}

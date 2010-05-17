@@ -309,17 +309,6 @@ typedef struct expansion_t {
 
 
 /**
- *	@enum win32_bt_stack_t
- *	@brief	Available bluetooth stacks for Windows.
- */
-typedef enum win_bt_stack_t {
-	WIIUSE_STACK_UNKNOWN,
-	WIIUSE_STACK_MS,
-	WIIUSE_STACK_BLUESOLEIL
-} win_bt_stack_t;
-
-
-/**
  *	@struct wiimote_state_t
  *	@brief Significant data from the previous event.
  */
@@ -382,21 +371,14 @@ typedef enum WIIUSE_EVENT_TYPE {
 typedef struct wiimote_t {
 	WCONST int unid;						/**< user specified id						*/
 
-	#ifdef WIN32
-		WCONST HANDLE dev_handle;			/**< HID handle								*/
-		WCONST OVERLAPPED hid_overlap;		/**< overlap handle							*/
-		WCONST enum win_bt_stack_t stack;	/**< type of bluetooth stack to use			*/
-		WCONST int timeout;					/**< read timeout							*/
-		WCONST byte normal_timeout;			/**< normal timeout							*/
-		WCONST byte exp_timeout;			/**< timeout for expansion handshake		*/
-	#elif MACOSX
+	#ifdef __APPLE__
 		WCONST IOBluetoothDeviceRef device;    	/**  Device reference object                */
 		WCONST CFStringRef address;            	/**  MacOS-like device address string       */
 		WCONST IOBluetoothL2CAPChannelRef inputCh;		/**  Input L2CAP channel					*/	
 		WCONST IOBluetoothL2CAPChannelRef outputCh;	/**  Output L2CAP channel					*/
 		WCONST IOBluetoothUserNotificationRef disconnectionRef;	/**  Disconnection Notification Reference **/
 		WCONST void* connectionHandler; /** Wiimote connection handler for MACOSX **/
-	#else
+	#elif LINUX
 		WCONST bdaddr_t bdaddr;				/**< bt address								*/
 		WCONST char bdaddr_str[18];			/**< readable bt address					*/
 		WCONST int out_sock;				/**< output socket							*/

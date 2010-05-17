@@ -34,8 +34,7 @@
  *	@brief Handles device I/O for *nix.
  */
 
-#ifndef WIN32
-#ifndef MACOSX
+#ifndef __APPLE__
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -272,5 +271,4 @@ int wiiuse_io_write(struct wiimote_t* wm, byte* buf, int len) {
 }
 
 
-#endif /* ifndef MACOSX */
-#endif /* ifndef WIN32 */
+#endif /* ifndef __APPLE__ */

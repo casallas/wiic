@@ -41,10 +41,6 @@ int balance_board_handshake(struct wiimote_t* wm, struct balance_board_t* bb, by
 	/* handshake done */
 	wm->exp.type = EXP_BALANCE_BOARD;
 
-	#ifdef WIN32
-	wm->timeout = WIIMOTE_DEFAULT_TIMEOUT;
-	#endif
-
 	return 1;
 }
 

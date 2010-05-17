@@ -47,17 +47,15 @@
 #ifndef WIIC_INTERNAL_H_INCLUDED
 #define WIIC_INTERNAL_H_INCLUDED
 
-#ifndef WIN32
-	#ifndef MACOSX
-		#include <arpa/inet.h>				/* htons() */
-		#include <bluetooth/bluetooth.h>
-	#endif
+#ifndef __APPLE__
+	#include <arpa/inet.h>				/* htons() */
+	#include <bluetooth/bluetooth.h>
 #endif
 
 #include "definitions.h"
 
 /* WiiC version */
-#define WIIC_VERSION					"0.31"
+#define WIIC_VERSION					"0.40"
 
 /********************
  *
@@ -115,10 +113,9 @@
  * This can also be seen in the WiiC Linux way:
  * 00000000 00100101 00000100 
  */
-#ifdef MACOSX
+#ifdef __APPLE__
 	#define WM_DEV_MINOR_CLASS				0x01
 	#define WM_DEV_MAJOR_CLASS				0x05
-	///FIXME - this should be 1, but not checked yet
 	#define WM_DEV_MAJOR_SERVICE			0x01
 #else
 	#define WM_DEV_CLASS_0				0x04

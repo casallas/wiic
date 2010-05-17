@@ -37,10 +37,8 @@
 #ifndef CONNECT_H_INCLUDED
 #define CONNECT_H_INCLUDED
 
-#ifndef WIN32
-#ifndef MACOSX
-	#include <bluetooth/bluetooth.h>
-#endif
+#ifdef LINUX
+#include <bluetooth/bluetooth.h>
 #endif
 
 #include "wiic_internal.h"
