@@ -45,7 +45,7 @@
 	/* mac */
 	#include <CoreFoundation/CoreFoundation.h>
 	#include <IOBluetooth/IOBluetoothUserLib.h>
-#elif
+#else
 	/* nix */
 	#include <bluetooth/bluetooth.h>
 #endif
