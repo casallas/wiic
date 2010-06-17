@@ -134,6 +134,7 @@
 #define WM_EXP_MEM_ENABLE			0x04A40040
 #define WM_EXP_MEM_CALIBR			0x04A40020
 #define WM_EXP_ID					0x04A400FA
+#define EXP_HANDSHAKE_LEN					224
 
 #define WM_REG_IR					0x04B00030
 #define WM_REG_IR_BLOCK1			0x04B00000
@@ -193,8 +194,6 @@
 /* unencrypted expansion id codes */
 #define EXP_ID_CODE_MOTION_PLUS				0xA4200405 /** Motion Plus ID (when activated) */
 #define EXP_ID_BALANCE_BOARD				0xA4200402
-
-#define EXP_HANDSHAKE_LEN					224
 
 /********************
  *

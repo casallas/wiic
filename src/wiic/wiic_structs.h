@@ -138,6 +138,29 @@ typedef struct accel_t {
 	float st_alpha;					/**< alpha value for smoothing [0-1]	*/
 } accel_t;
 
+/**
+ *  @struct pressure_t
+ *  @brief Pressure sensor struct. Contains four pressure sensor measurements. Used for the Wii Balance Board.
+ */
+typedef struct pressure_t {
+	unsigned short top_left;
+	unsigned short top_right;
+	unsigned short bottom_left;
+	unsigned short bottom_right;
+} pressure_t;
+
+/**
+ *  @struct pressure_weight_t
+ *  @brief Pressure sensor weight struct. Contains four pressure sensor measurements in Kg. Used for the Wii Balance Board.
+ */
+typedef struct pressure_weight_t {
+	float top_left;
+	float top_right;
+	float bottom_left;
+	float bottom_right;
+	float weight; // This is the sum of the weight on the four sensors
+} pressure_weight_t;
+
 /* IR correction types */
 typedef enum ir_position_t {
 	WIIUSE_IR_ABOVE,
@@ -274,7 +297,11 @@ typedef struct guitar_hero_3_t {
  *	@brief Balance Board expansion device.
  */
 typedef struct balance_board_t {
-	int pippo;
+	struct pressure_t cal_low_weight; // equivalent 0Kg
+	struct pressure_t cal_medium_weight; // equivalent 17Kg
+	struct pressure_t cal_high_weight; // equivalent 34Kg
+	struct pressure_t pressure_raw_data; // Actual reading
+	struct pressure_weight_t pressure_weight; // In Kg
 } balance_board_t;
 
 /**
