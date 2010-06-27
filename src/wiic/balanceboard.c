@@ -79,18 +79,18 @@ int balance_board_handshake(struct wiimote_t* wm, struct balance_board_t* bb, by
 		return 0;
 	}
 	
-	bb->cal_low_weight.top_right = (data[offset+0] << 8) + data[offset+1] ;
-	bb->cal_low_weight.bottom_right = (data[offset+2] << 8) + data[offset+3] ;
-	bb->cal_low_weight.top_left = (data[offset+4] << 8) + data[offset+5] ;
-	bb->cal_low_weight.bottom_left = (data[offset+6] << 8) + data[offset+7] ;
-	bb->cal_medium_weight.top_right = (data[offset+8] << 8) + data[offset+9] ;
-	bb->cal_medium_weight.bottom_right = (data[offset+10] << 8) + data[offset+11] ;
-	bb->cal_medium_weight.top_left = (data[offset+12] << 8) + data[offset+13] ;
-	bb->cal_medium_weight.bottom_left = (data[offset+14] << 8) + data[offset+15] ;
-	bb->cal_high_weight.top_right = (data[offset+16] << 8) + data[offset+17] ;
-	bb->cal_high_weight.bottom_right = (data[offset+18] << 8) + data[offset+19] ;
-	bb->cal_high_weight.top_left = (data[offset+20] << 8) + data[offset+21] ;
-	bb->cal_high_weight.bottom_left = (data[offset+22] << 8) + data[offset+23] ;
+	bb->cal_low_weight.top_right = (data[offset+0] << 8) | data[offset+1] ;
+	bb->cal_low_weight.bottom_right = (data[offset+2] << 8) | data[offset+3] ;
+	bb->cal_low_weight.top_left = (data[offset+4] << 8) | data[offset+5] ;
+	bb->cal_low_weight.bottom_left = (data[offset+6] << 8) | data[offset+7] ;
+	bb->cal_medium_weight.top_right = (data[offset+8] << 8) | data[offset+9] ;
+	bb->cal_medium_weight.bottom_right = (data[offset+10] << 8) | data[offset+11] ;
+	bb->cal_medium_weight.top_left = (data[offset+12] << 8) | data[offset+13] ;
+	bb->cal_medium_weight.bottom_left = (data[offset+14] << 8) | data[offset+15] ;
+	bb->cal_high_weight.top_right = (data[offset+16] << 8) | data[offset+17] ;
+	bb->cal_high_weight.bottom_right = (data[offset+18] << 8) | data[offset+19] ;
+	bb->cal_high_weight.top_left = (data[offset+20] << 8) | data[offset+21] ;
+	bb->cal_high_weight.bottom_left = (data[offset+22] << 8) | data[offset+23] ;
 	
 	/* handshake done */
 	wm->exp.type = EXP_BALANCE_BOARD;
@@ -107,10 +107,10 @@ int balance_board_handshake(struct wiimote_t* wm, struct balance_board_t* bb, by
 void balance_board_event(struct balance_board_t* bb, byte* msg) 
 {
 	// Raw data
-	bb->pressure_raw_data.top_right = (msg[0] << 8) + msg[1];
-	bb->pressure_raw_data.top_right = (msg[2] << 8) + msg[3];
-	bb->pressure_raw_data.top_right = (msg[4] << 8) + msg[5];
-	bb->pressure_raw_data.top_right = (msg[6] << 8) + msg[7];
+	bb->pressure_raw_data.top_right = (msg[0] << 8) | msg[1];
+	bb->pressure_raw_data.top_right = (msg[2] << 8) | msg[3];
+	bb->pressure_raw_data.top_right = (msg[4] << 8) | msg[5];
+	bb->pressure_raw_data.top_right = (msg[6] << 8) | msg[7];
 	
 	/* Weight in kg (we must interpole here) */
 
