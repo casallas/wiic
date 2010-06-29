@@ -791,6 +791,13 @@ static void save_state(struct wiimote_t* wm) {
 			wm->lstate.mp_raw_gyro.p = wm->exp.mp.raw_gyro.p;
 			wm->lstate.mp_raw_gyro.y = wm->exp.mp.raw_gyro.y;
 			break;
+			
+	/*	case EXP_BALANCE_BOARD:
+			wm->lstate.pressure_raw_data.top_left = wm->exp.bb.pressure_raw_data.top_left;
+			wm->lstate.pressure_raw_data.top_right = wm->exp.bb.pressure_raw_data.top_right;
+			wm->lstate.pressure_raw_data.bottom_left = wm->exp.bb.pressure_raw_data.bottom_left;
+			wm->lstate.pressure_raw_data.bottom_right = wm->exp.bb.pressure_raw_data.bottom_right;
+			break;*/
 
 		case EXP_NONE:
 			break;
@@ -913,6 +920,15 @@ static int state_changed(struct wiimote_t* wm) {
  			CROSS_THRESH_RATE(wm->lstate.mp_raw_gyro, wm->exp.mp.raw_gyro, wm->exp.mp.raw_gyro_threshold);
 			break;
 		}
+		case EXP_BALANCE_BOARD:
+		{
+			/* balance board */
+			STATE_CHANGED(wm->lstate.pressure_raw_data.top_left,wm->exp.bb.pressure_raw_data.top_left);
+			STATE_CHANGED(wm->lstate.pressure_raw_data.top_right,wm->exp.bb.pressure_raw_data.top_right);
+			STATE_CHANGED(wm->lstate.pressure_raw_data.bottom_left,wm->exp.bb.pressure_raw_data.bottom_left);
+			STATE_CHANGED(wm->lstate.pressure_raw_data.bottom_right,wm->exp.bb.pressure_raw_data.bottom_right);
+			break;
+		}	
 		case EXP_NONE:
 		{
 			break;

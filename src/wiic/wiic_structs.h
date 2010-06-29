@@ -354,6 +354,9 @@ typedef struct wiimote_state_t {
 	/* motion_plus_t */
 	byte mp_acc_mode;
 	struct ang3s_t mp_raw_gyro;
+	
+	/* balance_board_t */
+	struct pressure_t pressure_raw_data;
 
 	/* ir_t */
 	int ir_ax;

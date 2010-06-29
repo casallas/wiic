@@ -310,7 +310,7 @@ int wiiuse_set_report_type(struct wiimote_t* wm) {
 	else if (motion && ir)		buf[1] = WM_RPT_BTN_ACC_IR;
 	else if (ir && exp)			buf[1] = WM_RPT_BTN_IR_EXP;
 	else if (ir)				buf[1] = WM_RPT_BTN_ACC_IR;
-	else if (exp)				buf[1] = WM_RPT_BTN_EXP;
+	else if (exp) 				buf[1] = WM_RPT_BTN_EXP; 
 	else if (motion)			buf[1] = WM_RPT_BTN_ACC;
 	else						buf[1] = WM_RPT_BTN;
 

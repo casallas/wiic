@@ -91,7 +91,7 @@ int balance_board_handshake(struct wiimote_t* wm, struct balance_board_t* bb, by
 	bb->cal_high_weight.bottom_right = (data[offset+18] << 8) | data[offset+19] ;
 	bb->cal_high_weight.top_left = (data[offset+20] << 8) | data[offset+21] ;
 	bb->cal_high_weight.bottom_left = (data[offset+22] << 8) | data[offset+23] ;
-	
+
 	/* handshake done */
 	wm->exp.type = EXP_BALANCE_BOARD;
 
@@ -108,54 +108,54 @@ void balance_board_event(struct balance_board_t* bb, byte* msg)
 {
 	// Raw data
 	bb->pressure_raw_data.top_right = (msg[0] << 8) | msg[1];
-	bb->pressure_raw_data.top_right = (msg[2] << 8) | msg[3];
-	bb->pressure_raw_data.top_right = (msg[4] << 8) | msg[5];
-	bb->pressure_raw_data.top_right = (msg[6] << 8) | msg[7];
+	bb->pressure_raw_data.bottom_right = (msg[2] << 8) | msg[3];
+	bb->pressure_raw_data.top_left = (msg[4] << 8) | msg[5];
+	bb->pressure_raw_data.bottom_left = (msg[6] << 8) | msg[7];
 	
 	/* Weight in kg (we must interpole here) */
 
 	// Top Right
 	if(bb->pressure_raw_data.top_right <= bb->cal_medium_weight.top_right) {
-		bb->pressure_weight.top_right = 17.0 * (bb->pressure_raw_data.top_right - bb->cal_low_weight.top_right) / (float)(bb->cal_medium_weight.top_right - bb->cal_low_weight.top_right) + bb->cal_low_weight.top_right;
+		bb->pressure_weight.top_right = 17.0 * (bb->pressure_raw_data.top_right - bb->cal_low_weight.top_right) / (float)(bb->cal_medium_weight.top_right - bb->cal_low_weight.top_right);
 	}
 	else if(bb->pressure_raw_data.top_right <= bb->cal_high_weight.top_right) {
-		bb->pressure_weight.top_right = 17.0 * (bb->pressure_raw_data.top_right - bb->cal_medium_weight.top_right) / (float)(bb->cal_high_weight.top_right - bb->cal_medium_weight.top_right) + bb->cal_medium_weight.top_right;	
+		bb->pressure_weight.top_right = 17.0 * (bb->pressure_raw_data.top_right - bb->cal_medium_weight.top_right) / (float)(bb->cal_high_weight.top_right - bb->cal_medium_weight.top_right) + 17.0;	
 	}
 	else {
-		bb->pressure_weight.top_right = 17.0 * (bb->pressure_raw_data.top_right - bb->cal_high_weight.top_right) / (float)(bb->cal_high_weight.top_right - bb->cal_medium_weight.top_right) + bb->cal_high_weight.top_right;			
+		bb->pressure_weight.top_right = 17.0 * (bb->pressure_raw_data.top_right - bb->cal_high_weight.top_right) / (float)(bb->cal_high_weight.top_right - bb->cal_medium_weight.top_right) + 34.0;			
 	}
 	
 	// Bottom Right
 	if(bb->pressure_raw_data.bottom_right <= bb->cal_medium_weight.bottom_right) {
-		bb->pressure_weight.bottom_right = 17.0 * (bb->pressure_raw_data.bottom_right - bb->cal_low_weight.bottom_right) / (float)(bb->cal_medium_weight.bottom_right - bb->cal_low_weight.bottom_right) + bb->cal_low_weight.bottom_right;
+		bb->pressure_weight.bottom_right = 17.0 * (bb->pressure_raw_data.bottom_right - bb->cal_low_weight.bottom_right) / (float)(bb->cal_medium_weight.bottom_right - bb->cal_low_weight.bottom_right);
 	}
 	else if(bb->pressure_raw_data.bottom_right <= bb->cal_high_weight.bottom_right) {
-		bb->pressure_weight.bottom_right = 17.0 * (bb->pressure_raw_data.bottom_right - bb->cal_medium_weight.bottom_right) / (float)(bb->cal_high_weight.bottom_right - bb->cal_medium_weight.bottom_right) + bb->cal_medium_weight.bottom_right;	
+		bb->pressure_weight.bottom_right = 17.0 * (bb->pressure_raw_data.bottom_right - bb->cal_medium_weight.bottom_right) / (float)(bb->cal_high_weight.bottom_right - bb->cal_medium_weight.bottom_right) + 17.0;	
 	}
 	else {
-		bb->pressure_weight.bottom_right = 17.0 * (bb->pressure_raw_data.bottom_right - bb->cal_high_weight.bottom_right) / (float)(bb->cal_high_weight.bottom_right - bb->cal_medium_weight.bottom_right) + bb->cal_high_weight.bottom_right;			
+		bb->pressure_weight.bottom_right = 17.0 * (bb->pressure_raw_data.bottom_right - bb->cal_high_weight.bottom_right) / (float)(bb->cal_high_weight.bottom_right - bb->cal_medium_weight.bottom_right) + 34.0;			
 	}
 	
 	// Top Left
 	if(bb->pressure_raw_data.top_left <= bb->cal_medium_weight.top_left) {
-		bb->pressure_weight.top_left = 17.0 * (bb->pressure_raw_data.top_left - bb->cal_low_weight.top_left) / (float)(bb->cal_medium_weight.top_left - bb->cal_low_weight.top_left) + bb->cal_low_weight.top_left;
+		bb->pressure_weight.top_left = 17.0 * (bb->pressure_raw_data.top_left - bb->cal_low_weight.top_left) / (float)(bb->cal_medium_weight.top_left - bb->cal_low_weight.top_left);
 	}
 	else if(bb->pressure_raw_data.top_left <= bb->cal_high_weight.top_left) {
-		bb->pressure_weight.top_left = 17.0 * (bb->pressure_raw_data.top_left - bb->cal_medium_weight.top_left) / (float)(bb->cal_high_weight.top_left - bb->cal_medium_weight.top_left) + bb->cal_medium_weight.top_left;	
+		bb->pressure_weight.top_left = 17.0 * (bb->pressure_raw_data.top_left - bb->cal_medium_weight.top_left) / (float)(bb->cal_high_weight.top_left - bb->cal_medium_weight.top_left) + 17.0;	
 	}
 	else {
-		bb->pressure_weight.top_left = 17.0 * (bb->pressure_raw_data.top_left - bb->cal_high_weight.top_left) / (float)(bb->cal_high_weight.top_left - bb->cal_medium_weight.top_left) + bb->cal_high_weight.top_left;			
+		bb->pressure_weight.top_left = 17.0 * (bb->pressure_raw_data.top_left - bb->cal_high_weight.top_left) / (float)(bb->cal_high_weight.top_left - bb->cal_medium_weight.top_left) + 34.0;			
 	}
 	
 	// Botton Left
 	if(bb->pressure_raw_data.bottom_left <= bb->cal_medium_weight.bottom_left) {
-		bb->pressure_weight.bottom_left = 17.0 * (bb->pressure_raw_data.bottom_left - bb->cal_low_weight.bottom_left) / (float)(bb->cal_medium_weight.bottom_left - bb->cal_low_weight.bottom_left) + bb->cal_low_weight.bottom_left;
+		bb->pressure_weight.bottom_left = 17.0 * (bb->pressure_raw_data.bottom_left - bb->cal_low_weight.bottom_left) / (float)(bb->cal_medium_weight.bottom_left - bb->cal_low_weight.bottom_left);
 	}
 	else if(bb->pressure_raw_data.bottom_left <= bb->cal_high_weight.bottom_left) {
-		bb->pressure_weight.bottom_left = 17.0 * (bb->pressure_raw_data.bottom_left - bb->cal_medium_weight.bottom_left) / (float)(bb->cal_high_weight.bottom_left - bb->cal_medium_weight.bottom_left) + bb->cal_medium_weight.bottom_left;	
+		bb->pressure_weight.bottom_left = 17.0 * (bb->pressure_raw_data.bottom_left - bb->cal_medium_weight.bottom_left) / (float)(bb->cal_high_weight.bottom_left - bb->cal_medium_weight.bottom_left) + 17.0;	
 	}
 	else {
-		bb->pressure_weight.bottom_left = 17.0 * (bb->pressure_raw_data.bottom_left - bb->cal_high_weight.bottom_left) / (float)(bb->cal_high_weight.bottom_left - bb->cal_medium_weight.bottom_left) + bb->cal_high_weight.bottom_left;			
+		bb->pressure_weight.bottom_left = 17.0 * (bb->pressure_raw_data.bottom_left - bb->cal_high_weight.bottom_left) / (float)(bb->cal_high_weight.bottom_left - bb->cal_medium_weight.bottom_left) + 34.0;			
 	}
 	
 	bb->pressure_weight.weight = bb->pressure_weight.top_right + bb->pressure_weight.top_left + bb->pressure_weight.bottom_right + bb->pressure_weight.bottom_left;

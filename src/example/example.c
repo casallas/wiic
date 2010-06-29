@@ -195,7 +195,15 @@ void handle_event(struct wiimote_t* wm) {
 		printf("Guitar whammy bar:          %f\n", gh3->whammy_bar);
 		printf("Guitar joystick angle:      %f\n", gh3->js.ang);
 		printf("Guitar joystick magnitude:  %f\n", gh3->js.mag);
-	} 
+	} else if(wm->exp.type == EXP_BALANCE_BOARD) {
+		struct balance_board_t* bb = (balance_board_t*)&wm->exp.bb;
+		
+		printf("balance board top left weight: %f\n", bb->pressure_weight.top_left);
+		printf("balance board top right weight: %f\n", bb->pressure_weight.top_right);
+		printf("balance board bottom left weight: %f\n", bb->pressure_weight.bottom_left);
+		printf("balance board bottom right weight: %f\n", bb->pressure_weight.bottom_right);
+		printf("balance board total weight: %f\n", bb->pressure_weight.weight);
+	}
 }
 
 
@@ -421,7 +429,15 @@ int main(int argc, char** argv) {
 					case WIIUSE_MOTION_PLUS_INSERTED:
 						printf("Motion Plus inserted.\n");
 						break;
-
+						
+					case WIIUSE_BALANCE_BOARD_INSERTED:
+						printf("Balance Board connected.\n");
+						break;
+						
+					case WIIUSE_BALANCE_BOARD_REMOVED:
+						printf("Balance Board disconnected.\n");
+						break;
+						
 					case WIIUSE_NUNCHUK_REMOVED:
 					case WIIUSE_CLASSIC_CTRL_REMOVED:
 					case WIIUSE_GUITAR_HERO_3_CTRL_REMOVED:
@@ -430,7 +446,7 @@ int main(int argc, char** argv) {
 						handle_ctrl_status(wiimotes[i]);
 						printf("An expansion was removed.\n");
 						break;
-
+						
 					default:
 						break;
 				}
