@@ -359,6 +359,18 @@ void HandleEvent(CWiimote &wm)
         printf("%s joystick angle = %f\n", prefixString, angle);
         printf("%s joystick magnitude = %f\n", prefixString, magnitude);
     }
+	 else if(exType == wm.ExpansionDevice.TYPE_BALANCE_BOARD) 
+	 {
+		CBalanceBoard &bb = wm.ExpansionDevice.BalanceBoard;
+		float total, topLeft, topRight, bottomLeft, bottomRight;
+		
+		bb.WeightSensor.GetWeight(total, topLeft, topRight, bottomLeft, bottomRight);
+		printf("balance board top left weight: %f\n", topLeft);
+		printf("balance board top right weight: %f\n", topRight);
+		printf("balance board bottom left weight: %f\n", bottomLeft);
+		printf("balance board bottom right weight: %f\n", bottomRight);
+		printf("balance board total weight: %f\n", total);
+	}
 }
 
 void HandleStatus(CWiimote &wm)
@@ -496,14 +508,22 @@ int main(int argc, char** argv)
                         reloadWiimotes = 1;
                         break;
 
-					case CWiimote::EVENT_MOTION_PLUS_INSERTED:
-						cout << "Motion Plus inserted." << endl;
-						break;
+						  case CWiimote::EVENT_MOTION_PLUS_INSERTED:
+								cout << "Motion Plus inserted." << endl;
+								break;
+								
+						  case CWiimote::EVENT_BALANCE_BOARD_INSERTED:
+								cout << "Balance Board connected.\n"  << endl;
+								break;
+						
+						  case CWiimote::EVENT_BALANCE_BOARD_REMOVED:
+							   cout << "Balance Board disconnected.\n"  << endl;
+								break;
 						
                     case CWiimote::EVENT_NUNCHUK_REMOVED:
                     case CWiimote::EVENT_CLASSIC_CTRL_REMOVED:
                     case CWiimote::EVENT_GUITAR_HERO_3_CTRL_REMOVED:
-					case CWiimote::EVENT_MOTION_PLUS_REMOVED:
+						  case CWiimote::EVENT_MOTION_PLUS_REMOVED:
                         cout << "An expansion was removed." << endl;
                         HandleStatus(wiimote);
                         reloadWiimotes = 1;

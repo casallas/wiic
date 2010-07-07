@@ -252,6 +252,62 @@ void CGyroscope::Calibrate()
 	wiic_calibrate_motion_plus(mpMPPtr);	
 }
 
+
+/*
+ * CWeightSensor class methods.
+ */
+CWeightSensor::CWeightSensor(struct pressure_t* RawWeight, struct pressure_t* LowCalWeight, struct pressure_t* MediumCalWeight, struct pressure_t* HighCalWeight, struct pressure_weight_t* Weight, struct balance_board_t* BBPtr)
+{
+	mpRawWeight = RawWeight;
+	mpLowCalWeight = LowCalWeight;
+	mpMediumCalWeight = MediumCalWeight;
+	mpHighCalWeight = HighCalWeight;
+	mpWeight = Weight;
+	mpBBPtr = BBPtr;
+}
+
+void CWeightSensor::GetRawWeight(int& TopLeft, int& TopRight, int& BottomLeft, int& BottomRight)
+{
+	TopLeft = mpRawWeight->top_left;
+	TopRight = mpRawWeight->top_right;
+	BottomLeft = mpRawWeight->bottom_left;
+	BottomRight = mpRawWeight->bottom_right;
+}
+
+void CWeightSensor::GetLowCalWeight(int& TopLeft, int& TopRight, int& BottomLeft, int& BottomRight)
+{
+	TopLeft = mpLowCalWeight->top_left;
+	TopRight = mpLowCalWeight->top_right;
+	BottomLeft = mpLowCalWeight->bottom_left;
+	BottomRight = mpLowCalWeight->bottom_right;
+}
+
+void CWeightSensor::GetMediumCalWeight(int& TopLeft, int& TopRight, int& BottomLeft, int& BottomRight)
+{
+	TopLeft = mpMediumCalWeight->top_left;
+	TopRight = mpMediumCalWeight->top_right;
+	BottomLeft = mpMediumCalWeight->bottom_left;
+	BottomRight = mpMediumCalWeight->bottom_right;
+}
+
+void CWeightSensor::GetHighCalWeight(int& TopLeft, int& TopRight, int& BottomLeft, int& BottomRight)
+{
+	TopLeft = mpHighCalWeight->top_left;
+	TopRight = mpHighCalWeight->top_right;
+	BottomLeft = mpHighCalWeight->bottom_left;
+	BottomRight = mpHighCalWeight->bottom_right;
+}
+
+void CWeightSensor::GetWeight(float& TotalWeight, float& TopLeft, float& TopRight, float& BottomLeft, float& BottomRight)
+{
+	TotalWeight = mpWeight->weight;
+	TopLeft = mpWeight->top_left;
+	TopRight = mpWeight->top_right;
+	BottomLeft = mpWeight->bottom_left;
+	BottomRight = mpWeight->bottom_right;
+}
+
+
 /*
  * CIRDot class methods.
  */
@@ -411,7 +467,7 @@ float CIR::GetDistance()
  */
 
 CExpansionDevice::CExpansionDevice(struct expansion_t * ExpPtr) :
-    Nunchuk(ExpPtr),Classic(ExpPtr),GuitarHero3(ExpPtr),MotionPlus(ExpPtr)
+    Nunchuk(ExpPtr),Classic(ExpPtr),GuitarHero3(ExpPtr),MotionPlus(ExpPtr),BalanceBoard(ExpPtr)
 {
     mpExpansionPtr = ExpPtr;
 }
@@ -490,6 +546,18 @@ void CMotionPlus::Disconnect(struct wiimote_t* WiimotePtr)
 {
 	wiic_set_motion_plus(WiimotePtr,0);
 }
+
+
+/*
+ * CBalanceBoard class methods.
+ */
+CBalanceBoard::CBalanceBoard(struct expansion_t *ExpPtr):
+	WeightSensor(&(ExpPtr->bb.pressure_raw_data),&(ExpPtr->bb.cal_low_weight),&(ExpPtr->bb.cal_medium_weight),&(ExpPtr->bb.cal_high_weight),&(ExpPtr->bb.pressure_weight),&(ExpPtr->bb))
+{
+    // Initialize the expansion pointer.
+	 mpBBPtr = &(ExpPtr->bb);
+} 
+
 
 /*
  * CWiimote class methods.

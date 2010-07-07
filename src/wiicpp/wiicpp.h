@@ -208,6 +208,25 @@ private:
 	unsigned char* mpMode;
 };
 
+class CWeightSensor
+{
+public:
+	CWeightSensor(struct pressure_t* RawWeight, struct pressure_t* LowCalWeight, struct pressure_t* MediumCalWeight, struct pressure_t* HighCalWeight, struct pressure_weight_t* Weight, struct balance_board_t* BBPtr);
+	void GetRawWeight(int& TopLeft, int& TopRight, int& BottomLeft, int& BottomRight);
+	void GetWeight(float& TotalWeight, float& TopLeft, float& TopRight, float& BottomLeft, float& BottomRight);
+	void GetLowCalWeight(int& TopLeft, int& TopRight, int& BottomLeft, int& BottomRight);
+   void GetMediumCalWeight(int& TopLeft, int& TopRight, int& BottomLeft, int& BottomRight);
+   void GetHighCalWeight(int& TopLeft, int& TopRight, int& BottomLeft, int& BottomRight);
+
+private:
+	struct pressure_t* mpRawWeight;
+	struct pressure_t* mpLowCalWeight;
+	struct pressure_t* mpMediumCalWeight;
+	struct pressure_t* mpHighCalWeight;
+	struct pressure_weight_t* mpWeight;
+	struct balance_board_t* mpBBPtr;
+};
+
 class CIRDot
 {
 public:
@@ -332,6 +351,16 @@ private:
     struct motion_plus_t* mpMPPtr;
 };
 
+class CBalanceBoard
+{
+public:
+    CBalanceBoard(struct expansion_t* BBPtr);
+	
+    CWeightSensor WeightSensor;
+private:
+    struct balance_board_t* mpBBPtr;
+};
+
 class CExpansionDevice
 {
 public:
@@ -341,7 +370,8 @@ public:
         TYPE_NUNCHUK = EXP_NUNCHUK,
         TYPE_CLASSIC = EXP_CLASSIC,
         TYPE_GUITAR_HERO_3 = EXP_GUITAR_HERO_3,
-        TYPE_MOTION_PLUS = EXP_MOTION_PLUS
+        TYPE_MOTION_PLUS = EXP_MOTION_PLUS,
+		  TYPE_BALANCE_BOARD = EXP_BALANCE_BOARD
     };
 
     CExpansionDevice(struct expansion_t *ExpPtr);
@@ -352,6 +382,7 @@ public:
     CClassic Classic;
     CGuitarHero3 GuitarHero3;
     CMotionPlus MotionPlus;
+	 CBalanceBoard BalanceBoard;
 
 private:
     struct expansion_t *mpExpansionPtr;
@@ -395,7 +426,9 @@ public:
         EVENT_GUITAR_HERO_3_CTRL_INSERTED = WIIUSE_GUITAR_HERO_3_CTRL_INSERTED,
         EVENT_GUITAR_HERO_3_CTRL_REMOVED = WIIUSE_GUITAR_HERO_3_CTRL_REMOVED,
         EVENT_MOTION_PLUS_INSERTED = WIIUSE_MOTION_PLUS_INSERTED,
-        EVENT_MOTION_PLUS_REMOVED = WIIUSE_MOTION_PLUS_REMOVED
+        EVENT_MOTION_PLUS_REMOVED = WIIUSE_MOTION_PLUS_REMOVED,
+		  EVENT_BALANCE_BOARD_INSERTED = WIIUSE_BALANCE_BOARD_INSERTED,
+		  EVENT_BALANCE_BOARD_REMOVED = WIIUSE_BALANCE_BOARD_REMOVED
     };
 
     enum OnOffSelection
