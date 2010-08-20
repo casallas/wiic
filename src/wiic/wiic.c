@@ -298,7 +298,7 @@ int wiiuse_set_report_type(struct wiimote_t* wm) {
 	if (!wm || !WIIMOTE_IS_CONNECTED(wm))
 		return 0;
 
-	buf[0] = (WIIMOTE_IS_FLAG_SET(wm, WIIUSE_CONTINUOUS) ? 0x04 : 0x00);	/* set to 0x04 for continuous reporting */
+	buf[0] = (WIIMOTE_IS_FLAG_SET(wm, WIIC_CONTINUOUS) ? 0x04 : 0x00);	/* set to 0x04 for continuous reporting */
 	buf[1] = 0x00;
 
 	motion = WIIMOTE_IS_SET(wm, WIIMOTE_STATE_ACC);

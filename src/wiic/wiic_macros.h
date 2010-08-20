@@ -141,7 +141,7 @@
 
 /* wiimote option flags */
 #define WIIUSE_SMOOTHING				0x01
-#define WIIUSE_CONTINUOUS				0x02 // FIXME Ma non è 0x04 ????
+#define WIIC_CONTINUOUS				0x04 
 #define WIIUSE_ORIENT_THRESH			0x04
 #define WIIUSE_INIT_FLAGS				(WIIUSE_SMOOTHING | WIIUSE_ORIENT_THRESH)
 
