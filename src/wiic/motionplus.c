@@ -227,3 +227,15 @@ void motion_plus_disconnected(struct motion_plus_t* mp)
 	WIIUSE_DEBUG("Motion plus disconnected");
 	memset(mp, 0, sizeof(struct motion_plus_t));
 }
+
+/**
+ *	@brief	Set the gyroscope event threshold.
+ *
+ *	@param wm			Pointer to a wiimote_t structure.
+ *	@param threshold	The decimal place that should be considered a significant change.
+ */
+void wiiuse_set_mp_threshold(struct wiimote_t* wm, int threshold) {
+	if (!wm)	return;
+
+	wm->exp.mp.raw_gyro_threshold = threshold;
+}

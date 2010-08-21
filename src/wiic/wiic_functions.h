@@ -86,6 +86,7 @@ WIIUSE_EXPORT extern void wiic_set_speaker(struct wiimote_t* wm, int status);
 /* motionplus.c */
 WIIUSE_EXPORT extern void wiic_set_motion_plus(struct wiimote_t* wm, int status);
 WIIUSE_EXPORT extern void wiic_calibrate_motion_plus(struct motion_plus_t* mp);
+WIIUSE_EXPORT extern void wiiuse_set_mp_threshold(struct wiimote_t* wm, int threshold);
 
 #ifdef __cplusplus
 }

@@ -46,6 +46,8 @@ void motion_plus_disconnected(struct motion_plus_t* mp);
 
 void motion_plus_event(struct motion_plus_t* mp, byte* msg);
 
+void wiiuse_set_mp_threshold(struct wiimote_t* wm, int threshold);
+
 #ifdef __cplusplus
 }
 #endif

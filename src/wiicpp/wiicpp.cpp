@@ -224,13 +224,15 @@ void CAccelerometer::GetGravityVector(float &X, float &Y, float &Z)
 /*
  * CGyroscope class methods.
  */
-CGyroscope::CGyroscope(struct ang3s_t* RawGyro, struct ang3s_t* CalGyro, struct ang3f_t* AngleRate, unsigned char* Mode, struct motion_plus_t* MPPtr)
+CGyroscope::CGyroscope(struct ang3s_t* RawGyro, struct ang3s_t* CalGyro, struct ang3f_t* AngleRate, unsigned char* Mode, struct motion_plus_t* MPPtr, 
+	int* GyroThresholdPtr)
 {
 	mpRawGyro = RawGyro;
 	mpCalGyro = CalGyro;
 	mpAngleRate = AngleRate;
 	mpMode = Mode;
 	mpMPPtr = MPPtr;
+	mpGyroThresholdPtr = GyroThresholdPtr;
 }
 
 void CGyroscope::GetRawRates(int& Roll, int& Pitch, int& Yaw)
@@ -250,6 +252,16 @@ void CGyroscope::GetRates(float& Roll, float& Pitch, float& Yaw)
 void CGyroscope::Calibrate()
 {
 	wiic_calibrate_motion_plus(mpMPPtr);	
+}
+
+int CGyroscope::GetGyroThreshold()
+{
+    return *mpGyroThresholdPtr;
+}
+
+void CGyroscope::SetGyroThreshold(int Threshold)
+{
+    *mpGyroThresholdPtr = Threshold;
 }
 
 
@@ -532,7 +544,8 @@ float CGuitarHero3::GetWhammyBar()
  * CMotionPlus class methods.
  */
 CMotionPlus::CMotionPlus(struct expansion_t *ExpPtr):
-	Gyroscope(&(ExpPtr->mp.raw_gyro),&(ExpPtr->mp.cal_gyro),&(ExpPtr->mp.angle_rate_gyro),(unsigned char*)&(ExpPtr->mp.acc_mode),&(ExpPtr->mp))
+	Gyroscope(&(ExpPtr->mp.raw_gyro),&(ExpPtr->mp.cal_gyro),&(ExpPtr->mp.angle_rate_gyro),(unsigned char*)&(ExpPtr->mp.acc_mode),&(ExpPtr->mp),
+	&(ExpPtr->mp.raw_gyro_threshold))
 {
 	mpMPPtr = &(ExpPtr->mp);
 }

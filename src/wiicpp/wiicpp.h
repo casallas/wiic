@@ -195,10 +195,13 @@ private:
 class CGyroscope
 {
 public:
-	CGyroscope(struct ang3s_t* RawGyro, struct ang3s_t* CalGyro, struct ang3f_t* AngleRate, unsigned char* Mode, struct motion_plus_t* MPPtr);
+	CGyroscope(struct ang3s_t* RawGyro, struct ang3s_t* CalGyro, struct ang3f_t* AngleRate, unsigned char* Mode, struct motion_plus_t* MPPtr, 
+		int* GyroThresholdPtr);
 	void GetRawRates(int& Roll, int& Pitch, int& Yaw);
 	void GetRates(float& Roll, float& Pitch, float& Yaw);
 	void Calibrate();
+    int GetGyroThreshold();
+    void SetGyroThreshold(int Threshold);
 
 private:
 	struct ang3s_t* mpRawGyro;
@@ -206,6 +209,7 @@ private:
 	struct ang3f_t* mpAngleRate;
 	struct motion_plus_t* mpMPPtr;
 	unsigned char* mpMode;
+	int* mpGyroThresholdPtr;
 };
 
 class CWeightSensor
