@@ -862,5 +862,5 @@ std::vector<CWiimote>& CWii::Connect()
 
 int CWii::Poll()
 {
-    return wiiuse_poll((struct wiimote_t**) mpWiimoteArray, mpWiimoteArraySize);
+    return wiic_poll((struct wiimote_t**) mpWiimoteArray, mpWiimoteArraySize);
 }
