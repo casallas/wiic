@@ -8,6 +8,17 @@ http://wiic.sf.net
 
 
 ---------------------------
+v0.51 -- 21 Aug 2010
+---------------------------
+
+	Added:
+		-[Mac/Linux] Motion Plus gyroscope threshold can be set by the user
+
+	Changed:
+		-[Mac/Linux] "wiiuse" prefix is not anymore used, everything starts with "wiic"
+		-[Mac/Linux] Usual optimizations
+
+---------------------------
 v0.50 -- 08 Jul 2010
 ---------------------------
 
