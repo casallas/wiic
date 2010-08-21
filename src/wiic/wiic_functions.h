@@ -41,52 +41,52 @@
 extern "C" {
 #endif
 
-/* wiiuse.c */
-WIIUSE_EXPORT extern const char* wiiuse_version();
+/* wiic.c */
+WIIC_EXPORT extern const char* wiic_version();
 
-WIIUSE_EXPORT extern struct wiimote_t** wiiuse_init(int wiimotes);
-WIIUSE_EXPORT extern void wiiuse_disconnected(struct wiimote_t* wm);
-WIIUSE_EXPORT extern void wiiuse_cleanup(struct wiimote_t** wm, int wiimotes);
-WIIUSE_EXPORT extern void wiiuse_rumble(struct wiimote_t* wm, int status);
-WIIUSE_EXPORT extern void wiiuse_toggle_rumble(struct wiimote_t* wm);
-WIIUSE_EXPORT extern void wiiuse_set_leds(struct wiimote_t* wm, int leds);
-WIIUSE_EXPORT extern void wiiuse_motion_sensing(struct wiimote_t* wm, int status);
-WIIUSE_EXPORT extern int wiiuse_read_data(struct wiimote_t* wm, byte* buffer, unsigned int offset, unsigned short len);
-WIIUSE_EXPORT extern int wiiuse_write_data(struct wiimote_t* wm, unsigned int addr, byte* data, byte len);
-WIIUSE_EXPORT extern void wiiuse_status(struct wiimote_t* wm);
-WIIUSE_EXPORT extern struct wiimote_t* wiiuse_get_by_id(struct wiimote_t** wm, int wiimotes, int unid);
-WIIUSE_EXPORT extern int wiiuse_set_flags(struct wiimote_t* wm, int enable, int disable);
-WIIUSE_EXPORT extern float wiiuse_set_smooth_alpha(struct wiimote_t* wm, float alpha);
-WIIUSE_EXPORT extern void wiiuse_set_orient_threshold(struct wiimote_t* wm, float threshold);
-WIIUSE_EXPORT extern void wiiuse_resync(struct wiimote_t* wm);
-WIIUSE_EXPORT extern void wiiuse_set_accel_threshold(struct wiimote_t* wm, int threshold);
+WIIC_EXPORT extern struct wiimote_t** wiic_init(int wiimotes);
+WIIC_EXPORT extern void wiic_disconnected(struct wiimote_t* wm);
+WIIC_EXPORT extern void wiic_cleanup(struct wiimote_t** wm, int wiimotes);
+WIIC_EXPORT extern void wiic_rumble(struct wiimote_t* wm, int status);
+WIIC_EXPORT extern void wiic_toggle_rumble(struct wiimote_t* wm);
+WIIC_EXPORT extern void wiic_set_leds(struct wiimote_t* wm, int leds);
+WIIC_EXPORT extern void wiic_motion_sensing(struct wiimote_t* wm, int status);
+WIIC_EXPORT extern int wiic_read_data(struct wiimote_t* wm, byte* buffer, unsigned int offset, unsigned short len);
+WIIC_EXPORT extern int wiic_write_data(struct wiimote_t* wm, unsigned int addr, byte* data, byte len);
+WIIC_EXPORT extern void wiic_status(struct wiimote_t* wm);
+WIIC_EXPORT extern struct wiimote_t* wiic_get_by_id(struct wiimote_t** wm, int wiimotes, int unid);
+WIIC_EXPORT extern int wiic_set_flags(struct wiimote_t* wm, int enable, int disable);
+WIIC_EXPORT extern float wiic_set_smooth_alpha(struct wiimote_t* wm, float alpha);
+WIIC_EXPORT extern void wiic_set_orient_threshold(struct wiimote_t* wm, float threshold);
+WIIC_EXPORT extern void wiic_resync(struct wiimote_t* wm);
+WIIC_EXPORT extern void wiic_set_accel_threshold(struct wiimote_t* wm, int threshold);
 
 /* connect.c */
-WIIUSE_EXPORT extern int wiiuse_find(struct wiimote_t** wm, int max_wiimotes, int timeout);
-WIIUSE_EXPORT extern int wiiuse_connect(struct wiimote_t** wm, int wiimotes);
-WIIUSE_EXPORT extern void wiiuse_disconnect(struct wiimote_t* wm);
+WIIC_EXPORT extern int wiic_find(struct wiimote_t** wm, int max_wiimotes, int timeout);
+WIIC_EXPORT extern int wiic_connect(struct wiimote_t** wm, int wiimotes);
+WIIC_EXPORT extern void wiic_disconnect(struct wiimote_t* wm);
 
 /* events.c */
-WIIUSE_EXPORT extern int wiic_poll(struct wiimote_t** wm, int wiimotes);
+WIIC_EXPORT extern int wiic_poll(struct wiimote_t** wm, int wiimotes);
 
 /* ir.c */
-WIIUSE_EXPORT extern void wiiuse_set_ir(struct wiimote_t* wm, int status);
-WIIUSE_EXPORT extern void wiiuse_set_ir_vres(struct wiimote_t* wm, unsigned int x, unsigned int y);
-WIIUSE_EXPORT extern void wiiuse_set_ir_position(struct wiimote_t* wm, enum ir_position_t pos);
-WIIUSE_EXPORT extern void wiiuse_set_aspect_ratio(struct wiimote_t* wm, enum aspect_t aspect);
-WIIUSE_EXPORT extern void wiiuse_set_ir_sensitivity(struct wiimote_t* wm, int level);
+WIIC_EXPORT extern void wiic_set_ir(struct wiimote_t* wm, int status);
+WIIC_EXPORT extern void wiic_set_ir_vres(struct wiimote_t* wm, unsigned int x, unsigned int y);
+WIIC_EXPORT extern void wiic_set_ir_position(struct wiimote_t* wm, enum ir_position_t pos);
+WIIC_EXPORT extern void wiic_set_aspect_ratio(struct wiimote_t* wm, enum aspect_t aspect);
+WIIC_EXPORT extern void wiic_set_ir_sensitivity(struct wiimote_t* wm, int level);
 
 /* nunchuk.c */
-WIIUSE_EXPORT extern void wiiuse_set_nunchuk_orient_threshold(struct wiimote_t* wm, float threshold);
-WIIUSE_EXPORT extern void wiiuse_set_nunchuk_accel_threshold(struct wiimote_t* wm, int threshold);
+WIIC_EXPORT extern void wiic_set_nunchuk_orient_threshold(struct wiimote_t* wm, float threshold);
+WIIC_EXPORT extern void wiic_set_nunchuk_accel_threshold(struct wiimote_t* wm, int threshold);
 
 /* speaker.c */
-WIIUSE_EXPORT extern void wiic_set_speaker(struct wiimote_t* wm, int status);
+WIIC_EXPORT extern void wiic_set_speaker(struct wiimote_t* wm, int status);
 
 /* motionplus.c */
-WIIUSE_EXPORT extern void wiic_set_motion_plus(struct wiimote_t* wm, int status);
-WIIUSE_EXPORT extern void wiic_calibrate_motion_plus(struct motion_plus_t* mp);
-WIIUSE_EXPORT extern void wiiuse_set_mp_threshold(struct wiimote_t* wm, int threshold);
+WIIC_EXPORT extern void wiic_set_motion_plus(struct wiimote_t* wm, int status);
+WIIC_EXPORT extern void wiic_calibrate_motion_plus(struct motion_plus_t* mp);
+WIIC_EXPORT extern void wiic_set_mp_threshold(struct wiimote_t* wm, int threshold);
 
 #ifdef __cplusplus
 }

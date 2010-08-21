@@ -140,12 +140,12 @@
 
 
 /* wiimote option flags */
-#define WIIUSE_SMOOTHING				0x01
+#define WIIC_SMOOTHING				0x01
 #define WIIC_CONTINUOUS				0x04 
-#define WIIUSE_ORIENT_THRESH			0x04
-#define WIIUSE_INIT_FLAGS				(WIIUSE_SMOOTHING | WIIUSE_ORIENT_THRESH)
+#define WIIC_ORIENT_THRESH			0x04
+#define WIIC_INIT_FLAGS				(WIIC_SMOOTHING | WIIC_ORIENT_THRESH)
 
-#define WIIUSE_ORIENT_PRECISION			100.0f
+#define WIIC_ORIENT_PRECISION			100.0f
 
 /* expansion codes */
 #define EXP_NONE						0
@@ -196,7 +196,7 @@
  *	@param lvl		[out] Pointer to an int that will hold the level setting.
  *	If no level is set 'lvl' will be set to 0.
  */
-#define WIIUSE_GET_IR_SENSITIVITY(wm, lvl)									\
+#define WIIC_GET_IR_SENSITIVITY(wm, lvl)									\
 			do {														\
 				if ((wm->state & WIIMOTE_STATE_IR_SENS_LVL1) == WIIMOTE_STATE_IR_SENS_LVL1) 		*lvl = 1;	\
 				else if ((wm->state & WIIMOTE_STATE_IR_SENS_LVL2) == WIIMOTE_STATE_IR_SENS_LVL2) 	*lvl = 2;	\
@@ -206,12 +206,12 @@
 				else									*lvl = 0;		\
 			} while (0)
 
-#define WIIUSE_USING_ACC(wm)			((wm->state & WIIMOTE_STATE_ACC) == WIIMOTE_STATE_ACC)
-#define WIIUSE_USING_EXP(wm)			((wm->state & WIIMOTE_STATE_EXP) == WIIMOTE_STATE_EXP)
-#define WIIUSE_USING_IR(wm)				((wm->state & WIIMOTE_STATE_IR) == WIIMOTE_STATE_IR)
-#define WIIUSE_USING_SPEAKER(wm)		((wm->state & WIIMOTE_STATE_SPEAKER) == WIIMOTE_STATE_SPEAKER)
-#define WIIUSE_USING_MOTION_PLUS(wm)	((wm->state & WIIMOTE_STATE_MOTION_PLUS) == WIIMOTE_STATE_MOTION_PLUS)
-#define WIIUSE_IS_LED_SET(wm, num)		((wm->leds & WIIMOTE_LED_##num) == WIIMOTE_LED_##num)
+#define WIIC_USING_ACC(wm)			((wm->state & WIIMOTE_STATE_ACC) == WIIMOTE_STATE_ACC)
+#define WIIC_USING_EXP(wm)			((wm->state & WIIMOTE_STATE_EXP) == WIIMOTE_STATE_EXP)
+#define WIIC_USING_IR(wm)				((wm->state & WIIMOTE_STATE_IR) == WIIMOTE_STATE_IR)
+#define WIIC_USING_SPEAKER(wm)		((wm->state & WIIMOTE_STATE_SPEAKER) == WIIMOTE_STATE_SPEAKER)
+#define WIIC_USING_MOTION_PLUS(wm)	((wm->state & WIIMOTE_STATE_MOTION_PLUS) == WIIMOTE_STATE_MOTION_PLUS)
+#define WIIC_IS_LED_SET(wm, num)		((wm->leds & WIIMOTE_LED_##num) == WIIMOTE_LED_##num)
 
 /** TYPEDEFS */
 typedef unsigned char byte;
@@ -224,20 +224,20 @@ typedef char sbyte;
  *      @param data             Pointer to the filled data block.
  *      @param len              Length in bytes of the data block.
  *
- *      @see wiiuse_init()
+ *      @see wiic_init()
  *
  *      A registered function of this type is called automatically by the wiiuse
  *      library when the wiimote has returned the full data requested by a previous
  *      call to wiiuse_read_data().
  */
 struct wiimote_t;
-typedef void (*wiiuse_read_cb)(struct wiimote_t* wm, byte* data, unsigned short len);
+typedef void (*wiic_read_cb)(struct wiimote_t* wm, byte* data, unsigned short len);
 
 /**
  *	@enum aspect_t
  *	@brief Screen aspect ratio.
  */
 typedef enum aspect_t {
-	WIIUSE_ASPECT_4_3,
-	WIIUSE_ASPECT_16_9
+	WIIC_ASPECT_4_3,
+	WIIC_ASPECT_16_9
 } aspect_t;

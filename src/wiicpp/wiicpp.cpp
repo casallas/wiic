@@ -377,12 +377,12 @@ CIR::CIR(struct wiimote_t *wmPtr)
 
 void CIR::SetMode(CIR::OnOffSelection State)
 {
-    wiiuse_set_ir(mpWiimotePtr, State);
+    wiic_set_ir(mpWiimotePtr, State);
 }
 
 void CIR::SetVres(unsigned int x, unsigned int y)
 {
-    wiiuse_set_ir_vres(mpWiimotePtr, x, y);
+    wiic_set_ir_vres(mpWiimotePtr, x, y);
 }
 
 CIR::BarPositions CIR::GetBarPositionSetting()
@@ -392,7 +392,7 @@ CIR::BarPositions CIR::GetBarPositionSetting()
 
 void CIR::SetBarPosition(CIR::BarPositions PositionSelection)
 {
-    wiiuse_set_ir_position(mpWiimotePtr, (ir_position_t) PositionSelection);
+    wiic_set_ir_position(mpWiimotePtr, (ir_position_t) PositionSelection);
 }
 
 CIR::AspectRatioSelections CIR::GetAspectRatioSetting()
@@ -402,19 +402,19 @@ CIR::AspectRatioSelections CIR::GetAspectRatioSetting()
 
 void CIR::SetAspectRatio(CIR::AspectRatioSelections AspectRatioSelection)
 {
-    wiiuse_set_aspect_ratio(mpWiimotePtr, (enum aspect_t) AspectRatioSelection);
+    wiic_set_aspect_ratio(mpWiimotePtr, (enum aspect_t) AspectRatioSelection);
 }
 
 void CIR::SetSensitivity(int Level)
 {
-    wiiuse_set_ir_sensitivity(mpWiimotePtr, Level);
+    wiic_set_ir_sensitivity(mpWiimotePtr, Level);
 }
 
 int CIR::GetSensitivity()
 {
     int level = 0;
 
-	 WIIUSE_GET_IR_SENSITIVITY(mpWiimotePtr, &level);
+	 WIIC_GET_IR_SENSITIVITY(mpWiimotePtr, &level);
 
     return level;
 }
@@ -608,17 +608,17 @@ CWiimote::CWiimote(const CWiimote &copyin) : // Copy constructor to handle pass 
 
 void CWiimote::Disconnected()
 {
-    wiiuse_disconnected(mpWiimotePtr);
+    wiic_disconnected(mpWiimotePtr);
 }
 
 void CWiimote::SetRumbleMode(CWiimote::OnOffSelection State)
 {
-    wiiuse_rumble(mpWiimotePtr, State);
+    wiic_rumble(mpWiimotePtr, State);
 }
 
 void CWiimote::ToggleRumble()
 {
-    wiiuse_toggle_rumble(mpWiimotePtr);
+    wiic_toggle_rumble(mpWiimotePtr);
 }
 
 int CWiimote::GetLEDs()
@@ -628,7 +628,7 @@ int CWiimote::GetLEDs()
 
 void CWiimote::SetLEDs(int LEDs)
 {
-    wiiuse_set_leds(mpWiimotePtr, LEDs);
+    wiic_set_leds(mpWiimotePtr, LEDs);
 }
 
 float CWiimote::GetBatteryLevel()
@@ -653,7 +653,7 @@ const unsigned char *CWiimote::GetEventBuffer()
 
 void CWiimote::SetMotionSensingMode(CWiimote::OnOffSelection State)
 {
-    wiiuse_motion_sensing(mpWiimotePtr, State);
+    wiic_motion_sensing(mpWiimotePtr, State);
 }
 
 void CWiimote::EnableMotionPlus(CWiimote::OnOffSelection State)
@@ -667,17 +667,17 @@ void CWiimote::EnableMotionPlus(CWiimote::OnOffSelection State)
 
 void CWiimote::ReadData(unsigned char *Buffer, unsigned int Offset, unsigned int Length)
 {
-    wiiuse_read_data(mpWiimotePtr, Buffer, Offset, Length);
+    wiic_read_data(mpWiimotePtr, Buffer, Offset, Length);
 }
 
 void CWiimote::WriteData(unsigned int Address, unsigned char *Data, unsigned int Length)
 {
-    wiiuse_write_data(mpWiimotePtr, Address, Data, Length);
+    wiic_write_data(mpWiimotePtr, Address, Data, Length);
 }
 
 void CWiimote::UpdateStatus()
 {
-    wiiuse_status(mpWiimotePtr);
+    wiic_status(mpWiimotePtr);
 }
 
 int CWiimote::GetID()
@@ -697,42 +697,42 @@ int CWiimote::GetFlags()
 
 int CWiimote::SetFlags(int Enable, int Disable)
 {
-    return wiiuse_set_flags(mpWiimotePtr, Enable, Disable);
+    return wiic_set_flags(mpWiimotePtr, Enable, Disable);
 }
 
 void CWiimote::Resync()
 {
-    wiiuse_resync(mpWiimotePtr);
+    wiic_resync(mpWiimotePtr);
 }
 
 void CWiimote::Disconnect()
 {
-    wiiuse_disconnect(mpWiimotePtr);
+    wiic_disconnect(mpWiimotePtr);
 }
 
 int CWiimote::isUsingACC()
 {
-    return WIIUSE_USING_ACC(mpWiimotePtr) != 0;
+    return WIIC_USING_ACC(mpWiimotePtr) != 0;
 }
 
 int CWiimote::isUsingEXP()
 {
-    return WIIUSE_USING_EXP(mpWiimotePtr) != 0;
+    return WIIC_USING_EXP(mpWiimotePtr) != 0;
 }
 
 int CWiimote::isUsingIR()
 {
-    return WIIUSE_USING_IR(mpWiimotePtr) != 0;
+    return WIIC_USING_IR(mpWiimotePtr) != 0;
 }
 
 int CWiimote::isUsingMotionPlus()
 {
-	return WIIUSE_USING_MOTION_PLUS(mpWiimotePtr) != 0;
+	return WIIC_USING_MOTION_PLUS(mpWiimotePtr) != 0;
 }
 
 int CWiimote::isUsingSpeaker()
 {
-    return WIIUSE_USING_SPEAKER(mpWiimotePtr) != 0;
+    return WIIC_USING_SPEAKER(mpWiimotePtr) != 0;
 }
 
 int CWiimote::isLEDSet(int LEDNum)
@@ -766,18 +766,18 @@ int CWiimote::isLEDSet(int LEDNum)
 CWii::CWii()
 {
     mpWiimoteArraySize = 4;
-    mpWiimoteArray = wiiuse_init(mpWiimoteArraySize);
+    mpWiimoteArray = wiic_init(mpWiimoteArraySize);
 }
 
 CWii::CWii(int MaxNumWiimotes)
 {
     mpWiimoteArraySize = MaxNumWiimotes;
-    mpWiimoteArray = wiiuse_init(mpWiimoteArraySize);
+    mpWiimoteArray = wiic_init(mpWiimoteArraySize);
 }
 
 CWii::~CWii()
 {
-    wiiuse_cleanup((struct wiimote_t**) mpWiimoteArray, mpWiimoteArraySize);
+    wiic_cleanup((struct wiimote_t**) mpWiimoteArray, mpWiimoteArraySize);
 }
 
 void CWii::RefreshWiimotes()
@@ -839,7 +839,7 @@ std::vector<CWiimote>& CWii::GetWiimotes(int Refresh)
 
 int CWii::Find(int Timeout)
 {
-    return wiiuse_find((struct wiimote_t**) mpWiimoteArray, mpWiimoteArraySize, Timeout);
+    return wiic_find((struct wiimote_t**) mpWiimoteArray, mpWiimoteArraySize, Timeout);
 }
 
 std::vector<CWiimote>& CWii::Connect()
@@ -849,7 +849,7 @@ std::vector<CWiimote>& CWii::Connect()
 
     mpWiimotesVector.clear();
 
-    numConnected = wiiuse_connect((struct wiimote_t**) mpWiimoteArray, mpWiimoteArraySize);
+    numConnected = wiic_connect((struct wiimote_t**) mpWiimoteArray, mpWiimoteArraySize);
 
     for(index = 0; index < numConnected; index++)
     {

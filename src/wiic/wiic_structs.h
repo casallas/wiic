@@ -47,7 +47,7 @@ struct gforce_t;
  *	@brief Data read request structure.
  */
 struct read_req_t {
-	wiiuse_read_cb cb;			/**< read data callback											*/
+	wiic_read_cb cb;			/**< read data callback											*/
 	byte* buf;					/**< buffer where read data is written							*/
 	unsigned int addr;			/**< the offset that the read started at						*/
 	unsigned short size;		/**< the length of the data read								*/
@@ -163,8 +163,8 @@ typedef struct pressure_weight_t {
 
 /* IR correction types */
 typedef enum ir_position_t {
-	WIIUSE_IR_ABOVE,
-	WIIUSE_IR_BELOW
+	WIIC_IR_ABOVE,
+	WIIC_IR_BELOW
 } ir_position_t;
 
 /**
@@ -371,28 +371,28 @@ typedef struct wiimote_state_t {
 
 
 /**
- *	@enum WIIUSE_EVENT_TYPE
- *	@brief Events that wiiuse can generate from a poll.
+ *	@enum WIIC_EVENT_TYPE
+ *	@brief Events that wiic can generate from a poll.
  */
-typedef enum WIIUSE_EVENT_TYPE {
-	WIIUSE_NONE = 0,
-	WIIUSE_EVENT,
-	WIIUSE_STATUS,
-	WIIUSE_CONNECT,
-	WIIUSE_DISCONNECT,
-	WIIUSE_UNEXPECTED_DISCONNECT,
-	WIIUSE_READ_DATA,
-	WIIUSE_NUNCHUK_INSERTED,
-	WIIUSE_NUNCHUK_REMOVED,
-	WIIUSE_CLASSIC_CTRL_INSERTED,
-	WIIUSE_CLASSIC_CTRL_REMOVED,
-	WIIUSE_GUITAR_HERO_3_CTRL_INSERTED,
-	WIIUSE_GUITAR_HERO_3_CTRL_REMOVED,
-	WIIUSE_MOTION_PLUS_INSERTED,
-	WIIUSE_MOTION_PLUS_REMOVED,
-	WIIUSE_BALANCE_BOARD_INSERTED,
-	WIIUSE_BALANCE_BOARD_REMOVED
-} WIIUSE_EVENT_TYPE;
+typedef enum WIIC_EVENT_TYPE {
+	WIIC_NONE = 0,
+	WIIC_EVENT,
+	WIIC_STATUS,
+	WIIC_CONNECT,
+	WIIC_DISCONNECT,
+	WIIC_UNEXPECTED_DISCONNECT,
+	WIIC_READ_DATA,
+	WIIC_NUNCHUK_INSERTED,
+	WIIC_NUNCHUK_REMOVED,
+	WIIC_CLASSIC_CTRL_INSERTED,
+	WIIC_CLASSIC_CTRL_REMOVED,
+	WIIC_GUITAR_HERO_3_CTRL_INSERTED,
+	WIIC_GUITAR_HERO_3_CTRL_REMOVED,
+	WIIC_MOTION_PLUS_INSERTED,
+	WIIC_MOTION_PLUS_REMOVED,
+	WIIC_BALANCE_BOARD_INSERTED,
+	WIIC_BALANCE_BOARD_REMOVED
+} WIIC_EVENT_TYPE;
 
 /**
  *	@struct wiimote_t
@@ -442,6 +442,6 @@ typedef struct wiimote_t {
 
 	WCONST struct wiimote_state_t lstate;	/**< last saved state						*/
 
-	WCONST WIIUSE_EVENT_TYPE event;			/**< type of event that occured				*/
+	WCONST WIIC_EVENT_TYPE event;			/**< type of event that occured				*/
 	WCONST byte event_buf[MAX_PAYLOAD];		/**< event buffer							*/
 } wiimote;

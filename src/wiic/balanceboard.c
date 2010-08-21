@@ -73,8 +73,8 @@ int balance_board_handshake(struct wiimote_t* wm, struct balance_board_t* bb, by
 		/* get the calibration data */
 		byte* handshake_buf = malloc(EXP_HANDSHAKE_LEN * sizeof(byte));
 
-		WIIUSE_DEBUG("Balance board handshake appears invalid, trying again.");
-		wiiuse_read_data_cb(wm, handshake_expansion, handshake_buf, WM_EXP_MEM_CALIBR, EXP_HANDSHAKE_LEN);
+		WIIC_DEBUG("Balance board handshake appears invalid, trying again.");
+		wiic_read_data_cb(wm, handshake_expansion, handshake_buf, WM_EXP_MEM_CALIBR, EXP_HANDSHAKE_LEN);
 
 		return 0;
 	}

@@ -55,7 +55,7 @@
  *	The handshake will be concluded when the wiimote responds
  *	with this data.
  */
-void wiiuse_handshake(struct wiimote_t* wm, byte* data, unsigned short len) {
+void wiic_handshake(struct wiimote_t* wm, byte* data, unsigned short len) {
 	if (!wm)	return;
 
 	switch (wm->handshake_state) {
@@ -65,13 +65,13 @@ void wiiuse_handshake(struct wiimote_t* wm, byte* data, unsigned short len) {
 			byte* buf;
 
 			WIIMOTE_ENABLE_STATE(wm, WIIMOTE_STATE_HANDSHAKE);
-			wiiuse_set_leds(wm, WIIMOTE_LED_NONE);
+			wiic_set_leds(wm, WIIMOTE_LED_NONE);
 
 			buf = (byte*)malloc(sizeof(byte) * 8);
-			wiiuse_read_data_cb(wm, wiiuse_handshake, buf, WM_MEM_OFFSET_CALIBRATION, 7);
+			wiic_read_data_cb(wm, wiic_handshake, buf, WM_MEM_OFFSET_CALIBRATION, 7);
 			wm->handshake_state++;
 
-			wiiuse_set_leds(wm, WIIMOTE_LED_NONE);
+			wiic_set_leds(wm, WIIMOTE_LED_NONE);
 
 			break;
 		}
@@ -93,13 +93,13 @@ void wiiuse_handshake(struct wiimote_t* wm, byte* data, unsigned short len) {
 			free(req->buf);
 
 			/* handshake is done */
-			WIIUSE_DEBUG("Handshake finished. Calibration: Idle: X=%x Y=%x Z=%x\t+1g: X=%x Y=%x Z=%x",
+			WIIC_DEBUG("Handshake finished. Calibration: Idle: X=%x Y=%x Z=%x\t+1g: X=%x Y=%x Z=%x",
 					accel->cal_zero.x, accel->cal_zero.y, accel->cal_zero.z,
 					accel->cal_g.x, accel->cal_g.y, accel->cal_g.z);
 
 
 			/* request the status of the wiimote to see if there is an expansion */
-			wiiuse_status(wm);
+			wiic_status(wm);
 
 			WIIMOTE_DISABLE_STATE(wm, WIIMOTE_STATE_HANDSHAKE);
 			WIIMOTE_ENABLE_STATE(wm, WIIMOTE_STATE_HANDSHAKE_COMPLETE);
@@ -107,9 +107,9 @@ void wiiuse_handshake(struct wiimote_t* wm, byte* data, unsigned short len) {
 
 			/* now enable IR if it was set before the handshake completed */
 			if (WIIMOTE_IS_SET(wm, WIIMOTE_STATE_IR)) {
-				WIIUSE_DEBUG("Handshake finished, enabling IR.");
+				WIIC_DEBUG("Handshake finished, enabling IR.");
 				WIIMOTE_DISABLE_STATE(wm, WIIMOTE_STATE_IR);
-				wiiuse_set_ir(wm, 1);
+				wiic_set_ir(wm, 1);
 			}
 
 			break;

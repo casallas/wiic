@@ -58,7 +58,7 @@ static void ir_convert_to_vres(int* x, int* y, enum aspect_t aspect, int vx, int
  *	@param wm		Pointer to a wiimote_t structure.
  *	@param status	1 to enable, 0 to disable.
  */
-void wiiuse_set_ir(struct wiimote_t* wm, int status) {
+void wiic_set_ir(struct wiimote_t* wm, int status) {
 	byte buf;
 	char* block1 = NULL;
 	char* block2 = NULL;
@@ -74,7 +74,7 @@ void wiiuse_set_ir(struct wiimote_t* wm, int status) {
 	 *	again to actually enable IR.
 	 */
 	if (!WIIMOTE_IS_SET(wm, WIIMOTE_STATE_HANDSHAKE_COMPLETE)) {
-		WIIUSE_DEBUG("Tried to enable IR, will wait until handshake finishes.");
+		WIIC_DEBUG("Tried to enable IR, will wait until handshake finishes.");
 		WIIMOTE_ENABLE_STATE(wm, WIIMOTE_STATE_IR);
 		return;
 	}
@@ -84,7 +84,7 @@ void wiiuse_set_ir(struct wiimote_t* wm, int status) {
 	 */
 	ir_level = get_ir_sens(wm, &block1, &block2);
 	if (!ir_level) {
-		WIIUSE_ERROR("No IR sensitivity setting selected.");
+		WIIC_ERROR("No IR sensitivity setting selected.");
 		return;
 	}
 
@@ -102,39 +102,39 @@ void wiiuse_set_ir(struct wiimote_t* wm, int status) {
 
 	/* set camera 1 and 2 */
 	buf = (status ? 0x04 : 0x00);
-	wiiuse_send(wm, WM_CMD_IR, &buf, 1);
-	wiiuse_send(wm, WM_CMD_IR_2, &buf, 1);
+	wiic_send(wm, WM_CMD_IR, &buf, 1);
+	wiic_send(wm, WM_CMD_IR_2, &buf, 1);
 
 	if (!status) {
-		WIIUSE_DEBUG("Disabled IR cameras for wiimote id %i.", wm->unid);
-		wiiuse_set_report_type(wm);
+		WIIC_DEBUG("Disabled IR cameras for wiimote id %i.", wm->unid);
+		wiic_set_report_type(wm);
 		return;
 	}
 
 	/* enable IR, set sensitivity */
 	buf = 0x08;
-	wiiuse_write_data(wm, WM_REG_IR, &buf, 1);
+	wiic_write_data(wm, WM_REG_IR, &buf, 1);
 
 	/* wait for the wiimote to catch up */
 	usleep(50000);
 
 	/* write sensitivity blocks */
-	wiiuse_write_data(wm, WM_REG_IR_BLOCK1, (byte*)block1, 9);
-	wiiuse_write_data(wm, WM_REG_IR_BLOCK2, (byte*)block2, 2);
+	wiic_write_data(wm, WM_REG_IR_BLOCK1, (byte*)block1, 9);
+	wiic_write_data(wm, WM_REG_IR_BLOCK2, (byte*)block2, 2);
 
 	/* set the IR mode */
 	if (WIIMOTE_IS_SET(wm, WIIMOTE_STATE_EXP))
 		buf = WM_IR_TYPE_BASIC;
 	else
 		buf = WM_IR_TYPE_EXTENDED;
-	wiiuse_write_data(wm, WM_REG_IR_MODENUM, &buf, 1);
+	wiic_write_data(wm, WM_REG_IR_MODENUM, &buf, 1);
 
 	usleep(50000);
 
 	/* set the wiimote report type */
-	wiiuse_set_report_type(wm);
+	wiic_set_report_type(wm);
 
-	WIIUSE_DEBUG("Enabled IR camera for wiimote id %i (sensitivity level %i).", wm->unid, ir_level);
+	WIIC_DEBUG("Enabled IR camera for wiimote id %i (sensitivity level %i).", wm->unid, ir_level);
 }
 
 
@@ -183,7 +183,7 @@ static int get_ir_sens(struct wiimote_t* wm, char** block1, char** block2) {
  *	@param x       Screen resolution width.
  * @param y			Screen resolution height.
  */
-void wiiuse_set_ir_vres(struct wiimote_t* wm, unsigned int x, unsigned int y) {
+void wiic_set_ir_vres(struct wiimote_t* wm, unsigned int x, unsigned int y) {
 	if (!wm)	return;
 
 	wm->ir.vres[0] = (x-1);
@@ -195,31 +195,31 @@ void wiiuse_set_ir_vres(struct wiimote_t* wm, unsigned int x, unsigned int y) {
  *	@brief	Set the XY position for the IR cursor.
  *
  *	@param wm		Pointer to a wiimote_t structure.
- * @param pos		The position of the IR emitter (WIIUSE_IR_ABOVE or WIIUSE_IR_BELOW)
+ * @param pos		The position of the IR emitter (WIIC_IR_ABOVE or WIIC_IR_BELOW)
  */
-void wiiuse_set_ir_position(struct wiimote_t* wm, enum ir_position_t pos) {
+void wiic_set_ir_position(struct wiimote_t* wm, enum ir_position_t pos) {
 	if (!wm)	return;
 
 	wm->ir.pos = pos;
 
 	switch (pos) {
 
-		case WIIUSE_IR_ABOVE:
+		case WIIC_IR_ABOVE:
 			wm->ir.offset[0] = 0;
 
-			if (wm->ir.aspect == WIIUSE_ASPECT_16_9)
+			if (wm->ir.aspect == WIIC_ASPECT_16_9)
 				wm->ir.offset[1] = WM_ASPECT_16_9_Y/2 - 70;
-			else if (wm->ir.aspect == WIIUSE_ASPECT_4_3)
+			else if (wm->ir.aspect == WIIC_ASPECT_4_3)
 				wm->ir.offset[1] = WM_ASPECT_4_3_Y/2 - 100;
 
 			return;
 
-		case WIIUSE_IR_BELOW:
+		case WIIC_IR_BELOW:
 			wm->ir.offset[0] = 0;
 
-			if (wm->ir.aspect == WIIUSE_ASPECT_16_9)
+			if (wm->ir.aspect == WIIC_ASPECT_16_9)
 				wm->ir.offset[1] = -WM_ASPECT_16_9_Y/2 + 100;
-			else if (wm->ir.aspect == WIIUSE_ASPECT_4_3)
+			else if (wm->ir.aspect == WIIC_ASPECT_4_3)
 				wm->ir.offset[1] = -WM_ASPECT_4_3_Y/2 + 70;
 
 			return;
@@ -234,14 +234,14 @@ void wiiuse_set_ir_position(struct wiimote_t* wm, enum ir_position_t pos) {
  *	@brief	Set the aspect ratio of the TV/monitor.
  *
  *	@param wm		Pointer to a wiimote_t structure.
- *	@param aspect	Either WIIUSE_ASPECT_16_9 or WIIUSE_ASPECT_4_3
+ *	@param aspect	Either WIIC_ASPECT_16_9 or WIIC_ASPECT_4_3
  */
-void wiiuse_set_aspect_ratio(struct wiimote_t* wm, enum aspect_t aspect) {
+void wiic_set_aspect_ratio(struct wiimote_t* wm, enum aspect_t aspect) {
 	if (!wm)	return;
 
 	wm->ir.aspect = aspect;
 
-	if (aspect == WIIUSE_ASPECT_4_3) {
+	if (aspect == WIIC_ASPECT_4_3) {
 		wm->ir.vres[0] = WM_ASPECT_4_3_X;
 		wm->ir.vres[1] = WM_ASPECT_4_3_Y;
 	} else {
@@ -250,7 +250,7 @@ void wiiuse_set_aspect_ratio(struct wiimote_t* wm, enum aspect_t aspect) {
 	}
 
 	/* reset the position offsets */
-	wiiuse_set_ir_position(wm, wm->ir.pos);
+	wiic_set_ir_position(wm, wm->ir.pos);
 }
 
 
@@ -263,7 +263,7 @@ void wiiuse_set_aspect_ratio(struct wiimote_t* wm, enum aspect_t aspect) {
  *	If the level is < 1, then level will be set to 1.
  *	If the level is > 5, then level will be set to 5.
  */
-void wiiuse_set_ir_sensitivity(struct wiimote_t* wm, int level) {
+void wiic_set_ir_sensitivity(struct wiimote_t* wm, int level) {
 	char* block1 = NULL;
 	char* block2 = NULL;
 
@@ -301,10 +301,10 @@ void wiiuse_set_ir_sensitivity(struct wiimote_t* wm, int level) {
 	/* set the new sensitivity */
 	get_ir_sens(wm, &block1, &block2);
 
-	wiiuse_write_data(wm, WM_REG_IR_BLOCK1, (byte*)block1, 9);
-	wiiuse_write_data(wm, WM_REG_IR_BLOCK2, (byte*)block2, 2);
+	wiic_write_data(wm, WM_REG_IR_BLOCK1, (byte*)block1, 9);
+	wiic_write_data(wm, WM_REG_IR_BLOCK2, (byte*)block2, 2);
 
-	WIIUSE_DEBUG("Set IR sensitivity to level %i (unid %i)", level, wm->unid);
+	WIIC_DEBUG("Set IR sensitivity to level %i (unid %i)", level, wm->unid);
 }
 
 
@@ -511,16 +511,16 @@ static void interpret_ir_data(struct wiimote_t* wm) {
 		}
 	}
 
-	#ifdef WITH_WIIUSE_DEBUG
+	#ifdef WITH_WIIC_DEBUG
 	{
 	int ir_level;
-	WIIUSE_GET_IR_SENSITIVITY(wm, &ir_level);
-	WIIUSE_DEBUG("IR sensitivity: %i", ir_level);
-	WIIUSE_DEBUG("IR visible dots: %i", wm->ir.num_dots);
+	WIIC_GET_IR_SENSITIVITY(wm, &ir_level);
+	WIIC_DEBUG("IR sensitivity: %i", ir_level);
+	WIIC_DEBUG("IR visible dots: %i", wm->ir.num_dots);
 	for (i = 0; i < 4; ++i)
 		if (dot[i].visible)
-			WIIUSE_DEBUG("IR[%i][order %i] (%.3i, %.3i) -> (%.3i, %.3i)", i, dot[i].order, dot[i].rx, dot[i].ry, dot[i].x, dot[i].y);
-	WIIUSE_DEBUG("IR[absolute]: (%i, %i)", wm->ir.x, wm->ir.y);
+			WIIC_DEBUG("IR[%i][order %i] (%.3i, %.3i) -> (%.3i, %.3i)", i, dot[i].order, dot[i].rx, dot[i].ry, dot[i].x, dot[i].y);
+	WIIC_DEBUG("IR[absolute]: (%i, %i)", wm->ir.x, wm->ir.y);
 	}
 	#endif
 }
@@ -679,7 +679,7 @@ static int ir_correct_for_bounds(int* x, int* y, enum aspect_t aspect, int offse
 	int x0, y0;
 	int xs, ys;
 
-	if (aspect == WIIUSE_ASPECT_16_9) {
+	if (aspect == WIIC_ASPECT_16_9) {
 		xs = WM_ASPECT_16_9_X;
 		ys = WM_ASPECT_16_9_Y;
 	} else {
@@ -711,7 +711,7 @@ static int ir_correct_for_bounds(int* x, int* y, enum aspect_t aspect, int offse
 static void ir_convert_to_vres(int* x, int* y, enum aspect_t aspect, int vx, int vy) {
 	int xs, ys;
 
-	if (aspect == WIIUSE_ASPECT_16_9) {
+	if (aspect == WIIC_ASPECT_16_9) {
 		xs = WM_ASPECT_16_9_X;
 		ys = WM_ASPECT_16_9_Y;
 	} else {

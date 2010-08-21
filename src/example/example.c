@@ -1,5 +1,5 @@
 /*
- *	wiiuse
+ *	wiic
  *
  *	This file is part of WiiC, written by:
  *		Gabriele Randelli
@@ -13,7 +13,7 @@
  *
  *	Copyright 2006-2007
  *
- *	This file is part of wiiuse.
+ *	This file is part of wiic.
  *
  *	This program is free software; you can redistribute it and/or modify
  *	it under the terms of the GNU General Public License as published by
@@ -35,9 +35,9 @@
 /**
  *	@file
  *
- *	@brief Example using the wiiuse API.
+ *	@brief Example using the wiic API.
  *
- *	This file is an example of how to use the wiiuse library.
+ *	This file is an example of how to use the wiic library.
  */
 
 #include <stdio.h>
@@ -55,7 +55,7 @@ int exiting = 0;
  *
  *	@param wm		Pointer to a wiimote_t structure.
  *
- *	This function is called automatically by the wiiuse library when an
+ *	This function is called automatically by the wiic library when an
  *	event occurs on the specified wiimote.
  */
 void handle_event(struct wiimote_t* wm) {
@@ -79,13 +79,13 @@ void handle_event(struct wiimote_t* wm) {
 	 *	This is useful because it saves battery power.
 	 */
 	if (IS_JUST_PRESSED(wm, WIIMOTE_BUTTON_MINUS))
-		wiiuse_motion_sensing(wm, 0);
+		wiic_motion_sensing(wm, 0);
 
 	/*
 	 *	Pressing plus will tell the wiimote we are interested in movement.
 	 */
 	if (IS_JUST_PRESSED(wm, WIIMOTE_BUTTON_PLUS))
-		wiiuse_motion_sensing(wm, 1);
+		wiic_motion_sensing(wm, 1);
 		
 	if(IS_JUST_PRESSED(wm, WIIMOTE_BUTTON_LEFT))
 		wiic_set_motion_plus(wm,0);
@@ -97,22 +97,22 @@ void handle_event(struct wiimote_t* wm) {
 	 *	if B is pressed but is not held, toggle the rumble
 	 */
 	if (IS_JUST_PRESSED(wm, WIIMOTE_BUTTON_B))
-		wiiuse_toggle_rumble(wm);
+		wiic_toggle_rumble(wm);
 
 	if (IS_JUST_PRESSED(wm, WIIMOTE_BUTTON_UP))
-		wiiuse_set_ir(wm, 1);
+		wiic_set_ir(wm, 1);
 	if (IS_JUST_PRESSED(wm, WIIMOTE_BUTTON_DOWN))
-		wiiuse_set_ir(wm, 0);
+		wiic_set_ir(wm, 0);
 
 	/* if the accelerometer is turned on then print angles */
-	if (WIIUSE_USING_ACC(wm)) {
+	if (WIIC_USING_ACC(wm)) {
 		printf("wiimote roll  = %f [%f]\n", wm->orient.roll, wm->orient.a_roll);
 		printf("wiimote pitch = %f [%f]\n", wm->orient.pitch, wm->orient.a_pitch);
 		printf("wiimote yaw   = %f\n", wm->orient.yaw);
 	}
 
 	/* if the Motion Plus is turned on then print angle rates */
-	if (WIIUSE_USING_MOTION_PLUS(wm)) {
+	if (WIIC_USING_MOTION_PLUS(wm)) {
 		printf("motion plus roll rate = %f\n", wm->exp.mp.angle_rate_gyro.r);
 		printf("motion plus pitch rate = %f\n", wm->exp.mp.angle_rate_gyro.p);
 		printf("motion plus yaw rate = %f\n", wm->exp.mp.angle_rate_gyro.y);
@@ -124,7 +124,7 @@ void handle_event(struct wiimote_t* wm) {
 	 *
 	 *	Also make sure that we see at least 1 dot.
 	 */
-	if (WIIUSE_USING_IR(wm)) {
+	if (WIIC_USING_IR(wm)) {
 		int i = 0;
 
 		/* go through each of the 4 possible IR sources */
@@ -214,14 +214,14 @@ void handle_event(struct wiimote_t* wm) {
  *	@param data		Pointer to the filled data block.
  *	@param len		Length in bytes of the data block.
  *
- *	This function is called automatically by the wiiuse library when
+ *	This function is called automatically by the wiic library when
  *	the wiimote has returned the full data requested by a previous
- *	call to wiiuse_read_data().
+ *	call to wiic_read_data().
  *
  *	You can read data on the wiimote, such as Mii data, if
  *	you know the offset address and the length.
  *
- *	The \a data pointer was specified on the call to wiiuse_read_data().
+ *	The \a data pointer was specified on the call to wiic_read_data().
  *	At the time of this function being called, it is not safe to deallocate
  *	this buffer.
  */
@@ -251,7 +251,7 @@ void handle_read(struct wiimote_t* wm, byte* data, unsigned short len) {
  *
  *	This occurs when either the controller status changed
  *	or the controller status was requested explicitly by
- *	wiiuse_status().
+ *	wiic_status().
  *
  *	One reason the status can change is if the nunchuk was
  *	inserted or removed from the expansion port.
@@ -260,9 +260,9 @@ void handle_ctrl_status(struct wiimote_t* wm) {
 	printf("\n\n--- CONTROLLER STATUS [wiimote id %i] ---\n", wm->unid);
 
 	printf("attachment:      %i\n", wm->exp.type);
-	printf("speaker:         %i\n", WIIUSE_USING_SPEAKER(wm));
-	printf("ir:              %i\n", WIIUSE_USING_IR(wm));
-	printf("leds:            %i %i %i %i\n", WIIUSE_IS_LED_SET(wm, 1), WIIUSE_IS_LED_SET(wm, 2), WIIUSE_IS_LED_SET(wm, 3), WIIUSE_IS_LED_SET(wm, 4));
+	printf("speaker:         %i\n", WIIC_USING_SPEAKER(wm));
+	printf("ir:              %i\n", WIIC_USING_IR(wm));
+	printf("leds:            %i %i %i %i\n", WIIC_IS_LED_SET(wm, 1), WIIC_IS_LED_SET(wm, 2), WIIC_IS_LED_SET(wm, 3), WIIC_IS_LED_SET(wm, 4));
 	printf("battery:         %f %%\n", wm->battery_level);
 }
 
@@ -302,7 +302,7 @@ int main(int argc, char** argv) {
 	 *
 	 *	The parameter is the number of wiimotes I want to create.
 	 */
-	wiimotes =  wiiuse_init(MAX_WIIMOTES);
+	wiimotes =  wiic_init(MAX_WIIMOTES);
 
 	/*
 	 *	Find wiimote devices
@@ -315,7 +315,7 @@ int main(int argc, char** argv) {
 	 *
 	 *	This will return the number of actual wiimotes that are in discovery mode.
 	 */
-	found = wiiuse_find(wiimotes, MAX_WIIMOTES, 5);
+	found = wiic_find(wiimotes, MAX_WIIMOTES, 5);
 	if (!found) {
 		printf ("No wiimotes found.");
 		return 0;
@@ -330,7 +330,7 @@ int main(int argc, char** argv) {
 	 *
 	 *	This will return the number of established connections to the found wiimotes.
 	 */
-	connected = wiiuse_connect(wiimotes, found);
+	connected = wiic_connect(wiimotes, found);
 	if (connected)
 		printf("Connected to %i wiimotes (of %i found).\n", connected, found);
 	else {
@@ -342,22 +342,22 @@ int main(int argc, char** argv) {
 	 *	Now set the LEDs and rumble for a second so it's easy
 	 *	to tell which wiimotes are connected (just like the wii does).
 	 */
-	wiiuse_set_leds(wiimotes[0], WIIMOTE_LED_1);
-	wiiuse_rumble(wiimotes[0], 1);
+	wiic_set_leds(wiimotes[0], WIIMOTE_LED_1);
+	wiic_rumble(wiimotes[0], 1);
 	usleep(200000);
-	wiiuse_rumble(wiimotes[0], 0);
+	wiic_rumble(wiimotes[0], 0);
 
 	/*
 	 *	Maybe I'm interested in the battery power of the 0th
 	 *	wiimote.  This should be WIIMOTE_ID_1 but to be sure
 	 *	you can get the wiimote assoicated with WIIMOTE_ID_1
-	 *	using the wiiuse_get_by_id() function.
+	 *	using the wiic_get_by_id() function.
 	 *
 	 *	A status request will return other things too, like
 	 *	if any expansions are plugged into the wiimote or
 	 *	what LEDs are lit.
 	 */
-	wiiuse_status(wiimotes[0]);
+	wiic_status(wiimotes[0]);
 	
 	printf("\nPress PLUS (MINUS) to enable (disable) Motion Sensing Report (only accelerometers)\n");
 	printf("Press RIGHT (LEFT) to enable (disable) Motion Plus (requires Motion Sensing enabled)\n");
@@ -366,7 +366,7 @@ int main(int argc, char** argv) {
 	/*
 	 *	This is the main loop
 	 *
-	 *	wiiuse_poll() needs to be called with the wiimote array
+	 *	wiic_poll() needs to be called with the wiimote array
 	 *	and the number of wiimote structures in that array
 	 *	(it doesn't matter if some of those wiimotes are not used
 	 *	or are not connected).
@@ -383,23 +383,23 @@ int main(int argc, char** argv) {
 			int i = 0;
 			for (; i < MAX_WIIMOTES; ++i) {
 				switch (wiimotes[i]->event) {
-					case WIIUSE_EVENT:
+					case WIIC_EVENT:
 						// a generic event occured
 						handle_event(wiimotes[i]);
 						break;
 
-					case WIIUSE_STATUS:
+					case WIIC_STATUS:
 						// a status event occured
 						handle_ctrl_status(wiimotes[i]);
 						break;
 
-					case WIIUSE_DISCONNECT:
-					case WIIUSE_UNEXPECTED_DISCONNECT:
+					case WIIC_DISCONNECT:
+					case WIIC_UNEXPECTED_DISCONNECT:
 						// the wiimote disconnected
 						handle_disconnect(wiimotes[i]);
 						break;
 
-					case WIIUSE_READ_DATA:
+					case WIIC_READ_DATA:
 						/*
 						 *	Data we requested to read was returned.
 						 *	Take a look at wiimotes[i]->read_req
@@ -407,7 +407,7 @@ int main(int argc, char** argv) {
 						 */
 						break;
 
-					case WIIUSE_NUNCHUK_INSERTED:
+					case WIIC_NUNCHUK_INSERTED:
 						/*
 						 *	a nunchuk was inserted
 						 *	This is a good place to set any nunchuk specific
@@ -417,31 +417,31 @@ int main(int argc, char** argv) {
 						printf("Nunchuk inserted.\n");
 						break;
 
-					case WIIUSE_CLASSIC_CTRL_INSERTED:
+					case WIIC_CLASSIC_CTRL_INSERTED:
 						printf("Classic controller inserted.\n");
 						break;
 
-					case WIIUSE_GUITAR_HERO_3_CTRL_INSERTED:
+					case WIIC_GUITAR_HERO_3_CTRL_INSERTED:
 						// some expansion was inserted 
 						handle_ctrl_status(wiimotes[i]);
 						break;
 						
-					case WIIUSE_MOTION_PLUS_INSERTED:
+					case WIIC_MOTION_PLUS_INSERTED:
 						printf("Motion Plus inserted.\n");
 						break;
 						
-					case WIIUSE_BALANCE_BOARD_INSERTED:
+					case WIIC_BALANCE_BOARD_INSERTED:
 						printf("Balance Board connected.\n");
 						break;
 						
-					case WIIUSE_BALANCE_BOARD_REMOVED:
+					case WIIC_BALANCE_BOARD_REMOVED:
 						printf("Balance Board disconnected.\n");
 						break;
 						
-					case WIIUSE_NUNCHUK_REMOVED:
-					case WIIUSE_CLASSIC_CTRL_REMOVED:
-					case WIIUSE_GUITAR_HERO_3_CTRL_REMOVED:
-					case WIIUSE_MOTION_PLUS_REMOVED:
+					case WIIC_NUNCHUK_REMOVED:
+					case WIIC_CLASSIC_CTRL_REMOVED:
+					case WIIC_GUITAR_HERO_3_CTRL_REMOVED:
+					case WIIC_MOTION_PLUS_REMOVED:
 						// some expansion was removed 
 						handle_ctrl_status(wiimotes[i]);
 						printf("An expansion was removed.\n");
@@ -457,7 +457,7 @@ int main(int argc, char** argv) {
 	/*
 	 *	Disconnect the wiimotes
 	 */
-	wiiuse_cleanup(wiimotes, MAX_WIIMOTES);
+	wiic_cleanup(wiimotes, MAX_WIIMOTES);
 
 	return 0;
 }

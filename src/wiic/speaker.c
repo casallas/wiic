@@ -35,7 +35,7 @@
 void wiic_set_speaker(struct wiimote_t* wm, int status)
 {
 	if(!wm || !WIIMOTE_IS_CONNECTED(wm) || !WIIMOTE_IS_SET(wm, WIIMOTE_STATE_HANDSHAKE_COMPLETE)) {
-		WIIUSE_ERROR("Tried to enable the speakers, but the Wiimote is not connected or the handshaking is still pending.");
+		WIIC_ERROR("Tried to enable the speakers, but the Wiimote is not connected or the handshaking is still pending.");
 		return;
 	}
 
@@ -47,12 +47,12 @@ void wiic_set_speaker(struct wiimote_t* wm, int status)
 		WIIMOTE_DISABLE_STATE(wm, WIIMOTE_STATE_SPEAKER);
 	
 	/* set the wiimote report type */
-	wiiuse_set_report_type(wm);
+	wiic_set_report_type(wm);
 	
 	/* wait for the wiimote to catch up */
 	usleep(50000);
 
-	WIIUSE_DEBUG("Enabled speakers for wiimote id %i.", wm->unid);
+	WIIC_DEBUG("Enabled speakers for wiimote id %i.", wm->unid);
 }
 
 

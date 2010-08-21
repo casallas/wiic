@@ -44,7 +44,7 @@
 extern "C" {
 #endif
 
-void wiiuse_pressed_buttons(struct wiimote_t* wm, byte* msg);
+void wiic_pressed_buttons(struct wiimote_t* wm, byte* msg);
 
 void handshake_expansion(struct wiimote_t* wm, byte* data, unsigned short len);
 void disable_expansion(struct wiimote_t* wm);

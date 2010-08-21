@@ -132,7 +132,7 @@ int motion_plus_handshake(struct wiimote_t* wm, byte* data, unsigned short len)
 
 	if(val == EXP_ID_CODE_MOTION_PLUS) {
 		/* handshake done */
-		wm->event = WIIUSE_MOTION_PLUS_INSERTED;
+		wm->event = WIIC_MOTION_PLUS_INSERTED;
 		wm->exp.type = EXP_MOTION_PLUS;
 		
 		WIIMOTE_ENABLE_STATE(wm,WIIMOTE_STATE_EXP);
@@ -148,7 +148,7 @@ int motion_plus_handshake(struct wiimote_t* wm, byte* data, unsigned short len)
 		wm->exp.mp.raw_gyro_threshold = 10;
 	}
 	else {
-		WIIUSE_ERROR("Unable to activate Motion Plus");
+		WIIC_ERROR("Unable to activate Motion Plus");
 		wiic_set_motion_plus(wm,0);
 		return 0;
 	}
@@ -176,23 +176,23 @@ void wiic_set_motion_plus(struct wiimote_t *wm, int status)
 	if(status) {
 		// We initialize the motion plus
 		val = 0x55;
-		wiiuse_write_data(wm,WM_MOTION_PLUS_INIT,&val,1);
+		wiic_write_data(wm,WM_MOTION_PLUS_INIT,&val,1);
 		usleep(10000);
 
 		// We initialize the motion plus
 		val = 0x04;
-		wiiuse_write_data(wm,WM_MOTION_PLUS_ENABLE,&val,1);
+		wiic_write_data(wm,WM_MOTION_PLUS_ENABLE,&val,1);
 		usleep(10000);
 
 		// Callback to check if the init process performed right
 		tmp = (byte*)malloc(sizeof(byte)*6);
-		wiiuse_read_data_cb(wm, motion_plus_handshake, tmp, WM_MOTION_PLUS_ID_ADDR, 6);
+		wiic_read_data_cb(wm, motion_plus_handshake, tmp, WM_MOTION_PLUS_ID_ADDR, 6);
 	}
 	else {
 		disable_expansion(wm);
 		WIIMOTE_DISABLE_STATE(wm,WIIMOTE_STATE_MOTION_PLUS);
 		val = 0x55;
-		wiiuse_write_data(wm,WM_MOTION_PLUS_DISABLE,&val,1);
+		wiic_write_data(wm,WM_MOTION_PLUS_DISABLE,&val,1);
 		WIIMOTE_DISABLE_STATE(wm, WIIMOTE_STATE_EXP_HANDSHAKE);
 	}
 }
@@ -224,7 +224,7 @@ void wiic_calibrate_motion_plus(struct motion_plus_t *mp)
  */
 void motion_plus_disconnected(struct motion_plus_t* mp)
 {
-	WIIUSE_DEBUG("Motion plus disconnected");
+	WIIC_DEBUG("Motion plus disconnected");
 	memset(mp, 0, sizeof(struct motion_plus_t));
 }
 
@@ -234,7 +234,7 @@ void motion_plus_disconnected(struct motion_plus_t* mp)
  *	@param wm			Pointer to a wiimote_t structure.
  *	@param threshold	The decimal place that should be considered a significant change.
  */
-void wiiuse_set_mp_threshold(struct wiimote_t* wm, int threshold) {
+void wiic_set_mp_threshold(struct wiimote_t* wm, int threshold) {
 	if (!wm)	return;
 
 	wm->exp.mp.raw_gyro_threshold = threshold;

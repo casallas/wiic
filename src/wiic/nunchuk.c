@@ -86,8 +86,8 @@ int nunchuk_handshake(struct wiimote_t* wm, struct nunchuk_t* nc, byte* data, un
 			/* get the calibration data */
 			byte* handshake_buf = malloc(EXP_HANDSHAKE_LEN * sizeof(byte));
 
-			WIIUSE_DEBUG("Nunchuk handshake appears invalid, trying again.");
-			wiiuse_read_data_cb(wm, handshake_expansion, handshake_buf, WM_EXP_MEM_CALIBR, EXP_HANDSHAKE_LEN);
+			WIIC_DEBUG("Nunchuk handshake appears invalid, trying again.");
+			wiic_read_data_cb(wm, handshake_expansion, handshake_buf, WM_EXP_MEM_CALIBR, EXP_HANDSHAKE_LEN);
 
 			return 0;
 		} else
@@ -153,7 +153,7 @@ void nunchuk_event(struct nunchuk_t* nc, byte* msg) {
 	nc->accel.y = msg[3];
 	nc->accel.z = msg[4];
 
-	calculate_orientation(&nc->accel_calib, &nc->accel, &nc->orient, NUNCHUK_IS_FLAG_SET(nc, WIIUSE_SMOOTHING));
+	calculate_orientation(&nc->accel_calib, &nc->accel, &nc->orient, NUNCHUK_IS_FLAG_SET(nc, WIIC_SMOOTHING));
 	calculate_gforce(&nc->accel_calib, &nc->accel, &nc->gforce);
 }
 
@@ -185,9 +185,9 @@ static void nunchuk_pressed_buttons(struct nunchuk_t* nc, byte now) {
  *	@param wm			Pointer to a wiimote_t structure with a nunchuk attached.
  *	@param threshold	The decimal place that should be considered a significant change.
  *
- *	See wiiuse_set_orient_threshold() for details.
+ *	See wiic_set_orient_threshold() for details.
  */
-void wiiuse_set_nunchuk_orient_threshold(struct wiimote_t* wm, float threshold) {
+void wiic_set_nunchuk_orient_threshold(struct wiimote_t* wm, float threshold) {
 	if (!wm)	return;
 
 	wm->exp.nunchuk.orient_threshold = threshold;
@@ -200,9 +200,9 @@ void wiiuse_set_nunchuk_orient_threshold(struct wiimote_t* wm, float threshold) 
  *	@param wm			Pointer to a wiimote_t structure with a nunchuk attached.
  *	@param threshold	The decimal place that should be considered a significant change.
  *
- *	See wiiuse_set_orient_threshold() for details.
+ *	See wiic_set_orient_threshold() for details.
  */
-void wiiuse_set_nunchuk_accel_threshold(struct wiimote_t* wm, int threshold) {
+void wiic_set_nunchuk_accel_threshold(struct wiimote_t* wm, int threshold) {
 	if (!wm)	return;
 
 	wm->exp.nunchuk.accel_threshold = threshold;

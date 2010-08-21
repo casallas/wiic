@@ -31,7 +31,7 @@
 
 /**
  *	@file
- *	@brief General internal wiiuse stuff.
+ *	@brief General internal wiic stuff.
  *
  *	Since WiiC is a library, wiic.h is a duplicate
  *	of the API header.
@@ -55,7 +55,7 @@
 #include "definitions.h"
 
 /* WiiC version */
-#define WIIC_VERSION					"0.50"
+#define WIIC_VERSION					"0.51"
 
 /********************
  *
@@ -100,7 +100,7 @@
  * The different codes wrt. to Linux
  * is a bit hard to explain.
  * Looking at Bluetooth CoD format, we have 24 bits.
- * In wiiuse Linux they are stored in three fields,
+ * In wiic Linux they are stored in three fields,
  * each one 8bit long. The result number is
  * 0x002504. However, MacOS Bluetooth does
  * not store them in such a way, rather it uses
@@ -207,7 +207,7 @@
  *		St = St_last + (alpha * (tilt - St_last))
  *	alpha is between 0 and 1
  */
-#define WIIUSE_DEFAULT_SMOOTH_ALPHA		0.07f
+#define WIIC_DEFAULT_SMOOTH_ALPHA		0.07f
 
 #define SMOOTH_ROLL						0x01
 #define SMOOTH_PITCH					0x02
@@ -219,10 +219,10 @@ extern "C" {
 #endif
 
 /* not part of the api */
-int wiiuse_set_report_type(struct wiimote_t* wm);
-void wiiuse_send_next_pending_read_request(struct wiimote_t* wm);
-int wiiuse_send(struct wiimote_t* wm, byte report_type, byte* msg, int len);
-int wiiuse_read_data_cb(struct wiimote_t* wm, wiiuse_read_cb read_cb, byte* buffer, unsigned int offset, unsigned short len);
+int wiic_set_report_type(struct wiimote_t* wm);
+void wiic_send_next_pending_read_request(struct wiimote_t* wm);
+int wiic_send(struct wiimote_t* wm, byte report_type, byte* msg, int len);
+int wiic_read_data_cb(struct wiimote_t* wm, wiic_read_cb read_cb, byte* buffer, unsigned int offset, unsigned short len);
 
 #ifdef __cplusplus
 }

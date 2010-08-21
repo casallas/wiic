@@ -64,7 +64,7 @@ static int max_num_wiimotes = 0;
 
 - (void) dealloc
 {	
-	WIIUSE_DEBUG("Wiimote Discovery released");
+	WIIC_DEBUG("Wiimote Discovery released");
 	[super dealloc];
 }
 
@@ -91,13 +91,13 @@ static int max_num_wiimotes = 0;
 - (IOReturn) start:(unsigned int) timeout maxWiimotes:(unsigned int) wiimotesNum
 {
 	if (![IOBluetoothHostController defaultController]) {
-		WIIUSE_ERROR("Unable to find any bluetooth receiver on your host.");
+		WIIC_ERROR("Unable to find any bluetooth receiver on your host.");
 		return kIOReturnNotAttached;
 	}
 	
 	// If we are currently discovering, we can't start a new discovery right now.
 	if ([self isDiscovering]) {
-		WIIUSE_INFO("Wiimote search is already in progress...");
+		WIIC_INFO("Wiimote search is already in progress...");
 		return kIOReturnSuccess;
 	}
 	
@@ -119,7 +119,7 @@ static int max_num_wiimotes = 0;
 		[inquiry retain];
 	} else {
 		[self close];
-		WIIUSE_ERROR("Unable to search for bluetooth devices.");
+		WIIC_ERROR("Unable to search for bluetooth devices.");
 	}
 	
 	return status;
@@ -138,20 +138,20 @@ static int max_num_wiimotes = 0;
 	[inquiry release];
 	inquiry = nil;
 	
-	WIIUSE_DEBUG(@"Discovery closed");
+	WIIC_DEBUG(@"Discovery closed");
 	return ret;
 }
 
 #pragma mark -
 #pragma mark IOBluetoothDeviceInquiry delegates
-//*************** HANDLERS FOR WIIUSE_FIND FOR MACOSX *******************/
+//*************** HANDLERS FOR WIIC_FIND FOR MACOSX *******************/
 - (void) retrieveWiimoteInfo:(IOBluetoothDevice*) device
 {	
 	// We set the device reference (we must retain it to use it after the search)
 	wiimotes[foundWiimotes]->device = [[device retain] getDeviceRef];
 	wiimotes[foundWiimotes]->address = (CFStringRef)[[device getAddressString] retain];
 	WIIMOTE_ENABLE_STATE(wiimotes[foundWiimotes], WIIMOTE_STATE_DEV_FOUND);
-	WIIUSE_INFO("Found Wiimote (%s) [id %i].",CFStringGetCStringPtr(wiimotes[foundWiimotes]->address, kCFStringEncodingMacRoman),wiimotes[foundWiimotes]->unid);
+	WIIC_INFO("Found Wiimote (%s) [id %i].",CFStringGetCStringPtr(wiimotes[foundWiimotes]->address, kCFStringEncodingMacRoman),wiimotes[foundWiimotes]->unid);
 	++foundWiimotes;
 }
 
@@ -177,12 +177,12 @@ static int max_num_wiimotes = 0;
 	if ((error != kIOReturnSuccess) && !aborted) {
 		foundWiimotes = 0;
 		[self close];
-		WIIUSE_ERROR("Search not completed, because of unexpected errors. This error can be due to a short search timeout.");
+		WIIC_ERROR("Search not completed, because of unexpected errors. This error can be due to a short search timeout.");
 		return;
 	}
 	
 	foundWiimotes = [[inquiry foundDevices] count];
-	WIIUSE_INFO("Found %i Wiimote device(s).", foundWiimotes);
+	WIIC_INFO("Found %i Wiimote device(s).", foundWiimotes);
 }
 
 @end
@@ -203,7 +203,7 @@ static int max_num_wiimotes = 0;
 
 - (void) dealloc
 {	
-	WIIUSE_DEBUG("Wiimote released");
+	WIIC_DEBUG("Wiimote released");
 	if(receivedMsg)
 		[receivedMsg release];
 	receivedMsg = 0;
@@ -285,13 +285,13 @@ static int max_num_wiimotes = 0;
 	IOBluetoothL2CAPChannel* inCh = nil;
 	
 	if(!device) {
-		WIIUSE_ERROR("Non existent device or already connected.");
+		WIIC_ERROR("Non existent device or already connected.");
 		return kIOReturnBadArgument;
 	}
 	
 	outCh = [self openL2CAPChannelWithPSM:WM_OUTPUT_CHANNEL device:device delegate:self];
 	if (!outCh) {
-		WIIUSE_ERROR("Unable to open L2CAP output channel (id %i).", wm->unid);
+		WIIC_ERROR("Unable to open L2CAP output channel (id %i).", wm->unid);
 		[device closeConnection];
 		return kIOReturnNotOpen;
 	}
@@ -300,7 +300,7 @@ static int max_num_wiimotes = 0;
 	
 	inCh = [self openL2CAPChannelWithPSM:WM_INPUT_CHANNEL device:device delegate:self];
 	if (!inCh) {
-		WIIUSE_ERROR("Unable to open L2CAP input channel (id %i).", wm->unid);
+		WIIC_ERROR("Unable to open L2CAP input channel (id %i).", wm->unid);
 		[device closeConnection];
 		return kIOReturnNotOpen;
 	}
@@ -309,7 +309,7 @@ static int max_num_wiimotes = 0;
 	
 	IOBluetoothUserNotification* disconnectNotification = [device registerForDisconnectNotification:self selector:@selector(disconnected:fromDevice:)];
 	if(!disconnectNotification) {
-		WIIUSE_ERROR("Unable to register disconnection handler (id %i).", wm->unid);
+		WIIC_ERROR("Unable to register disconnection handler (id %i).", wm->unid);
 		[device closeConnection];
 		return kIOReturnNotOpen;
 	}
@@ -326,10 +326,10 @@ static int max_num_wiimotes = 0;
 {
 	[self setReading:NO];
 	// The wiimote_t struct must be re-initialized due to the disconnection
-	wiiuse_disconnected(_wm) ;
+	wiic_disconnected(_wm) ;
 }
 
-//*************** HANDLERS FOR WIIUSE_IO_READ FOR MACOSX *******************/
+//*************** HANDLERS FOR WIIC_IO_READ FOR MACOSX *******************/
 - (void) l2capChannelData:(IOBluetoothL2CAPChannel*) channel data:(byte *) data length:(NSUInteger) length 
 {
 	NSAutoreleasePool *pool = [[NSAutoreleasePool alloc] init];
@@ -344,7 +344,7 @@ static int max_num_wiimotes = 0;
 
 	/* 
 	 * This is called if we are receiving data before completing
-	 * the handshaking, hence before calling wiiuse_poll
+	 * the handshaking, hence before calling wiic_poll
 	 */
 	if(WIIMOTE_IS_SET(_wm, WIIMOTE_STATE_HANDSHAKE))
 		propagate_event(_wm, data[1], data+2);
@@ -403,7 +403,7 @@ static int max_num_wiimotes = 0;
  *	You can then call wiimote_connect() to connect to the found				\n
  *	devices.
  */
-int wiiuse_find(struct wiimote_t** wm, int max_wiimotes, int timeout) 
+int wiic_find(struct wiimote_t** wm, int max_wiimotes, int timeout) 
 {
 	int found_wiimotes = 0;
 
@@ -424,17 +424,17 @@ int wiiuse_find(struct wiimote_t** wm, int max_wiimotes, int timeout)
 }
 
 
-//*************** HANDLERS FOR WIIUSE_DISCONNECT FOR MACOSX *******************/
+//*************** HANDLERS FOR WIIC_DISCONNECT FOR MACOSX *******************/
 /**
  *	@brief Disconnect a wiimote.
  *
  *	@param wm		Pointer to a wiimote_t structure.
  *
- *	@see wiiuse_connect()
+ *	@see wiic_connect()
  *
  *	Note that this will not free the wiimote structure.
  */
-void wiiuse_disconnect(struct wiimote_t* wm) 
+void wiic_disconnect(struct wiimote_t* wm) 
 {
 	IOReturn error;
 	
@@ -449,7 +449,7 @@ void wiiuse_disconnect(struct wiimote_t* wm)
 		error = [inCh closeChannel];
 		[inCh setDelegate:nil];
 		if(error != kIOReturnSuccess) 
-			WIIUSE_ERROR("Unable to close input channel (id %i).", wm->unid);			
+			WIIC_ERROR("Unable to close input channel (id %i).", wm->unid);			
 		usleep(10000);
 		[inCh release];
 		inCh = nil;
@@ -462,7 +462,7 @@ void wiiuse_disconnect(struct wiimote_t* wm)
 		error = [outCh closeChannel];
 		[outCh setDelegate:nil];
 		if(error != kIOReturnSuccess) 
-			WIIUSE_ERROR("Unable to close output channel (id %i).", wm->unid);			
+			WIIC_ERROR("Unable to close output channel (id %i).", wm->unid);			
 		usleep(10000);
 		[outCh release];
 		outCh = nil;
@@ -475,7 +475,7 @@ void wiiuse_disconnect(struct wiimote_t* wm)
 		error = [device closeConnection];
 
 		if(error != kIOReturnSuccess) 
-			WIIUSE_ERROR("Unable to close the device connection (id %i).", wm->unid);			
+			WIIC_ERROR("Unable to close the device connection (id %i).", wm->unid);			
 		usleep(10000);
 		[device release];
 		device = nil;
@@ -487,7 +487,7 @@ void wiiuse_disconnect(struct wiimote_t* wm)
 	
 	[pool release];
 	
-	wm->event = WIIUSE_NONE;
+	wm->event = WIIC_NONE;
 
     WIIMOTE_DISABLE_STATE(wm, WIIMOTE_STATE_CONNECTED);
     WIIMOTE_DISABLE_STATE(wm, WIIMOTE_STATE_HANDSHAKE);
@@ -498,15 +498,15 @@ void wiiuse_disconnect(struct wiimote_t* wm)
  *
  *	@param wm		Pointer to a wiimote_t structure.
  *	@param address	The address of the device to connect to.
- *					If NULL, use the address in the struct set by wiiuse_find().
+ *					If NULL, use the address in the struct set by wiic_find().
  *
  *	@return 1 on success, 0 on failure
  */
-static int wiiuse_connect_single(struct wiimote_t* wm, char* address) 
+static int wiic_connect_single(struct wiimote_t* wm, char* address) 
 {
 	// Skip if already connected or device not found
 	if(!wm || WIIMOTE_IS_CONNECTED(wm) || wm->device == 0) {
-		WIIUSE_ERROR("Non existent device or already connected.");
+		WIIC_ERROR("Non existent device or already connected.");
 		return 0;	
 	}
 
@@ -516,14 +516,14 @@ static int wiiuse_connect_single(struct wiimote_t* wm, char* address)
 	NSAutoreleasePool *pool = [[NSAutoreleasePool alloc] init];
 	WiiConnect* connect = [[WiiConnect alloc] init];
 	if([connect connectToWiimote:wm] == kIOReturnSuccess) {
-		WIIUSE_INFO("Connected to wiimote [id %i].", wm->unid);
+		WIIC_INFO("Connected to wiimote [id %i].", wm->unid);
 		// This is stored to retrieve incoming data
 		wm->connectionHandler = (void*)([connect retain]);
 
 		// Do the handshake 
 		WIIMOTE_ENABLE_STATE(wm, WIIMOTE_STATE_CONNECTED);
-		wiiuse_handshake(wm, NULL, 0);
-		wiiuse_set_report_type(wm);
+		wiic_handshake(wm, NULL, 0);
+		wiic_set_report_type(wm);
 		
 		[pool release];
 	}
@@ -543,22 +543,22 @@ static int wiiuse_connect_single(struct wiimote_t* wm, char* address)
  *
  *	@return The number of wiimotes that successfully connected.
  *
- *	@see wiiuse_find()
- *	@see wiiuse_connect_single()
- *	@see wiiuse_disconnect()
+ *	@see wiic_find()
+ *	@see wiic_connect_single()
+ *	@see wiic_disconnect()
  *
  *	Connect to a number of wiimotes when the address is already set
  *	in the wiimote_t structures.  These addresses are normally set
- *	by the wiiuse_find() function, but can also be set manually.
+ *	by the wiic_find() function, but can also be set manually.
  */
-int wiiuse_connect(struct wiimote_t** wm, int wiimotes) 
+int wiic_connect(struct wiimote_t** wm, int wiimotes) 
 {
 	int connected = 0;
 	int i = 0;
 	
 	for (; i < wiimotes; ++i) {
 		if(!(wm[i])) {
-			WIIUSE_ERROR("Trying to connect more Wiimotes than initialized");
+			WIIC_ERROR("Trying to connect more Wiimotes than initialized");
 			return;
 		}
 		
@@ -566,7 +566,7 @@ int wiiuse_connect(struct wiimote_t** wm, int wiimotes)
 			// If the device address is not set, skip it 
 			continue;
 
-		if (wiiuse_connect_single(wm[i], NULL))
+		if (wiic_connect_single(wm[i], NULL))
 			++connected;
 	}
 
@@ -574,7 +574,7 @@ int wiiuse_connect(struct wiimote_t** wm, int wiimotes)
 }
 
 
-int wiiuse_io_read(struct wiimote_t* wm) 
+int wiic_io_read(struct wiimote_t* wm) 
 {
     if (!WIIMOTE_IS_SET(wm, WIIMOTE_STATE_CONNECTED))
             return 0;
@@ -604,7 +604,7 @@ int wiiuse_io_read(struct wiimote_t* wm)
 		return 0;
 	
 	if(!(wm->connectionHandler)) {
-		WIIUSE_ERROR("Unable to find the connection handler (id %i).", wm->unid);
+		WIIC_ERROR("Unable to find the connection handler (id %i).", wm->unid);
 		return 0;
 	}
 	byte* buffer = [deviceHandler getNextMsg];
@@ -616,7 +616,7 @@ int wiiuse_io_read(struct wiimote_t* wm)
 	if(length < sizeof(wm->event_buf)) 
 		memcpy(wm->event_buf,buffer,length);
 	else {
-		WIIUSE_DEBUG("Received data are more than the buffer.... strange! (id %i)", wm->unid);
+		WIIC_DEBUG("Received data are more than the buffer.... strange! (id %i)", wm->unid);
 		memcpy(wm->event_buf,buffer,sizeof(wm->event_buf));
 	}
 
@@ -626,13 +626,13 @@ int wiiuse_io_read(struct wiimote_t* wm)
 }
 
 
-int wiiuse_io_write(struct wiimote_t* wm, byte* buf, int len) 
+int wiic_io_write(struct wiimote_t* wm, byte* buf, int len) 
 {
 	unsigned int length = (unsigned int)len;
 	
 	// Small check before writing
 	if(!wm || !(wm->outputCh)) {
-		WIIUSE_ERROR("Attempt to write over non-existent channel (id %i).", wm->unid);
+		WIIC_ERROR("Attempt to write over non-existent channel (id %i).", wm->unid);
 		perror("Error Details");
 		return 0;
 	}
@@ -642,7 +642,7 @@ int wiiuse_io_write(struct wiimote_t* wm, byte* buf, int len)
 	IOBluetoothL2CAPChannel* channel = [IOBluetoothL2CAPChannel withL2CAPChannelRef:wm->outputCh];
     IOReturn error = [channel writeSync:buf length:length];
 	if (error != kIOReturnSuccess) 
-		WIIUSE_ERROR("Unable to write over the output channel (id %i).", wm->unid);		
+		WIIC_ERROR("Unable to write over the output channel (id %i).", wm->unid);		
     usleep(10000);
 	
     [pool release];

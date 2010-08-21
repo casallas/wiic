@@ -49,7 +49,7 @@
 #include "wiic_internal.h"
 #include "io.h"
 
-static int wiiuse_connect_single(struct wiimote_t* wm, char* address);
+static int wiic_connect_single(struct wiimote_t* wm, char* address);
 
 /**
  *	@brief Find a wiimote or wiimotes.
@@ -67,7 +67,7 @@ static int wiiuse_connect_single(struct wiimote_t* wm, char* address);
  *	You can then call wiimote_connect() to connect to the found				\n
  *	devices.
  */
-int wiiuse_find(struct wiimote_t** wm, int max_wiimotes, int timeout) {
+int wiic_find(struct wiimote_t** wm, int max_wiimotes, int timeout) {
 	int device_id;
 	int device_sock;
 	int found_devices;
@@ -103,7 +103,7 @@ int wiiuse_find(struct wiimote_t** wm, int max_wiimotes, int timeout) {
 		return 0;
 	}
 
-	WIIUSE_INFO("Found %i bluetooth device(s).", found_devices);
+	WIIC_INFO("Found %i bluetooth device(s).", found_devices);
 
 	int i = 0;
 
@@ -116,7 +116,7 @@ int wiiuse_find(struct wiimote_t** wm, int max_wiimotes, int timeout) {
 			/* found a device */
 			ba2str(&scan_info[i].bdaddr, wm[found_wiimotes]->bdaddr_str);
 
-			WIIUSE_INFO("Found wiimote (%s) [id %i].", wm[found_wiimotes]->bdaddr_str, wm[found_wiimotes]->unid);
+			WIIC_INFO("Found wiimote (%s) [id %i].", wm[found_wiimotes]->bdaddr_str, wm[found_wiimotes]->unid);
 
 			wm[found_wiimotes]->bdaddr = scan_info[i].bdaddr;
 			WIIMOTE_ENABLE_STATE(wm[found_wiimotes], WIIMOTE_STATE_DEV_FOUND);
@@ -137,15 +137,15 @@ int wiiuse_find(struct wiimote_t** wm, int max_wiimotes, int timeout) {
  *
  *	@return The number of wiimotes that successfully connected.
  *
- *	@see wiiuse_find()
- *	@see wiiuse_connect_single()
- *	@see wiiuse_disconnect()
+ *	@see wiic_find()
+ *	@see wiic_connect_single()
+ *	@see wiic_disconnect()
  *
  *	Connect to a number of wiimotes when the address is already set
  *	in the wiimote_t structures.  These addresses are normally set
- *	by the wiiuse_find() function, but can also be set manually.
+ *	by the wiic_find() function, but can also be set manually.
  */
-int wiiuse_connect(struct wiimote_t** wm, int wiimotes) {
+int wiic_connect(struct wiimote_t** wm, int wiimotes) {
 	int connected = 0;
 	int i = 0;
 
@@ -154,7 +154,7 @@ int wiiuse_connect(struct wiimote_t** wm, int wiimotes) {
 			/* if the device address is not set, skip it */
 			continue;
 		
-		if (wiiuse_connect_single(wm[i], NULL)) {
+		if (wiic_connect_single(wm[i], NULL)) {
 			++connected;
 		}
 	}
@@ -168,11 +168,11 @@ int wiiuse_connect(struct wiimote_t** wm, int wiimotes) {
  *
  *	@param wm		Pointer to a wiimote_t structure.
  *	@param address	The address of the device to connect to.
- *					If NULL, use the address in the struct set by wiiuse_find().
+ *					If NULL, use the address in the struct set by wiic_find().
  *
  *	@return 1 on success, 0 on failure
  */
-static int wiiuse_connect_single(struct wiimote_t* wm, char* address) {
+static int wiic_connect_single(struct wiimote_t* wm, char* address) {
 	struct sockaddr_l2 addr;
 	memset(&addr, 0, sizeof(addr));
 
@@ -223,13 +223,13 @@ static int wiiuse_connect_single(struct wiimote_t* wm, char* address) {
 		return 0;
 	}
 
-	WIIUSE_INFO("Connected to wiimote [id %i].", wm->unid);
+	WIIC_INFO("Connected to wiimote [id %i].", wm->unid);
 
 	/* do the handshake */
 	WIIMOTE_ENABLE_STATE(wm, WIIMOTE_STATE_CONNECTED);
-	wiiuse_handshake(wm, NULL, 0);
+	wiic_handshake(wm, NULL, 0);
 
-	wiiuse_set_report_type(wm);
+	wiic_set_report_type(wm);
 
 	return 1;
 }
@@ -240,11 +240,11 @@ static int wiiuse_connect_single(struct wiimote_t* wm, char* address) {
  *
  *	@param wm		Pointer to a wiimote_t structure.
  *
- *	@see wiiuse_connect()
+ *	@see wiic_connect()
  *
  *	Note that this will not free the wiimote structure.
  */
-void wiiuse_disconnect(struct wiimote_t* wm) {
+void wiic_disconnect(struct wiimote_t* wm) {
 	if (!wm || !WIIMOTE_IS_CONNECTED(wm))
 		return;
 
@@ -253,20 +253,20 @@ void wiiuse_disconnect(struct wiimote_t* wm) {
 
 	wm->out_sock = -1;
 	wm->in_sock = -1;
-	wm->event = WIIUSE_NONE;
+	wm->event = WIIC_NONE;
 
 	WIIMOTE_DISABLE_STATE(wm, WIIMOTE_STATE_CONNECTED);
 	WIIMOTE_DISABLE_STATE(wm, WIIMOTE_STATE_HANDSHAKE);
 }
 
 
-int wiiuse_io_read(struct wiimote_t* wm) {
+int wiic_io_read(struct wiimote_t* wm) {
 	/* not used */
 	return 0;
 }
 
 
-int wiiuse_io_write(struct wiimote_t* wm, byte* buf, int len) {
+int wiic_io_write(struct wiimote_t* wm, byte* buf, int len) {
 	return write(wm->out_sock, buf, len);
 }
 

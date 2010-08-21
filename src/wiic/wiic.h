@@ -68,13 +68,13 @@
  *
  *****************************************/
 
-#define WIIUSE_EXPORT_DECL
-#define WIIUSE_IMPORT_DECL
+#define WIIC_EXPORT_DECL
+#define WIIC_IMPORT_DECL
 
-#ifdef WIIUSE_COMPILE_LIB
-	#define WIIUSE_EXPORT WIIUSE_EXPORT_DECL
+#ifdef WIIC_COMPILE_LIB
+	#define WIIC_EXPORT WIIC_EXPORT_DECL
 #else
-	#define WIIUSE_EXPORT WIIUSE_IMPORT_DECL
+	#define WIIC_EXPORT WIIC_IMPORT_DECL
 #endif
 
 #include "wiic_macros.h"
