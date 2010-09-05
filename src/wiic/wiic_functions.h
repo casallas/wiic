@@ -63,6 +63,7 @@ WIIC_EXPORT extern void wiic_set_accel_threshold(struct wiimote_t* wm, int thres
 
 /* connect.c */
 WIIC_EXPORT extern int wiic_find(struct wiimote_t** wm, int max_wiimotes, int timeout);
+WIIC_EXPORT extern int wiic_load(struct wiimote_t** wm);
 WIIC_EXPORT extern int wiic_connect(struct wiimote_t** wm, int wiimotes);
 WIIC_EXPORT extern void wiic_disconnect(struct wiimote_t* wm);
 

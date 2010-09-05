@@ -426,7 +426,7 @@ int main(int argc, char** argv)
 
     //Find the wiimote
     numFound = wii.Find(5);
-    
+
     // Search for up to five seconds;
 
     cout << "Found " << numFound << " wiimotes" << endl;

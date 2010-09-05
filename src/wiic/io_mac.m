@@ -573,6 +573,67 @@ int wiic_connect(struct wiimote_t** wm, int wiimotes)
 	return connected;
 }
 
+/**
+ *	@brief Loads up to four Wii devices registered in the wiimotes.config file.
+ *
+ *	@param wm			An array of wiimote_t structures.
+ *
+ *	@return The number of wiimotes that successfully connected.
+ *
+ *	@see wiic_find()
+ *  @see wiic_connect()
+ *	@see wiic_connect_single()
+ *	@see wiic_disconnect()
+ *
+ *	Up to version 0.53, it is possible to register the MAC address of your 
+ *  Wii devices. This allows to directly load them, without waiting for the
+ *  search timeout. To register a new device, go to: <HOME_DIR>/.wiic/ and
+ *  edit the file wiimotes.config, by adding the MAC address of the device 
+ *  you want to register.
+ */
+int wiic_load(struct wiimote_t** wm) 
+{
+	int loaded = 0;
+	int i = 0;
+	char str[200];
+	char configPath[100];
+	char* tmp = 0;
+	
+	// Retrieve the HOME environment variable
+	tmp = getenv("HOME");
+	strcpy(configPath,tmp);
+	strncat(configPath,"/.wiic/wiimotes.config",22);
+
+	// Open the config file
+	FILE* fd = 0;
+	fd = fopen(configPath,"r");
+	if(!fd) 
+		return loaded;
+
+	// Read line by line
+	while(fgets(str,sizeof(str),fd) != NULL && loaded < 1) {
+		int len = strlen(str)-1;
+      	if(str[len] == '\n') 
+        	str[len] = 0;
+		loaded++;
+	}
+	
+	// We initialize the device structure
+	NSAutoreleasePool *pool = [[NSAutoreleasePool alloc] init];
+	for (; i < loaded; ++i) {
+		NSString* string = [NSString stringWithCString:str encoding:[NSString defaultCStringEncoding]];
+		BluetoothDeviceAddress deviceAddr;
+		IOBluetoothNSStringToDeviceAddress(string, &deviceAddr);
+		IOBluetoothDevice* device = [IOBluetoothDevice withAddress:&deviceAddr];
+		wm[i]->device = [[device retain] getDeviceRef];
+		wm[i]->address = (CFStringRef)[[device getAddressString] retain];
+		WIIMOTE_ENABLE_STATE(wm[i], WIIMOTE_STATE_DEV_FOUND);
+		WIIC_INFO("Loaded Wiimote (%s) [id %i].",CFStringGetCStringPtr(wm[i]->address, kCFStringEncodingMacRoman),wm[i]->unid);
+	}
+	[pool release];
+
+	return loaded;
+}
 
 int wiic_io_read(struct wiimote_t* wm) 
 {

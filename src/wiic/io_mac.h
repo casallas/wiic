@@ -40,6 +40,7 @@
 #define BLUETOOTH_VERSION_USE_CURRENT 
 
 #import <arpa/inet.h>				/* htons() */
+#import <IOBluetooth/IOBluetoothUtilities.h>
 #import <IOBluetooth/objc/IOBluetoothDevice.h>
 #import <IOBluetooth/objc/IOBluetoothHostController.h>
 #import <IOBluetooth/objc/IOBluetoothDeviceInquiry.h>

@@ -842,6 +842,11 @@ int CWii::Find(int Timeout)
     return wiic_find((struct wiimote_t**) mpWiimoteArray, mpWiimoteArraySize, Timeout);
 }
 
+int CWii::LoadRegisteredWiimotes()
+{
+	return wiic_load((struct wiimote_t**) mpWiimoteArray);
+}
+
 std::vector<CWiimote>& CWii::Connect()
 {
     int numConnected = 0;

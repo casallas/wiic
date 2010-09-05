@@ -516,6 +516,7 @@ public:
     std::vector<CWiimote>& GetWiimotes(int Refresh=1);
 
     int Find(int timeout);
+	int LoadRegisteredWiimotes();
     std::vector<CWiimote>& Connect();
 
     int Poll();
