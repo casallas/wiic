@@ -574,11 +574,11 @@ int wiic_connect(struct wiimote_t** wm, int wiimotes)
 }
 
 /**
- *	@brief Loads up to four Wii devices registered in the wiimotes.config file.
+ *	@brief Load Wii devices registered in the wiimotes.config file.
  *
  *	@param wm			An array of wiimote_t structures.
  *
- *	@return The number of wiimotes that successfully connected.
+ *	@return The number of wiimotes successfully loaded.
  *
  *	@see wiic_find()
  *  @see wiic_connect()
@@ -586,10 +586,10 @@ int wiic_connect(struct wiimote_t** wm, int wiimotes)
  *	@see wiic_disconnect()
  *
  *	Up to version 0.53, it is possible to register the MAC address of your 
- *  Wii devices. This allows to directly load them, without waiting for the
+ *  Wii devices. This allows to automatically load them, without waiting for any
  *  search timeout. To register a new device, go to: <HOME_DIR>/.wiic/ and
  *  edit the file wiimotes.config, by adding the MAC address of the device 
- *  you want to register.
+ *  you want to register (one line per MAC address).
  */
 int wiic_load(struct wiimote_t** wm) 
 {
