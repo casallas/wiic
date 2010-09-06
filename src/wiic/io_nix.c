@@ -215,7 +215,7 @@ int wiic_load(struct wiimote_t** wm)
 		str_ptr = str;
 		str2ba(str_ptr,&(wm[i]->bdaddr));
 		WIIMOTE_ENABLE_STATE(wm[i], WIIMOTE_STATE_DEV_FOUND);
-		WIIC_INFO("Loaded Wiimote (%s) [id %i].",CFStringGetCStringPtr(wm[i]->bdaddr_str, kCFStringEncodingMacRoman),wm[i]->unid);
+		WIIC_INFO("Loaded Wiimote (%s) [id %i].",wm[i]->bdaddr_str,wm[i]->unid);
 	}
 
 	return loaded;
