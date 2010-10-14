@@ -664,6 +664,20 @@ void CWiimote::EnableMotionPlus(CWiimote::OnOffSelection State)
     	ExpansionDevice.MotionPlus.Disconnect(mpWiimotePtr);
 }
 
+void CWiimote::EnableSpeaker(CWiimote::OnOffSelection State)
+{
+    wiic_set_speaker(mpWiimotePtr, State);
+}
+
+void CWiimote::MuteSpeaker(CWiimote::OnOffSelection State)
+{
+    wiic_mute_speaker(mpWiimotePtr, State);
+}
+
+void CWiimote::PlaySound()
+{
+	wiic_sound(mpWiimotePtr);
+}
 
 void CWiimote::ReadData(unsigned char *Buffer, unsigned int Offset, unsigned int Length)
 {
@@ -733,6 +747,11 @@ int CWiimote::isUsingMotionPlus()
 int CWiimote::isUsingSpeaker()
 {
     return WIIC_USING_SPEAKER(mpWiimotePtr) != 0;
+}
+
+int CWiimote::isSpeakerMuted()
+{
+    return WIIC_SPEAKER_MUTED(mpWiimotePtr) != 0;
 }
 
 int CWiimote::isLEDSet(int LEDNum)

@@ -74,9 +74,12 @@
 #define WM_CMD_REPORT_TYPE			0x12
 #define WM_CMD_RUMBLE				0x13
 #define WM_CMD_IR					0x13
+#define WM_CMD_SPEAKER_ENABLE		0x14
 #define WM_CMD_CTRL_STATUS			0x15
 #define WM_CMD_WRITE_DATA			0x16
 #define WM_CMD_READ_DATA			0x17
+#define WM_CMD_SPEAKER_DATA			0x18
+#define WM_CMD_SPEAKER_MUTE			0x19
 #define WM_CMD_IR_2					0x1A
 
 /* input report ids */

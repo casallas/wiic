@@ -83,6 +83,8 @@ WIIC_EXPORT extern void wiic_set_nunchuk_accel_threshold(struct wiimote_t* wm, i
 
 /* speaker.c */
 WIIC_EXPORT extern void wiic_set_speaker(struct wiimote_t* wm, int status);
+WIIC_EXPORT extern void wiic_mute_speaker(struct wiimote_t* wm, int status);
+WIIC_EXPORT extern void wiic_sound(struct wiimote_t* wm);
 
 /* motionplus.c */
 WIIC_EXPORT extern void wiic_set_motion_plus(struct wiimote_t* wm, int status);

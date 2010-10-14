@@ -466,6 +466,10 @@ public:
     void SetMotionSensingMode(OnOffSelection State);
     void EnableMotionPlus(OnOffSelection State);
 
+	void EnableSpeaker(OnOffSelection State);
+	void MuteSpeaker(OnOffSelection State);
+	void PlaySound();
+
     void ReadData(unsigned char *Buffer, unsigned int Offset, unsigned int Length);
     void WriteData(unsigned int Address, unsigned char *Data, unsigned int Length);
 
@@ -486,6 +490,7 @@ public:
     int isUsingEXP();
     int isUsingIR();
     int isUsingSpeaker();
+	int isSpeakerMuted();
     int isUsingMotionPlus();
     int isLEDSet(int LEDNum);
 
