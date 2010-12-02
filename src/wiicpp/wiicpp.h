@@ -34,7 +34,8 @@
 #define WIICPP_H_
 
 #include <vector>
-#include <wiic.h>
+#include <wiic/wiic.h>
+#include <wiicpp/logging/dataset.h>
 
 class CButtonBase
 {

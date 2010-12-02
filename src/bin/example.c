@@ -43,7 +43,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <unistd.h>
-#include "wiic.h"
+#include <wiic/wiic.h>
 
 
 #define MAX_WIIMOTES				4

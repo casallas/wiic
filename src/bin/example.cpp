@@ -32,7 +32,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <unistd.h>
-#include <wiicpp.h>
+#include <wiicpp/wiicpp.h>
 
 using namespace std;
 

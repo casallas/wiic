@@ -66,7 +66,7 @@ void wiic_cleanup(struct wiimote_t** wm, int wiimotes) {
 	if (!wm)
 		return;
 
-	WIIC_INFO("wiiC clean up...");
+	WIIC_DEBUG("wiiC clean up...");
 
 	for (; i < wiimotes; ++i) {
 		wiic_disconnect(wm[i]);
@@ -104,7 +104,7 @@ struct wiimote_t** wiic_init(int wiimotes) {
 	 *	to call this function again it won't be intrusive.
 	 */
 	if (!g_banner) {
-		printf(	"WiiC v" WIIC_VERSION " loaded.\n"
+		WIIC_DEBUG(	"WiiC v" WIIC_VERSION " loaded.\n"
 				"By: Gabriele Randelli <randelli[at]dis{dot}uniroma1{dot}it>\n"
 				"http://www.dis.uniroma1.it/~randelli\n\n");
 		g_banner = 1;
