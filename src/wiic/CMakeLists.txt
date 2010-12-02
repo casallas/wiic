@@ -12,7 +12,7 @@ ENDIF(APPLE)
 
 ADD_LIBRARY(wiic SHARED ${WIIC_SOURCES})
 IF(LINUX)
-	TARGET_LINK_LIBRARIES(wiic bluetooth m)
+	TARGET_LINK_LIBRARIES(wiic bluetooth m pthread)
 ENDIF(LINUX)
 IF(APPLE)
 	TARGET_LINK_LIBRARIES(wiic "-framework IOBluetooth -framework Foundation -framework CoreFoundation")
