@@ -1,18 +1,8 @@
 #include "training.h"
 
-/***
- * Training methods
- */
-Training::Training()
-{
-
-}
-
 Training::~Training()
 {
-	ax.clear();
-	ay.clear();
-	az.clear();
+	clear();
 }
 
 /***
@@ -20,39 +10,57 @@ Training::~Training()
  */
 void Training::loadTraining(ifstream& infile)
 {
-	string line;
-	float nwVal;
-
-	// X Measurements
-	getline(infile,line);
-	istringstream xlstream(line);	
-	while(xlstream >> nwVal) {
-		ax.push_back(nwVal);
+	istringstream xIn, yIn, zIn;
+	string xLine, yLine, zLine;
+	float xAcc, yAcc, zAcc;
+	
+	if(getline(infile,xLine) && getline(infile,yLine) && getline(infile,zLine)) {
+		xIn.str(xLine);
+		yIn.str(yLine);
+		zIn.str(zLine);
+		
+		while(xIn >> xAcc) {
+			yIn >> yAcc;
+			zIn >> zAcc;
+			samples.push_back(new AccSample(xAcc,yAcc,zAcc));
+		}
 	}
-
-	// Y Measurements
-	getline(infile,line);
-	istringstream ylstream(line);
-	while(ylstream >> nwVal) {
-		ay.push_back(nwVal);
-	}
-
-	// Z Measurements
-	getline(infile,line);
-	istringstream zlstream(line);
-	while(zlstream >> nwVal) {
-		az.push_back(nwVal);
-	}	
 }
 
-void Training::addSample(double x, double y, double z)
+void Training::save(ofstream& out) const
 {
-	// X measures
-	ax.push_back(x);
-
-	// Y measures
-	ay.push_back(y);
+	for(int i = 0 ; i < samples.size() ; i++) {
+		AccSample* s = (AccSample*)samples[i];
+		out << s->x() << " ";
+	}
+	out << endl;
 	
-	// Z Measures
-	az.push_back(z);
+	for(int i = 0 ; i < samples.size() ; i++) {
+		AccSample* s = (AccSample*)samples[i];
+		out << s->y() << " ";
+	}
+	out << endl;
+	
+	for(int i = 0 ; i < samples.size() ; i++) {
+		AccSample* s = (AccSample*)samples[i];
+		out << s->z() << " ";
+	}
+	out << endl;
+}
+
+void Training::addSample(Sample* s)
+{
+	if(s)
+		samples.push_back(s);
+}
+
+void Training::clear()
+{
+	for(int i = 0 ; i < samples.size() ; i++) {
+		if(samples[i]) {
+			delete samples[i];
+			samples[i] = 0;
+		}
+	}
+	samples.clear();
 }

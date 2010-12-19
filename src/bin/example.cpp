@@ -32,7 +32,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <unistd.h>
-#include <wiicpp/wiicpp.h>
+#include <wiicpp.h>
 
 using namespace std;
 
@@ -138,11 +138,16 @@ void HandleEvent(CWiimote &wm)
     if(wm.isUsingACC())
     {
         float pitch, roll, yaw, a_pitch, a_roll;
-        wm.Accelerometer.GetOrientation(pitch, roll, yaw);
+        /*wm.Accelerometer.GetOrientation(pitch, roll, yaw);
         wm.Accelerometer.GetRawOrientation(a_pitch, a_roll);
         printf("%s wiimote roll = %f [%f]\n", prefixString, roll, a_roll);
         printf("%s wiimote pitch = %f [%f]\n", prefixString, pitch, a_pitch);
-        printf("%s wiimote yaw = %f\n", prefixString, yaw);
+        printf("%s wiimote yaw = %f\n", prefixString, yaw);*/
+	float x, y, z;
+	wm.Accelerometer.GetGravityVector(x,y,z);
+	printf("wiimote x acc = %f\n",x);
+	printf("wiimote y acc = %f\n",y);
+	printf("wiimote z acc = %f\n",z);
     }
 
 	// if the Motion Plus is turned on then print angles

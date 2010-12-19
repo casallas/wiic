@@ -27,12 +27,11 @@
  *	along with this program.  If not, see <http://www.gnu.org/licenses/>.
  *
  */
-
 #include <iostream>
 #include <stdio.h>
 #include <stdlib.h>
 #include <unistd.h>
-#include <wiicpp/wiicpp.h>
+#include <wiicpp.h>
 
 using namespace std;
 
@@ -59,7 +58,7 @@ void dataAcquisition(CWii& wii, CWiimote& wiimote, const string logfile)
 		while(enbAcq && wiimote.Buttons.isPressed(CButtons::BUTTON_PLUS)) {
 			float x, y, z;
 			wiimote.Accelerometer.GetGravityVector(x,y,z);
-			training->addSample(x,y,z);	
+			training->addSample(new AccSample(x,y,z));	
 		  	enbAcq = 2;		
 		  	usleep(10000);
 			wii.Poll();					
@@ -68,11 +67,12 @@ void dataAcquisition(CWii& wii, CWiimote& wiimote, const string logfile)
 		if(enbAcq == 2) {
 			dataset->addTraining(training);
 			count++;
-			cout << "Training acquired" << endl;
+			cout << "Training " << count << " acquired" << endl;
 			cout << "  - Press PLUS button to acquire the training" << endl;
 			cout << "  - Release PLUS button to end the training acquisition" << endl;
 			cout << "  - Press HOME button to go back to the main menu" << endl;
 			enbAcq = 1;		
+			training = new Training();
 		}
 
 		if(enbAcq == 1 && wiimote.Buttons.isJustPressed(CButtons::BUTTON_HOME)) {
@@ -80,6 +80,14 @@ void dataAcquisition(CWii& wii, CWiimote& wiimote, const string logfile)
 			enbAcq = 0;
 		}
 	}
+	
+	if(training)
+		delete training;
+	training = 0;
+
+	if(dataset)
+		delete dataset;
+	dataset = 0;		
 }
 
 

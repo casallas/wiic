@@ -2,6 +2,7 @@
 #include <iostream>
 #include <vector>
 #include <sstream>
+#include "accsample.h"
 
 using namespace std;
 
@@ -10,42 +11,38 @@ using namespace std;
  */
 class Training
 {
-	public:
+public:
 	/**
 	 * Constructor void
 	 */
-	Training();
+	Training() {}
 	~Training();
 
-	void loadTraining(ifstream& infile);
-	void addSample(double, double, double);
-	
-	inline float xSample(int i) const {
-		if(i < ax.size())
-			return ax[i];
-		else
-			return -1;
-	}
-	
-	inline float ySample(int i) const {
-		if(i < ay.size())
-			return ay[i];
-		else
-			return -1;
-	}
-	
-	inline float zSample(int i) const {
-		if(i < az.size())
-			return az[i];
-		else
-			return -1;
-	}
-	
-	inline int size() const { return ax.size(); }
+	void loadTraining(ifstream&);
+	void save(ofstream&) const;
+	void addSample(Sample*);
+	void clear();
 
-	private:
-	/** vector<float> ax,ay,az is a vector with the values of the accelerations */
-	vector<float> ax;
-	vector<float> ay;
-	vector<float> az;
+	inline const Sample* sampleAt(int i) const { 
+		if(i < samples.size())
+			return samples[i]; 
+		else {
+			cout << "[Error]: requested out of array bound index in training." << endl;
+			return 0;
+		}
+	}
+
+	inline Sample* sampleAt(int i) { 
+		if(i < samples.size())
+			return samples[i]; 
+		else {
+			cout << "[Error]: requested out of array bound index in training." << endl;
+			return 0;
+		}
+	}
+
+	inline int size() const { return samples.size(); }
+
+private:
+	vector<Sample*> samples;
 };
