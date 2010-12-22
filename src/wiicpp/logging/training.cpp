@@ -10,6 +10,21 @@ Training::~Training()
  */
 void Training::loadTraining(ifstream& infile)
 {
+	string line;
+	if(getline(infile,line)) {
+		if(line == "acc") {
+			loadAccTraining(infile);
+			logType = LOG_ACC;
+		}
+		else
+			cout << "[Error]: bad log type." << endl;
+	}
+	else
+		cout << "[Error]: unable to identify the log type. Check your log file format." << endl; 
+}
+
+void Training::loadAccTraining(ifstream& infile)
+{
 	istringstream xIn, yIn, zIn;
 	string xLine, yLine, zLine;
 	float xAcc, yAcc, zAcc;
@@ -28,24 +43,28 @@ void Training::loadTraining(ifstream& infile)
 }
 
 void Training::save(ofstream& out) const
-{
-	for(int i = 0 ; i < samples.size() ; i++) {
-		AccSample* s = (AccSample*)samples[i];
-		out << s->x() << " ";
+{	
+	if(logType == LOG_ACC) {
+		out << "acc" << endl;
+		
+		for(int i = 0 ; i < samples.size() ; i++) {
+			AccSample* s = (AccSample*)samples[i];
+			out << s->x() << " ";
+		}
+		out << endl;
+
+		for(int i = 0 ; i < samples.size() ; i++) {
+			AccSample* s = (AccSample*)samples[i];
+			out << s->y() << " ";
+		}
+		out << endl;
+
+		for(int i = 0 ; i < samples.size() ; i++) {
+			AccSample* s = (AccSample*)samples[i];
+			out << s->z() << " ";
+		}
+		out << endl;		
 	}
-	out << endl;
-	
-	for(int i = 0 ; i < samples.size() ; i++) {
-		AccSample* s = (AccSample*)samples[i];
-		out << s->y() << " ";
-	}
-	out << endl;
-	
-	for(int i = 0 ; i < samples.size() ; i++) {
-		AccSample* s = (AccSample*)samples[i];
-		out << s->z() << " ";
-	}
-	out << endl;
 }
 
 void Training::addSample(Sample* s)

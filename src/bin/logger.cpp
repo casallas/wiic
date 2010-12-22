@@ -43,7 +43,7 @@ void dataAcquisition(CWii& wii, CWiimote& wiimote, const string logfile)
 	string fileacc;
 	
 	Dataset* dataset = new Dataset();
-	Training* training = new Training();
+	Training* training = new Training(WiiC::LOG_ACC);
 
 	cout << "Trainings will be stored in " << logfile << endl;
 	cout << "  - Press PLUS button to acquire the training" << endl;
@@ -72,7 +72,7 @@ void dataAcquisition(CWii& wii, CWiimote& wiimote, const string logfile)
 			cout << "  - Release PLUS button to end the training acquisition" << endl;
 			cout << "  - Press HOME button to go back to the main menu" << endl;
 			enbAcq = 1;		
-			training = new Training();
+			training = new Training(WiiC::LOG_ACC);
 		}
 
 		if(enbAcq == 1 && wiimote.Buttons.isJustPressed(CButtons::BUTTON_HOME)) {

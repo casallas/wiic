@@ -4,7 +4,15 @@
 #include <sstream>
 #include "accsample.h"
 
+namespace WiiC {
+	enum LogType {
+		LOG_NONE,
+		LOG_ACC
+	};
+}
+
 using namespace std;
+using namespace WiiC;
 
 /**
  * Class Training to save the individual training of a gesture  
@@ -15,7 +23,8 @@ public:
 	/**
 	 * Constructor void
 	 */
-	Training() {}
+	Training() { logType = LOG_ACC; }
+	Training(LogType l) { logType = l; }
 	~Training();
 
 	void loadTraining(ifstream&);
@@ -40,9 +49,16 @@ public:
 			return 0;
 		}
 	}
+	
+	inline void setLogType(LogType l) { logType = l; }
+	inline LogType getLogType() const { return logType; }
 
 	inline int size() const { return samples.size(); }
+	
+protected:
+	void loadAccTraining(ifstream& infile);
 
 private:
 	vector<Sample*> samples;
+	LogType logType;
 };
