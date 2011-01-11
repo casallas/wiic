@@ -7,12 +7,6 @@
  *
  *	Copyright 2010
  *
- *	This file is based on WiiuseCpp, written By:
- *		James Thomas
- *		Email: jt@missioncognition.net
- *
- *	Copyright 2009
- *
  *	This program is free software; you can redistribute it and/or modify
  *	it under the terms of the GNU General Public License as published by
  *	the Free Software Foundation; either version 3 of the License, or
@@ -27,13 +21,81 @@
  *	along with this program.  If not, see <http://www.gnu.org/licenses/>.
  *
  */
-#include <iostream>
-#include <stdio.h>
-#include <stdlib.h>
+#include <fstream>
 #include <unistd.h>
 #include <wiicpp.h>
+#include <stdio.h>
+#include <stdlib.h>
+#include <time.h>
 
 using namespace std;
+
+void acquireGesture(CWii& wii, CWiimote& wiimote, Training* training)
+{
+	cout << "  - Press PLUS button to acquire the training" << endl;
+	cout << "  - Release PLUS button to end the training acquisition" << endl;
+	int enbAcq = 1;
+
+	while(enbAcq) {
+		wii.Poll();
+		
+		//Inizio acquisizione dati
+		while(enbAcq && wiimote.Buttons.isPressed(CButtons::BUTTON_PLUS)) {
+			float x, y, z;
+			wiimote.Accelerometer.GetGravityVector(x,y,z);
+			training->addSample(new AccSample(x,y,z));	
+		  	enbAcq = 2;		
+		  	usleep(10000);
+			wii.Poll();					
+		}
+		
+		if(enbAcq == 2) {
+			cout << "Training acquired" << endl;
+			enbAcq = 0;		
+		}
+	}
+}
+
+void randomAcquisition(CWii& wii, CWiimote& wiimote, const int samples, vector<string>& files)
+{
+	// Total iterations
+	int totSamples = samples*files.size();
+	srand(time(0));
+	
+	// Open output streams
+	vector<ofstream*> outs;
+	for(int i = 0 ; i < files.size() ; i++)
+		outs[i] = new ofstream(files[i].c_str());
+	
+	// Number of samples per file
+	vector<int> fileSamples;
+	for(int i = 0 ; i < files.size() ; i++)
+		fileSamples.push_back(samples);
+	
+	for(int i = 0 ; i < totSamples ; i++) {
+		// Random generation
+		int selection = rand() % files.size() ;
+
+		// Gesture acquisition
+		cout << "Selected gesture: " << files[selection] << endl;
+		Training* training = new Training(WiiC::LOG_ACC);
+		acquireGesture(wii, wiimote, training);
+		
+		// Gesture save
+		training->save(*(outs[selection]));
+		if(training) {
+			delete training;
+			training = 0;
+		}
+		
+		// Sample decrement and check whether to close the file
+		if(!(--fileSamples[selection])) {
+			outs[selection]->close(); // Stream close
+			outs.erase(outs.begin() + selection); // Stream erase
+			files.erase(files.begin() + selection); // Filename erase
+		}
+	}	
+}
 
 void dataAcquisition(CWii& wii, CWiimote& wiimote, const string logfile)
 {
@@ -100,24 +162,35 @@ int main(int argc, char** argv)
     int index;
     bool help = false;
 
-	string option;
+	string option; 
 	if(argc == 2) {
 		option = string(argv[1]);
 		if(option == "help") {
 			cout << endl << "wiic-logger is a utility to collect accelerometer data in a log." << endl;
 			cout << "wiic-logger is part of WiiC (http://wiic.sf.net)" << endl << endl;
 			cout << "Usage: wiic-logger <log_filename>" << endl;
-			cout << "   <log_filename>: full pathname of the output log file" << endl << endl;
+			cout << "       wiic-logger RANDOM <num_samples> <filename1> ... <filenameN>" << endl;
+			cout << "   <log_filename>: full pathname of the output log file" << endl;
+			cout << "   <num_samples>: number of samples for each file" << endl << endl;
+			cout << "   <filename1> ... <filenameN>: full pathname of each gesture file" << endl << endl;
+		
+			return 1;
+		}
+	}
+	else if(argc >= 3) {
+		option = string(argv[1]);
+		if(option != "RANDOM") {
+			cout << endl << "Bad Syntax!" << endl;
+			cout << "Type wiic-logger help for a brief documentation." << endl << endl;
 		
 			return 1;
 		}
 	}
 	else {
-		cout << endl << "Bad Syntax: wiic-logger <log_filename>" << endl;
-		cout << "   <log_filename>: full pathname of the output log file" << endl;
+		cout << endl << "Bad Syntax!" << endl;
 		cout << "Type wiic-logger help for a brief documentation." << endl << endl;
 		
-		return 1;
+		return 1;	
 	}
 
     cout << "Searching for wiimotes... Turn them on!" << endl;
@@ -149,7 +222,20 @@ int main(int argc, char** argv)
     wiimote.SetRumbleMode(CWiimote::OFF);
 	wiimote.SetMotionSensingMode(CWiimote::ON);
 
-	dataAcquisition(wii, wiimote, option);
+	if(option == "RANDOM") {
+		// Num of samples for each file
+		int numSamples = atoi(argv[2]);
+		
+		// Load candidate files
+		vector<string> gestures;
+		int i = 3;
+		while (i < argc) 
+			gestures.push_back(string(argv[i++]));
+		
+		randomAcquisition(wii, wiimote, numSamples, gestures);
+	}
+	else
+		dataAcquisition(wii, wiimote, option);
 
     return 0;
 }
