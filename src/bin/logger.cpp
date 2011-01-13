@@ -50,7 +50,6 @@ void acquireGesture(CWii& wii, CWiimote& wiimote, Training* training)
 		}
 		
 		if(enbAcq == 2) {
-			cout << "Training acquired" << endl;
 			enbAcq = 0;		
 		}
 	}
@@ -61,12 +60,16 @@ void randomAcquisition(CWii& wii, CWiimote& wiimote, const int samples, vector<s
 	// Total iterations
 	int totSamples = samples*files.size();
 	srand(time(0));
+	cout << "=======================================" << endl;
+	cout << "You are going to acquire " << samples << endl;
+	cout << "samples per " << files.size() << " files "
+		 << " = " << totSamples << " total samples" << endl << endl;
 	
 	// Open output streams
 	vector<ofstream*> outs;
-	for(int i = 0 ; i < files.size() ; i++)
-		outs[i] = new ofstream(files[i].c_str());
-	
+	for(int i = 0 ; i < files.size() ; i++) 
+		outs.push_back(new ofstream(files[i].c_str(), ios::app));		
+		
 	// Number of samples per file
 	vector<int> fileSamples;
 	for(int i = 0 ; i < files.size() ; i++)
@@ -80,6 +83,7 @@ void randomAcquisition(CWii& wii, CWiimote& wiimote, const int samples, vector<s
 		cout << "Selected gesture: " << files[selection] << endl;
 		Training* training = new Training(WiiC::LOG_ACC);
 		acquireGesture(wii, wiimote, training);
+		cout << "Training " << (i+1) << " acquired" << endl;
 		
 		// Gesture save
 		training->save(*(outs[selection]));
@@ -91,10 +95,16 @@ void randomAcquisition(CWii& wii, CWiimote& wiimote, const int samples, vector<s
 		// Sample decrement and check whether to close the file
 		if(!(--fileSamples[selection])) {
 			outs[selection]->close(); // Stream close
+			if(outs[selection])
+				delete outs[selection]; // Stream deallocation
 			outs.erase(outs.begin() + selection); // Stream erase
 			files.erase(files.begin() + selection); // Filename erase
+			fileSamples.erase(fileSamples.begin() + selection); // File sample erase
 		}
 	}	
+	
+	cout << "=======================================" << endl;
+	cout << "That's it! Bye" << endl;
 }
 
 void dataAcquisition(CWii& wii, CWiimote& wiimote, const string logfile)
