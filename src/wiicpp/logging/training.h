@@ -32,7 +32,7 @@ public:
 	void addSample(Sample*);
 	void clear();
 
-	inline const Sample* sampleAt(int i) const { 
+	inline const Sample* sampleAt(unsigned int i) const { 
 		if(i < samples.size())
 			return samples[i]; 
 		else {
@@ -41,7 +41,7 @@ public:
 		}
 	}
 
-	inline Sample* sampleAt(int i) { 
+	inline Sample* sampleAt(unsigned int i) { 
 		if(i < samples.size())
 			return samples[i]; 
 		else {
@@ -53,7 +53,7 @@ public:
 	inline void setLogType(LogType l) { logType = l; }
 	inline LogType getLogType() const { return logType; }
 
-	inline int size() const { return samples.size(); }
+	inline unsigned int size() const { return samples.size(); }
 	
 protected:
 	void loadAccTraining(ifstream& infile);

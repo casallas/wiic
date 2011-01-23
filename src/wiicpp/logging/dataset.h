@@ -15,7 +15,7 @@ public:
 	 */
 	inline int size() const { return trainings.size(); }
 
-	inline const Training* trainingAt(int i) const { 
+	inline const Training* trainingAt(unsigned int i) const { 
 		if(i < trainings.size())
 			return trainings[i]; 
 		else {
@@ -24,7 +24,7 @@ public:
 		}
 	}
 
-	inline Training* trainingAt(int i) { 
+	inline Training* trainingAt(unsigned int i) { 
 		if(i < trainings.size())
 			return trainings[i]; 
 		else {
