@@ -37,6 +37,38 @@ void MLAlg::setType(const string& st)
     	if (st == MLAlgName[i]) tp = (type)i;
 	}
 }
+
+void MLAlg::load(const char* filename) 
+{
+	switch (tp) {
+		case KNN:
+    	knn.load(filename); 
+		break;
+		
+		case Bayes:
+    	bayes.load(filename); 
+		break;
+		
+		case SVM:
+    	svm.load(filename); 
+		break;
+		
+		case DT:
+		dt.load(filename);
+		break;
+		
+		case Boost:
+		boost.load(filename); 
+		break;
+		
+		case RT:
+		rt.load(filename);
+		break;
+		
+		default:
+		cout << "ML method not implemented yet." << endl;
+	}	
+}
 	
 void MLAlg::save(const char* filename) const
 {

@@ -16,6 +16,7 @@ public:
 	void validate(const CvMat *validateIn, const CvMat *validateOut);
 	void recognize(const CvMat *recognizeIn, CvMat *recognizeOut);
 	void save(const char* filename) const;
+	void load(const char* filename);
 
 private:  
     CvKNearest knn;
