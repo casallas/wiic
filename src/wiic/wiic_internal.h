@@ -55,7 +55,7 @@
 #include "definitions.h"
 
 /* WiiC version */
-#define WIIC_VERSION					"0.60"
+#define WIIC_VERSION					"1.0"
 
 /********************
  *

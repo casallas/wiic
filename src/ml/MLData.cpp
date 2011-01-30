@@ -127,6 +127,11 @@ bool MLData::open(const vector<string>& vf)
     return true; 
 }
 
+bool MLData::load(const vector<Dataset>& vd)
+{
+	// TO BE IMPLEMENTED
+}
+
 void MLData::generateTrainingAndValidationData(float perc)  // genera random perc % training data (in train) e il resto come validation
 { 
     if (train_in) cvReleaseMat(&train_in);

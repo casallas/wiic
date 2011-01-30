@@ -4,6 +4,7 @@
 #include <ml.h>
 #include <vector>
 #include <string>
+#include <Dataset.h>
 
 using namespace std;
 
@@ -13,8 +14,9 @@ public:
        MLData(const vector<int>& mask);
        ~MLData();
 
-       	bool open(const vector<string>& vf); // apre i file memorizzati in vf (uno per ciascuna categoria e li carica in memoria)
-       	void generateTrainingAndValidationData(float perc);  // genera random perc % training data (in train) e il resto come validation
+       	bool open(const vector<string>& vf); // Open files stored vf (one for each category)
+		bool load(const vector<Dataset>& vd); // Extracts features from WiiC data (one Dataset per gesture) 
+      	void generateTrainingAndValidationData(float perc);  // Generate training and testing set according to the desired percentage
 
        	int getNumFeatures(); // nr. of features
        	int getNumCategories(); // nr. of categories
