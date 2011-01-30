@@ -127,7 +127,7 @@ bool MLData::open(const vector<string>& vf)
     return true; 
 }
 
-bool MLData::load(const vector<Dataset>& vd)
+bool MLData::loadTraining(const Training* t)
 {
 	// TO BE IMPLEMENTED
 }

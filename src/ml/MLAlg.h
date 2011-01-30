@@ -14,6 +14,7 @@ public:
 	void setType(const string& st);
 	void train(const CvMat *trainIn, const CvMat *trainOut);
 	void validate(const CvMat *validateIn, const CvMat *validateOut);
+	void recognize(const CvMat *recognizeIn, CvMat *recognizeOut);
 
 private:  
     CvKNearest knn;

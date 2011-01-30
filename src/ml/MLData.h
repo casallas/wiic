@@ -15,7 +15,7 @@ public:
        ~MLData();
 
        	bool open(const vector<string>& vf); // Open files stored vf (one for each category)
-		bool load(const vector<Dataset>& vd); // Extracts features from WiiC data (one Dataset per gesture) 
+		bool loadTraining(const Training* t); // Extracts features from WiiC data (one Training per gesture) 
       	void generateTrainingAndValidationData(float perc);  // Generate training and testing set according to the desired percentage
 
        	int getNumFeatures(); // nr. of features

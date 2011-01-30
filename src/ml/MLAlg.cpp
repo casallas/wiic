@@ -123,3 +123,48 @@ void MLAlg::validate(const CvMat *validateIn, const CvMat *validateOut) {
 	cout << "Errors = " << err << "/" << validateIn->rows << " - Accuracy = " << (1.0f-(float)err/validateIn->rows)*100 << " %" << endl;
 	cout << "Done." << endl;
 }
+
+void MLAlg::recognize(const CvMat *recognizeIn, CvMat *recognizeOut) {
+	cout << "Recognizing the acquired gesture with "  << MLAlgName[tp] << "..." << endl;
+
+	CvMat sample;
+	CvDTreeNode* n = 0;
+	recognizeOut = cvCreateMat( recognizeIn->rows, 1, CV_32FC1 );
+	
+	for (int v = 0 ; v < recognizeIn->rows ; v++) {
+    	cvGetRow(recognizeIn, &sample, v);
+		float r;
+    	switch (tp) {
+			case KNN:
+	    	r = knn.find_nearest(&sample,K); 
+			break;
+			
+			case Bayes:
+	    	r = bayes.predict(&sample); 
+			break;
+			
+			case SVM:
+	    	r = svm.predict(&sample); 
+			break;
+			
+			case DT:
+			n = dt.predict(&sample);
+			if(n)
+				r = (float)n->value;
+			break;
+			
+			case Boost:
+			r = boost.predict(&sample); 
+			break;
+			
+			case RT:
+			r = rt.predict(&sample);
+			break;
+			
+    		default:
+			cout << "ML method not implemented yet." << endl;
+    	}
+    	cout << "Recognized value: " << r << endl;
+		recognizeOut->data.fl[v] = r; 
+	}
+}
