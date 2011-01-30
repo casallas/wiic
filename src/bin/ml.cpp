@@ -4,8 +4,16 @@ int main(int argc, char **argv) {
 
   
     if (argc<2) {
-		cout << "Use  " << argv[0] << " <KNN|Bayes|SVN|DT> [training data ratio] " << endl;
-		cout << "e.g. " << argv[0] << " KNN  [0.75] " << endl;
+		cout << "Use  " << argv[0] << " <KNN|Bayes|SVN|DT|ANN|Boost|RT> <training_data_ratio> <data_file1> ... <data_fileN>" << endl;
+		cout << "e.g. " << argv[0] << " KNN 0.75 file1.log file2.log" << endl;
+		cout << "======= Supported Algorithms =======" << endl;
+		cout << "KNN: k-nearest neighbor" << endl;
+		cout << "Bayes: normal Bayes classifier" << endl;
+		cout << "SVN: support vector machines" << endl;
+		cout << "DT: decision trees" << endl;
+		cout << "ANN: artificial neural networks" << endl;
+		cout << "Boost: two-class discrete AdaBoost" << endl;
+		cout << "RT: random trees" << endl;
 		return 1;
     }
     
@@ -18,12 +26,9 @@ int main(int argc, char **argv) {
     mlalg.setType(string(argv[1]));
     
     vector<string> vf;
-    vf.push_back("data/UP");
-    vf.push_back("data/DOWN");
-    vf.push_back("data/LEFT");
-    vf.push_back("data/RIGHT");
-    vf.push_back("data/FORWARD");
-    vf.push_back("data/BACKWARD");
+	for(int i = 3 ; i < argc ; i++)
+    	vf.push_back(string(argv[i]));
+
     if(!mldata.open(vf)) {
 		cout << "Unable to parse input files" << endl;
 		return 1;
