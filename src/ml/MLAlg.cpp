@@ -38,7 +38,38 @@ void MLAlg::setType(const string& st)
 	}
 }
 	
-    
+void MLAlg::save(const char* filename) const
+{
+	switch (tp) {
+		case KNN:
+    	knn.save(filename); 
+		break;
+		
+		case Bayes:
+    	bayes.save(filename); 
+		break;
+		
+		case SVM:
+    	svm.save(filename); 
+		break;
+		
+		case DT:
+		dt.save(filename);
+		break;
+		
+		case Boost:
+		boost.save(filename); 
+		break;
+		
+		case RT:
+		rt.save(filename);
+		break;
+		
+		default:
+		cout << "ML method not implemented yet." << endl;
+	}	
+}
+
 void MLAlg::train(const CvMat *trainIn, const CvMat *trainOut)
 {
 	cout << "Training " << MLAlgName[tp] << " with " << trainIn->rows << " training samples." << endl;

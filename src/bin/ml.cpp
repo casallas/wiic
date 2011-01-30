@@ -49,6 +49,10 @@ int main(int argc, char **argv) {
     
     cout << "===================================" << endl;
     mlalg.validate(validateIn,validateOut);
+
+	string output = string(argv[1]) + string("_model");
+	cout << "Saving the trained model in " << output << endl;
+	mlalg.save(output.c_str());
     
     return 0;
 }
