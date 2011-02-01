@@ -30,7 +30,12 @@ public:
        	void getRandomSample(CvMat *sample, float &cat);
 		void normalize(const int minN =0, const int maxN =1); // This will replace old data
 
-  private:
+protected:
+		void computeDisplacement(const Training* t, vector<double>& features);
+		void computeAttitude(const Training* t, vector<double>& features);
+		void computeSpeed(const Training* t, vector<double>& features);
+
+private:
         CvMat *all_in, *train_in, *validation_in;
         CvMat *all_out, *train_out, *validation_out;
         vector<string> categoryNames;

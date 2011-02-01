@@ -192,7 +192,7 @@ void MLAlg::recognize(const CvMat *recognizeIn, CvMat *recognizeOut) {
 
 	CvMat sample;
 	CvDTreeNode* n = 0;
-	recognizeOut = cvCreateMat( recognizeIn->rows, 1, CV_32FC1 );
+	//recognizeOut = cvCreateMat( recognizeIn->rows, 1, CV_32FC1 );
 	
 	for (int v = 0 ; v < recognizeIn->rows ; v++) {
     	cvGetRow(recognizeIn, &sample, v);

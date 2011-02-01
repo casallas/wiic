@@ -2,6 +2,7 @@
 #include <fstream>
 #include <sstream>
 #include <limits>
+#include <cmath>
 
 using namespace std;
 
@@ -129,7 +130,85 @@ bool MLData::open(const vector<string>& vf)
 
 bool MLData::loadTraining(const Training* t)
 {
-	// TO BE IMPLEMENTED
+	vector<double> features;
+	
+	// Extract features
+	computeDisplacement(t,features);
+	computeAttitude(t,features);
+	computeSpeed(t,features);
+	
+	// Parameter init
+	nsamples = 1;
+	ncategories = 1;
+	nfeatures = 8;
+	
+	// Store in OpenCV data structure
+	if (!all_in) {
+		all_in = cvCreateMat( nsamples*ncategories, nfeatures, CV_32FC1 );
+		all_out = cvCreateMat( nsamples*ncategories, 1, CV_32FC1 );
+	}
+	
+	for (int k = 0; k < nfeatures ; k++) {
+		all_in->data.fl[k] = features[k];
+		if(features[k] < min)
+			min = features[k];
+		else if(features[k] > max)
+			max = features[k];
+	}
+}
+
+void MLData::computeDisplacement(const Training* t, vector<double>& features)
+{
+	double xspace, yspace, zspace;
+	double xvel, yvel, zvel;
+	xspace = yspace = zspace = xvel = yvel = zvel = 0.0;
+	
+	// Compute displacement and update speed
+	for(int i = 0 ; i < t->size() ; i++) {
+		const AccSample* sample = reinterpret_cast<const AccSample*>(t->sampleAt(i));
+		xspace = xspace + xvel*0.01 + 0.5*sample->x()*0.01*0.01; 
+		xvel = xvel + sample->x()*0.01;
+ 		yspace = yspace + yvel*0.01 + 0.5*sample->y()*0.01*0.01; 
+ 		yvel = yvel + sample->y()*0.01;
+ 		zspace = zspace + zvel*0.01 + 0.5*(sample->z()-1)*0.01*0.01; 
+		zvel = zvel + (sample->z()-1)*0.01;	
+	}
+	
+	features.push_back(xspace);
+	features.push_back(yspace);
+	features.push_back(zspace);
+}
+
+void MLData::computeAttitude(const Training* t, vector<double>& features)
+{
+	double roll, pitch;
+	roll = pitch = 0.0;
+	
+	int i = t->size() - 1;
+	const AccSample* sample = reinterpret_cast<const AccSample*>(t->sampleAt(i));
+	roll = atan2(sample->x(),sample->z())*180/M_PI;
+	pitch = atan2(sample->y(),sample->z())*180/M_PI;;
+	
+	features.push_back(roll);
+	features.push_back(pitch);
+}
+
+void MLData::computeSpeed(const Training* t, vector<double>& features)
+{
+	double xvel, yvel, zvel;
+	xvel = yvel = zvel = 0.0;
+	
+	// Compute speed
+	for(int i = 0 ; i < t->size() ; i++) {
+		const AccSample* sample = reinterpret_cast<const AccSample*>(t->sampleAt(i));
+		xvel = xvel + sample->x()*0.01;
+ 		yvel = yvel + sample->y()*0.01;
+		zvel = zvel + (sample->z()-1)*0.01;	
+	}	
+	
+	features.push_back(xvel);
+	features.push_back(yvel);
+	features.push_back(zvel);
 }
 
 void MLData::generateTrainingAndValidationData(float perc)  // genera random perc % training data (in train) e il resto come validation
