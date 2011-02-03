@@ -12,6 +12,9 @@ public:
 	MLAlg(type t=KNN);
   	inline void setType(type t) { tp = t; }
 	void setType(const string& st);
+	inline string getType() { return MLAlgName[tp]; }
+	inline void setCategoryNames(const vector<string>& names) { categoryNames = names; }
+	string categoryName(int i);
 	void train(const CvMat *trainIn, const CvMat *trainOut);
 	void validate(const CvMat *validateIn, const CvMat *validateOut);
 	void recognize(const CvMat *recognizeIn, CvMat *recognizeOut);
@@ -34,4 +37,5 @@ private:
     
     int K;
     type tp;
+	vector<string> categoryNames;
 };

@@ -1,3 +1,6 @@
+#ifndef ACC_SAMPLE_H
+#define ACC_SAMPLE_H
+
 #include "sample.h"
 
 class AccSample : public Sample
@@ -14,3 +17,5 @@ private:
 	float ay;
 	float az;
 };
+
+#endif

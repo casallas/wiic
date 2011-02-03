@@ -74,7 +74,6 @@ void MLAlg::save(const char* filename) const
 {
 	switch (tp) {
 		case KNN:
-    	knn.save(filename); 
 		break;
 		
 		case Bayes:
@@ -146,10 +145,11 @@ void MLAlg::validate(const CvMat *validateIn, const CvMat *validateOut) {
 	CvMat sample; // = cvCreateMat(1, mldata.getNumFeatures(), CV_32FC1 );
 	float cat; int err=0;
 	CvDTreeNode* n = 0;
-	
+
 	for (int v=0; v<validateIn->rows; v++) {
     	cvGetRow(validateIn, &sample, v);
-    	cat = validateOut->data.fl[v]; float r=cat+1;
+    	cat = validateOut->data.fl[v]; 
+    	float r = 0.0;
     	switch (tp) {
 			case KNN:
 	    	r = knn.find_nearest(&sample,K); 
@@ -181,7 +181,7 @@ void MLAlg::validate(const CvMat *validateIn, const CvMat *validateOut) {
 			cout << "ML method not implemented yet." << endl;
     	}
     	err += (cat!=r);
-    	cout << "True value: " << cat << " - KNN: " << r << "  " << (r==cat?"":"ERROR") << endl;
+    	cout << "True value: " << categoryName(cat) << " - " << MLAlgName[tp] << ": " << categoryName(r) << "  " << (r==cat?"":"ERROR") << endl;
 	}
 	cout << "Errors = " << err << "/" << validateIn->rows << " - Accuracy = " << (1.0f-(float)err/validateIn->rows)*100 << " %" << endl;
 	cout << "Done." << endl;
@@ -192,11 +192,10 @@ void MLAlg::recognize(const CvMat *recognizeIn, CvMat *recognizeOut) {
 
 	CvMat sample;
 	CvDTreeNode* n = 0;
-	//recognizeOut = cvCreateMat( recognizeIn->rows, 1, CV_32FC1 );
-	
+
 	for (int v = 0 ; v < recognizeIn->rows ; v++) {
     	cvGetRow(recognizeIn, &sample, v);
-		float r;
+		float r = 0.0;
     	switch (tp) {
 			case KNN:
 	    	r = knn.find_nearest(&sample,K); 
@@ -227,7 +226,18 @@ void MLAlg::recognize(const CvMat *recognizeIn, CvMat *recognizeOut) {
     		default:
 			cout << "ML method not implemented yet." << endl;
     	}
-    	cout << "Recognized value: " << r << endl;
+    	cout << "Recognized value: " << categoryName(r) << endl;
 		recognizeOut->data.fl[v] = r; 
+	}
+}
+
+string MLAlg::categoryName(int i) 
+{
+	if(i < categoryNames.size())
+		return categoryNames[i];
+	else {
+		ostringstream oss;
+		oss << i;
+		return oss.str();
 	}
 }

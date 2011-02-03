@@ -1,3 +1,6 @@
+#ifndef SAMPLE_H
+#define SAMPLE_H
+
 #include <sys/time.h>
 
 using namespace std;
@@ -11,3 +14,5 @@ public:
 protected:	
 	struct timeval timestamp;
 };
+
+#endif

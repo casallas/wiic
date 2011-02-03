@@ -103,7 +103,11 @@ void calculate_orientation(struct accel_t* ac, struct vec3b_t* accel, struct ori
 
 	if (abs(accel->y - ac->cal_zero.y) <= ac->cal_g.y) {
 		/* pitch */
-		y = RAD_TO_DEGREE(asin(y));
+		float y_tmp = asin(y);
+		if(isnan(y_tmp))
+			y = 0.0;
+		else
+			y = RAD_TO_DEGREE(y_tmp);
 
 		orient->pitch = y;
 		orient->a_pitch = y;

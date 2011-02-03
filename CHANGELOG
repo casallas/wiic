@@ -8,6 +8,14 @@ http://wiic.sf.net
 
 
 ---------------------------
+v1.00 --  ?? ??? 2011
+---------------------------
+
+	Added:
+		-[Mac/Linux] Wiimote logging system
+		-[Mac/Linux] WiiC machine learning module
+
+---------------------------
 v0.53 -- 01 Sep 2010
 ---------------------------
 

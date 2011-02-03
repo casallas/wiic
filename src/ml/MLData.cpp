@@ -23,13 +23,28 @@ MLData::MLData(const vector<int>& mask) : rng(time(0)) {
 	featureMask = mask;
 }
 
-MLData::~MLData() {      
+MLData::~MLData() 
+{      
     if (all_in) cvReleaseMat(&all_in);
     if (all_out) cvReleaseMat(&all_out);
     if (train_in) cvReleaseMat(&train_in);
     if (train_out) cvReleaseMat(&train_out);
     if (validation_in) cvReleaseMat(&validation_in);
     if (validation_out) cvReleaseMat(&validation_out);
+}
+
+void MLData::clean()
+{
+    if (all_in) cvReleaseMat(&all_in);
+    if (all_out) cvReleaseMat(&all_out);
+    if (train_in) cvReleaseMat(&train_in);
+    if (train_out) cvReleaseMat(&train_out);
+    if (validation_in) cvReleaseMat(&validation_in);
+    if (validation_out) cvReleaseMat(&validation_out);	
+
+    all_in = all_out = NULL;
+    train_in = train_out = NULL;
+    validation_in = validation_out = NULL;
 }
 
 // apre i file memorizzati in vf (uno per ciascuna categoria e li carica in memoria)
@@ -80,12 +95,9 @@ bool MLData::open(const vector<string>& vf)
 					if(find(featureMask.begin(), featureMask.end(), (k+1)) != featureMask.end()) { // Feature selection
 						a[nfeatures++]=val; 
 					}
-					// cout << "   "   << val ;
 					ss >> val;
 					k++;
 				}
-				//cout << endl;
-				// nfeatures--;
 				cout << "Number of features = " << nfeatures << endl;
 			}
 	    	else {
@@ -121,7 +133,7 @@ bool MLData::open(const vector<string>& vf)
 
 	// Feature Bitmask (if already set, do nothing, otherwise set all the features)
 	if(!featureMask.size()) {
-		for(int i = 1 ; i < nfeatures ; i++) // BE CAREFUL: feature index starts from 1, vector index starts from 0!
+		for(int i = 1 ; i <= nfeatures ; i++) // BE CAREFUL: feature index starts from 1, vector index starts from 0!
 			featureMask.push_back(i);
 	}
 
@@ -143,11 +155,12 @@ bool MLData::loadTraining(const Training* t)
 	nfeatures = 8;
 	
 	// Store in OpenCV data structure
-	if (!all_in) {
-		all_in = cvCreateMat( nsamples*ncategories, nfeatures, CV_32FC1 );
-		all_out = cvCreateMat( nsamples*ncategories, 1, CV_32FC1 );
-	}
+	clean();
+	all_in = cvCreateMat( nsamples*ncategories, nfeatures, CV_32FC1 );
+	all_out = cvCreateMat( nsamples*ncategories, 1, CV_32FC1 );
 	
+	// FIXME - qui manca il controllo della feature mask
+
 	for (int k = 0; k < nfeatures ; k++) {
 		all_in->data.fl[k] = features[k];
 		if(features[k] < min)
@@ -166,12 +179,12 @@ void MLData::computeDisplacement(const Training* t, vector<double>& features)
 	// Compute displacement and update speed
 	for(int i = 0 ; i < t->size() ; i++) {
 		const AccSample* sample = reinterpret_cast<const AccSample*>(t->sampleAt(i));
-		xspace = xspace + xvel*0.01 + 0.5*sample->x()*0.01*0.01; 
-		xvel = xvel + sample->x()*0.01;
- 		yspace = yspace + yvel*0.01 + 0.5*sample->y()*0.01*0.01; 
- 		yvel = yvel + sample->y()*0.01;
- 		zspace = zspace + zvel*0.01 + 0.5*(sample->z()-1)*0.01*0.01; 
-		zvel = zvel + (sample->z()-1)*0.01;	
+		xspace = xspace + xvel*TIME_DELTA + 0.5*sample->x()*TIME_DELTA*TIME_DELTA*GRAV_ACC; 
+		xvel = xvel + sample->x()*TIME_DELTA*GRAV_ACC;
+ 		yspace = yspace + yvel*TIME_DELTA + 0.5*sample->y()*TIME_DELTA*TIME_DELTA*GRAV_ACC; 
+ 		yvel = yvel + sample->y()*TIME_DELTA*GRAV_ACC;
+ 		zspace = zspace + zvel*TIME_DELTA + 0.5*(sample->z()-1)*TIME_DELTA*TIME_DELTA*GRAV_ACC; 
+		zvel = zvel + (sample->z()-1)*TIME_DELTA*GRAV_ACC;	
 	}
 	
 	features.push_back(xspace);
@@ -186,8 +199,10 @@ void MLData::computeAttitude(const Training* t, vector<double>& features)
 	
 	int i = t->size() - 1;
 	const AccSample* sample = reinterpret_cast<const AccSample*>(t->sampleAt(i));
-	roll = atan2(sample->x(),sample->z())*180/M_PI;
-	pitch = atan2(sample->y(),sample->z())*180/M_PI;;
+	roll = -atan2(sample->x(),sample->z());
+	pitch = asin(sample->y());
+	if(isnan(pitch))
+		pitch = 0.0;
 	
 	features.push_back(roll);
 	features.push_back(pitch);
@@ -201,9 +216,9 @@ void MLData::computeSpeed(const Training* t, vector<double>& features)
 	// Compute speed
 	for(int i = 0 ; i < t->size() ; i++) {
 		const AccSample* sample = reinterpret_cast<const AccSample*>(t->sampleAt(i));
-		xvel = xvel + sample->x()*0.01;
- 		yvel = yvel + sample->y()*0.01;
-		zvel = zvel + (sample->z()-1)*0.01;	
+		xvel = xvel + sample->x()*TIME_DELTA*GRAV_ACC;
+ 		yvel = yvel + sample->y()*TIME_DELTA*GRAV_ACC;
+		zvel = zvel + (sample->z()-1)*TIME_DELTA*GRAV_ACC;	
 	}	
 	
 	features.push_back(xvel);
@@ -265,13 +280,11 @@ void MLData::generateTrainingAndValidationData(float perc)  // genera random per
     }
 }
 
-
 void MLData::getRandomSample(CvMat *sample, float &cat)
 {
     int r = nsamples*cvRandReal(&rng);
-    cout << r << endl;
     for (int k=0; k<nfeatures; k++) {
-	sample->data.fl[k] = all_in->data.fl[r*nfeatures+k];
+		sample->data.fl[k] = all_in->data.fl[r*nfeatures+k];
     }
     cat = all_out->data.fl[r];
 }
@@ -297,8 +310,16 @@ int MLData::getNumCategories() // nr. of categories
 int MLData::getNumSamples() // nr. of samples
 { return nsamples; }
 
-string MLData::categoryName(int k) // name of k-th category
-{ return string("NONE"); }
+string MLData::categoryName(int i) // name of k-th category
+{ 
+	if(i < categoryNames.size())
+		return categoryNames[i];
+	else {
+		ostringstream oss;
+		oss << i;
+		return oss.str();
+	}
+}
 
 CvMat * MLData::getTrainingInputData() // training input data
 { return train_in; }

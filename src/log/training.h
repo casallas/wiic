@@ -1,3 +1,6 @@
+#ifndef TRAINING_H
+#define TRAINING_H
+
 #include <fstream>
 #include <iostream>
 #include <vector>
@@ -62,3 +65,5 @@ private:
 	vector<Sample*> samples;
 	LogType logType;
 };
+
+#endif

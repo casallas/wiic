@@ -1,3 +1,6 @@
+#ifndef DATASET_H
+#define DATASET_H
+
 #include "training.h"
 
 /**
@@ -71,3 +74,5 @@ public:
 private:
 	vector<Training*> trainings;
 };
+
+#endif
