@@ -70,7 +70,7 @@ void recognize(int argc, char** argv, MLAlg& mlalg)
 			training->addSample(new AccSample(x,y,z));
 		  	enbAcq = 2;		
 		  	usleep(10000);
-			wii.Poll();					
+			wii.Poll();	
 		}
 		
 		if(enbAcq == 2) {
@@ -88,7 +88,14 @@ void recognize(int argc, char** argv, MLAlg& mlalg)
 			}
 			training = new Training(WiiC::LOG_ACC);
 		}
+		
+		if((wiimote.GetEvent() == CWiimote::EVENT_DISCONNECT) ||					
+		(wiimote.GetEvent() == CWiimote::EVENT_UNEXPECTED_DISCONNECT))
+				enbAcq = 0;
 	}
+	
+	if(training) delete training;
+	training = 0;
 }
 
 void train(int argc, char** argv, MLAlg& mlalg, MLData& mldata)
