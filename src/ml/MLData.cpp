@@ -14,6 +14,8 @@ MLData::MLData(const vector<int>& mask) : rng(time(0)) {
     nfeatures=0;
     ncategories=0;
     nsamples=0;
+    
+    timeDelta_ = TIME_DELTA;
 
 	min = std::numeric_limits<float>::max();
 	max = std::numeric_limits<float>::min();
@@ -142,7 +144,13 @@ bool MLData::open(const vector<string>& vf)
 
 bool MLData::loadTraining(const Training* t)
 {
+	return loadTraining(t,TIME_DELTA);
+}
+
+bool MLData::loadTraining(const Training* t, float timeDelta)
+{
 	vector<double> features;
+	timeDelta_ = timeDelta;
 	
 	// Extract features
 	computeDisplacement(t,features);
@@ -179,12 +187,12 @@ void MLData::computeDisplacement(const Training* t, vector<double>& features)
 	// Compute displacement and update speed
 	for(int i = 0 ; i < t->size() ; i++) {
 		const AccSample* sample = reinterpret_cast<const AccSample*>(t->sampleAt(i));
-		xspace = xspace + xvel*TIME_DELTA + 0.5*sample->x()*TIME_DELTA*TIME_DELTA*GRAV_ACC; 
-		xvel = xvel + sample->x()*TIME_DELTA*GRAV_ACC;
- 		yspace = yspace + yvel*TIME_DELTA + 0.5*sample->y()*TIME_DELTA*TIME_DELTA*GRAV_ACC; 
- 		yvel = yvel + sample->y()*TIME_DELTA*GRAV_ACC;
- 		zspace = zspace + zvel*TIME_DELTA + 0.5*(sample->z()-1)*TIME_DELTA*TIME_DELTA*GRAV_ACC; 
-		zvel = zvel + (sample->z()-1)*TIME_DELTA*GRAV_ACC;	
+		xspace = xspace + xvel*timeDelta_ + 0.5*sample->x()*timeDelta_*timeDelta_*GRAV_ACC; 
+		xvel = xvel + sample->x()*timeDelta_*GRAV_ACC;
+ 		yspace = yspace + yvel*timeDelta_ + 0.5*sample->y()*timeDelta_*timeDelta_*GRAV_ACC; 
+ 		yvel = yvel + sample->y()*timeDelta_*GRAV_ACC;
+ 		zspace = zspace + zvel*timeDelta_ + 0.5*(sample->z()-1)*timeDelta_*timeDelta_*GRAV_ACC; 
+		zvel = zvel + (sample->z()-1)*timeDelta_*GRAV_ACC;	
 	}
 	
 	features.push_back(xspace);
@@ -216,9 +224,9 @@ void MLData::computeSpeed(const Training* t, vector<double>& features)
 	// Compute speed
 	for(int i = 0 ; i < t->size() ; i++) {
 		const AccSample* sample = reinterpret_cast<const AccSample*>(t->sampleAt(i));
-		xvel = xvel + sample->x()*TIME_DELTA*GRAV_ACC;
- 		yvel = yvel + sample->y()*TIME_DELTA*GRAV_ACC;
-		zvel = zvel + (sample->z()-1)*TIME_DELTA*GRAV_ACC;	
+		xvel = xvel + sample->x()*timeDelta_*GRAV_ACC;
+ 		yvel = yvel + sample->y()*timeDelta_*GRAV_ACC;
+		zvel = zvel + (sample->z()-1)*timeDelta_*GRAV_ACC;	
 	}	
 	
 	features.push_back(xvel);

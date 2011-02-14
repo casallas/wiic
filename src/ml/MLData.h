@@ -19,6 +19,7 @@ public:
 
        	bool open(const vector<string>& vf); // Open files stored vf (one for each category)
 		bool loadTraining(const Training* t); // Extracts features from WiiC data (one Training per gesture) 
+		bool loadTraining(const Training* t, float timeDelta); // Extracts features from WiiC data (one Training per gesture) with a delta time
       	void generateTrainingAndValidationData(float perc);  // Generate training and testing set according to the desired percentage
 		void clean();
 		
@@ -42,12 +43,13 @@ protected:
 		void computeSpeed(const Training* t, vector<double>& features);
 
 private:
-        CvMat *all_in, *train_in, *validation_in;
-        CvMat *all_out, *train_out, *validation_out;
-        vector<string> categoryNames;
+      CvMat *all_in, *train_in, *validation_in;
+      CvMat *all_out, *train_out, *validation_out;
+      vector<string> categoryNames;
 		vector<int> featureMask;
 		int ncategories,nfeatures,nsamples;
 		float min, max;
+		float timeDelta_;
 		CvRNG rng;
 };
 
