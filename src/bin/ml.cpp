@@ -128,6 +128,43 @@ void train(int argc, char** argv, MLAlg& mlalg, MLData& mldata)
 	cout << "Trained model saved in " << output << endl;
 }
 
+void validation(int argc, char** argv, MLAlg& mlalg, MLData& mldata)
+{
+	// Load the model
+	mlalg.load(argv[3]);
+	
+	// Load category names, if any
+	if(argc > 5) {
+		ifstream in(argv[5]);
+		vector<string> categories;
+		
+		string tmp;
+		while(in.good()) {
+			in >> tmp;
+			categories.push_back(tmp);
+		}
+		in.close();
+    	mlalg.setCategoryNames(categories);
+	}	
+	
+    vector<string> vf;
+    vf.push_back(string(argv[4]));
+
+    if(!mldata.open(vf)) {
+		cout << "Unable to parse input files" << endl;
+		return;
+    }
+
+    //mldata.normalize();
+    float tr = 0.0;
+    mldata.generateTrainingAndValidationData(tr);
+    CvMat *validateIn = mldata.getValidationInputData();
+    CvMat *validateOut = mldata.getValidationOutputData();
+    
+    cout << "===================================" << endl;
+    mlalg.validate(validateIn,validateOut);
+}
+
 int main(int argc, char **argv) {
 
   
@@ -135,8 +172,10 @@ int main(int argc, char **argv) {
 		cout << "wiic-ml allows to recognize a set of gestures using OpenCV machine learning library." << endl;
 		cout << "wiic-ml is part of WiiC (http://wiic.sf.net)" << endl << endl;
 		cout << "Usage:  " << argv[0] << " train <KNN|Bayes|SVN|DT|ANN|Boost|RT> <training_data_ratio> <data_file1> ... <data_fileN>" << endl;
+		cout << "        " << argv[0] << " val <KNN|Bayes|SVN|DT|ANN|Boost|RT> <model_file> <val_file> [category_names]" << endl;
 		cout << "        " << argv[0] << " rec <KNN|Bayes|SVN|DT|ANN|Boost|RT> <model_file> [category_names]" << endl;
 		cout << "e.g. " << argv[0] << " train KNN 0.75 file1.log file2.log" << endl;
+		cout << "e.g. " << argv[0] << " val KNN KNN_model.xml validation.log [category_names.txt]" << endl;
 		cout << "e.g. " << argv[0] << " rec KNN KNN_model.xml [category_names.txt]" << endl;
 		cout << "======= Supported Algorithms =======" << endl;
 		cout << "KNN: k-nearest neighbor" << endl;
@@ -165,6 +204,9 @@ int main(int argc, char **argv) {
 	}
 	else if(cmd == "train") {
 		train(argc, argv, mlalg, mldata);
+	}
+	else if(cmd == "val") {
+		validation(argc, argv, mlalg, mldata);
 	}
 	else {
 		cout << "Error - Unsupported option" << endl;
