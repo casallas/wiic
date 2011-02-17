@@ -22,17 +22,19 @@ void Dataset::addTraining(Training* t)
  */
 void Dataset::loadDataset(const string& nomefile)
 {
-	int size, dummy;
-	ifstream infile;
-	
-	infile.open(nomefile.c_str());
+	int size; 
+	string line;
+	ifstream infile(nomefile.c_str());
+
 	if(!infile.is_open()) {
 		cout<<"[Error] Unable to open the dataset file"<<endl;
 	}
 	else {
 		trainings.clear();
-		infile >> size >> dummy; // Number of trainings (dummy is used for the CR)
-
+		getline(infile,line);
+		istringstream iline(line);
+		iline >> size;
+		
 		for(int i = 0 ; i < size ; i++) {
 			// Each training is inserted in the training vector	
 			trainings.push_back(new Training());	

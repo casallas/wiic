@@ -142,6 +142,28 @@ bool MLData::open(const vector<string>& vf)
     return true; 
 }
 
+bool MLData::save(string savefile, bool add_flag)
+{
+	ofstream out;
+	
+	if(add_flag)
+		out.open(savefile.c_str(),ios::app);
+	else
+		out.open(savefile.c_str(),ios::trunc);
+		
+	if(!out.is_open()) {
+		cout << "Unable to save " << savefile << endl;
+		return false;		
+	}
+	
+	for(int i = 0 ; i < nsamples ; i++) {
+		for(int j = 0 ; j < nfeatures ; j++)
+			out << all_in->data.fl[i*nfeatures+j] << " ";
+		out << endl;
+	}
+	out.close();
+}
+
 bool MLData::loadTraining(const Training* t)
 {
 	return loadTraining(t,TIME_DELTA);
@@ -228,6 +250,10 @@ void MLData::computeSpeed(const Training* t, vector<double>& features)
  		yvel = yvel + sample->y()*timeDelta_*GRAV_ACC;
 		zvel = zvel + (sample->z()-1)*timeDelta_*GRAV_ACC;	
 	}	
+	
+	xvel = xvel/t->size();
+	yvel = yvel/t->size();
+	zvel = zvel/t->size();
 	
 	features.push_back(xvel);
 	features.push_back(yvel);

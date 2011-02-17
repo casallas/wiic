@@ -101,7 +101,7 @@ void recognize(int argc, char** argv, MLAlg& mlalg)
 void train(int argc, char** argv, MLAlg& mlalg, MLData& mldata)
 {
     vector<string> vf;
-	for(int i = 3 ; i < argc ; i++)
+	for(int i = 4 ; i < argc ; i++) 
     	vf.push_back(string(argv[i]));
 
     if(!mldata.open(vf)) {
@@ -110,7 +110,7 @@ void train(int argc, char** argv, MLAlg& mlalg, MLData& mldata)
     }
 
     //mldata.normalize();
-    float tr = 0.75; if (argc>2) tr = atof(argv[2]);
+    float tr = 0.75; if (argc>3) tr = atof(argv[3]);
     mldata.generateTrainingAndValidationData(tr);
     CvMat *trainIn = mldata.getTrainingInputData();
     CvMat *trainOut = mldata.getTrainingOutputData();
@@ -123,7 +123,7 @@ void train(int argc, char** argv, MLAlg& mlalg, MLData& mldata)
     cout << "===================================" << endl;
     mlalg.validate(validateIn,validateOut);
 
-	string output = string(argv[1]) + string("_model.xml");
+	string output = string(argv[2]) + string("_model.xml");
 	mlalg.save(output.c_str());
 	cout << "Trained model saved in " << output << endl;
 }
@@ -165,18 +165,44 @@ void validation(int argc, char** argv, MLAlg& mlalg, MLData& mldata)
     mlalg.validate(validateIn,validateOut);
 }
 
+void convert(int argc, char** argv, MLAlg& mlalg)
+{	
+    vector<int> mask;
+    for(int i = 1 ; i <= 8 ; i++) 
+	    mask.push_back(i);
+	
+    vector<string> vf;
+	for(int i = 2 ; i < argc ; i++) 
+    	vf.push_back(string(argv[i]));
+
+	for(int i = 0 ; i < vf.size() ; i++) {
+		Dataset dataset(vf[i]);
+		string outputFile = vf[i] + "_features" ;
+		for(int j = 0 ; j < dataset.size() ; j++) {
+			Training* t = dataset.trainingAt(j);
+			MLData newData(mask);
+			if(t) {
+				newData.loadTraining(t);
+				newData.save(outputFile,true);
+			}
+		}
+		cout << vf[i] << " saved in " << outputFile << endl;
+	}
+}
+
 int main(int argc, char **argv) {
 
-  
     if (argc<3) {
 		cout << "wiic-ml allows to recognize a set of gestures using OpenCV machine learning library." << endl;
 		cout << "wiic-ml is part of WiiC (http://wiic.sf.net)" << endl << endl;
 		cout << "Usage:  " << argv[0] << " train <KNN|Bayes|SVN|DT|ANN|Boost|RT> <training_data_ratio> <data_file1> ... <data_fileN>" << endl;
 		cout << "        " << argv[0] << " val <KNN|Bayes|SVN|DT|ANN|Boost|RT> <model_file> <val_file> [category_names]" << endl;
 		cout << "        " << argv[0] << " rec <KNN|Bayes|SVN|DT|ANN|Boost|RT> <model_file> [category_names]" << endl;
+		cout << "        " << argv[0] << " convert <data_file1> ... <data_fileN>" << endl;
 		cout << "e.g. " << argv[0] << " train KNN 0.75 file1.log file2.log" << endl;
 		cout << "e.g. " << argv[0] << " val KNN KNN_model.xml validation.log [category_names.txt]" << endl;
 		cout << "e.g. " << argv[0] << " rec KNN KNN_model.xml [category_names.txt]" << endl;
+		cout << "e.g. " << argv[0] << " convert file1.log file2.log" << endl;
 		cout << "======= Supported Algorithms =======" << endl;
 		cout << "KNN: k-nearest neighbor" << endl;
 		cout << "Bayes: normal Bayes classifier" << endl;
@@ -207,6 +233,9 @@ int main(int argc, char **argv) {
 	}
 	else if(cmd == "val") {
 		validation(argc, argv, mlalg, mldata);
+	}
+	else if(cmd == "convert") {
+		convert(argc, argv, mlalg);
 	}
 	else {
 		cout << "Error - Unsupported option" << endl;

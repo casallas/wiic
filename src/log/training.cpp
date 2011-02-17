@@ -11,16 +11,13 @@ Training::~Training()
 void Training::loadTraining(ifstream& infile)
 {
 	string line;
-	if(getline(infile,line)) {
-		if(line == "acc") {
-			loadAccTraining(infile);
-			logType = LOG_ACC;
-		}
-		else
-			cout << "[Error]: bad log type." << endl;
+	getline(infile,line);
+	if(line == "acc") {
+		loadAccTraining(infile);
+		logType = LOG_ACC;
 	}
 	else
-		cout << "[Error]: unable to identify the log type. Check your log file format." << endl; 
+		cout << "[Error]: bad log type." << endl;			
 }
 
 void Training::loadAccTraining(ifstream& infile)
