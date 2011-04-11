@@ -135,7 +135,7 @@ void validation(int argc, char** argv, MLAlg& mlalg, MLData& mldata)
 	
 	// Load category names, if any
 	if(argc > 5) {
-		ifstream in(argv[5]);
+		ifstream in("categories");
 		vector<string> categories;
 		
 		string tmp;
@@ -148,7 +148,8 @@ void validation(int argc, char** argv, MLAlg& mlalg, MLData& mldata)
 	}	
 	
     vector<string> vf;
-    vf.push_back(string(argv[4]));
+	for(int i = 4 ; i < argc ; i++) 
+    	vf.push_back(string(argv[i]));
 
     if(!mldata.open(vf)) {
 		cout << "Unable to parse input files" << endl;
@@ -196,11 +197,11 @@ int main(int argc, char **argv) {
 		cout << "wiic-ml allows to recognize a set of gestures using OpenCV machine learning library." << endl;
 		cout << "wiic-ml is part of WiiC (http://wiic.sf.net)" << endl << endl;
 		cout << "Usage:  " << argv[0] << " train <KNN|Bayes|SVN|DT|ANN|Boost|RT> <training_data_ratio> <data_file1> ... <data_fileN>" << endl;
-		cout << "        " << argv[0] << " val <KNN|Bayes|SVN|DT|ANN|Boost|RT> <model_file> <val_file> [category_names]" << endl;
+		cout << "        " << argv[0] << " val <KNN|Bayes|SVN|DT|ANN|Boost|RT> <model_file> <val_file1> ... <val_fileN>" << endl;
 		cout << "        " << argv[0] << " rec <KNN|Bayes|SVN|DT|ANN|Boost|RT> <model_file> [category_names]" << endl;
 		cout << "        " << argv[0] << " convert <data_file1> ... <data_fileN>" << endl;
 		cout << "e.g. " << argv[0] << " train KNN 0.75 file1.log file2.log" << endl;
-		cout << "e.g. " << argv[0] << " val KNN KNN_model.xml validation.log [category_names.txt]" << endl;
+		cout << "e.g. " << argv[0] << " val KNN KNN_model.xml file1.log file2.log" << endl;
 		cout << "e.g. " << argv[0] << " rec KNN KNN_model.xml [category_names.txt]" << endl;
 		cout << "e.g. " << argv[0] << " convert file1.log file2.log" << endl;
 		cout << "======= Supported Algorithms =======" << endl;

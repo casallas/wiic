@@ -21,6 +21,8 @@ ABOUT
 	WiiC also supports all the Wiiuse functionality, such as: 
 	motion sensing, IR tracking, nunchuk, classic controller, 
 	and the Guitar Hero 3 controller. 
+	WiiC can be integrated with OpenCV, in order to exploit its machine
+	learning algorithms for gesture recognition.
 	Single threaded and nonblocking makes a light weight and clean API.
 
 	Distributed under the GPL and LGPL.
@@ -98,7 +100,9 @@ PLATFORMS AND DEPENDENCIES
 		- CMake for compiling the library
 		- Everything else is already present in the OS :)
 
-	Optionally, if you want to generate the documentation, you need Doxygen.
+	Optional additional libraries:
+		- OpenCV, for machine learning support for gesture recognition
+		- Doxygen, if you want to generate the documentation
 
 
 DOWNLOAD
@@ -131,6 +135,7 @@ COMPILING
 
 		libwiic.so is installed to /usr/local/lib
 		libwiicpp.so is installed to /usr/local/lib
+		libwiicml.so (optional) is installed to /usr/local/lib
 		wiic-example and wiicpp-example are installed to /usr/local/bin
 		Headers file are installed in /usr/local/include
 
@@ -156,6 +161,7 @@ COMPILING
 
 		libwiic.dylib is installed to /usr/local/lib
 		libwiicpp.dylib is installed to /usr/local/lib
+		libwiicml.dylib (optional) is installed to /usr/local/lib
 		wiic-example and wiicpp-example are installed to /usr/local/bin
 		Headers file are installed in /usr/local/include
 
@@ -171,7 +177,7 @@ USING THE LIBRARY IN A THIRD PARTY APPLICATION
 
 	For Linux you must link libwiic.so ( -lwiic ) for the C library, or libwiicpp.so ( -lwiicpp ) for the C++ library.
 	For Mac you must link libwiic.dylib ( -lwiic ) for the C library, or libwiicpp.dylib ( -lwiicpp ) for the C++ library.
-
+	In case you aim at exploiting WiiC machine learning techniques, link libwiicml.so (Linux) or libwiicml.dylib (Mac). 
 
 
 

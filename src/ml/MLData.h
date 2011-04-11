@@ -1,6 +1,7 @@
 #ifndef _MLDATA_H_
 #define _MLDATA_H_
 
+#include <cv.h>
 #include <ml.h>
 #include <vector>
 #include <string>

@@ -64,6 +64,7 @@ static int max_num_wiimotes = 0;
 
 - (void) dealloc
 {	
+	inquiry = 0;
 	WIIC_DEBUG("Wiimote Discovery released");
 	[super dealloc];
 }
@@ -198,6 +199,7 @@ static int max_num_wiimotes = 0;
 	_wm = 0;
 	isReading = NO;
 	timeout = NO;
+	disconnecting = NO;
 	return self;
 }
 
@@ -219,6 +221,19 @@ static int max_num_wiimotes = 0;
 	return (byte*)[receivedMsg bytes];
 }
 
+- (void) deleteMsg
+{
+	if(receivedMsg) {
+		[receivedMsg release];
+		msgLength = 0;
+	}
+}
+
+- (BOOL) isDisconnecting
+{
+	return disconnecting;
+}
+
 - (BOOL) isReading
 {
 	return isReading;
@@ -227,12 +242,6 @@ static int max_num_wiimotes = 0;
 - (void) setReading:(BOOL) flag
 {
 	isReading = flag;
-}
-
-- (void) timeout:(NSTimer *)timer 
-{
-	timeout = YES;
-	printf("sto staccando %d\n",timeout);
 }
 
 - (BOOL) isTimeout
@@ -248,16 +257,11 @@ static int max_num_wiimotes = 0;
 - (void) startTimerThread
 {
 	NSAutoreleasePool* pool = [[NSAutoreleasePool alloc] init];
-	NSRunLoop* runLoop = [NSRunLoop currentRunLoop];
 	
 	// Timer 
 	sleep(1);
-	[self setTimeout:YES];
 	
-	// We also have to stop the loop of the main thread
-	[self performSelectorOnMainThread:@selector(wakeUpMainThreadRunloop:) withObject:nil waitUntilDone:NO]; 
-	
-	[pool release];
+	[pool drain];
 }
 
 - (void) wakeUpMainThreadRunloop:(id)arg
@@ -324,20 +328,20 @@ static int max_num_wiimotes = 0;
 #pragma mark IOBluetoothL2CAPChannel delegates
 - (void) disconnected:(IOBluetoothUserNotification*) notification fromDevice:(IOBluetoothDevice*) device
 {
+	[self deleteMsg];
 	[self setReading:NO];
+	disconnecting = YES;
+		
 	// The wiimote_t struct must be re-initialized due to the disconnection
-	wiic_disconnected(_wm) ;
+	wiic_disconnected(_wm) ;	
 }
 
 //*************** HANDLERS FOR WIIC_IO_READ FOR MACOSX *******************/
 - (void) l2capChannelData:(IOBluetoothL2CAPChannel*) channel data:(byte *) data length:(NSUInteger) length 
 {
-	NSAutoreleasePool *pool = [[NSAutoreleasePool alloc] init];
-
 	// This is done in case the output channel woke up this handler
 	if(!data) {
 	    [self setReading:NO];
-		[pool release];
 		length = 0;
 		return;
 	}
@@ -349,12 +353,11 @@ static int max_num_wiimotes = 0;
 	if(WIIMOTE_IS_SET(_wm, WIIMOTE_STATE_HANDSHAKE))
 		propagate_event(_wm, data[1], data+2);
 
-	receivedMsg = [[NSData dataWithBytes:data length:length] retain];
+	receivedMsg = [[NSData dataWithBytes:data length:length] retain]; 
 	msgLength = length;
 	
     // This is done when a message is successfully received. Stop the main loop after reading
     [self setReading:NO];
-	[pool release];
 }
 
 - (unsigned int) getMsgLength
@@ -418,7 +421,7 @@ int wiic_find(struct wiimote_t** wm, int max_wiimotes, int timeout)
 	found_wiimotes = [search getFoundWiimotes];
 
 	[search release];
-	[pool release];
+	[pool drain];
 	
 	return found_wiimotes;
 }
@@ -437,7 +440,7 @@ int wiic_find(struct wiimote_t** wm, int max_wiimotes, int timeout)
 void wiic_disconnect(struct wiimote_t* wm) 
 {
 	IOReturn error;
-	
+
     if (!wm || !WIIMOTE_IS_CONNECTED(wm))
             return;
 
@@ -481,11 +484,8 @@ void wiic_disconnect(struct wiimote_t* wm)
 		device = nil;
 		wm->device = 0;
 	}
-
-	// FIXME va tolto anche il disconnetion notifier
-	// FIXME va tolto anche il connect
 	
-	[pool release];
+	[pool drain];
 	
 	wm->event = WIIC_NONE;
 
@@ -514,7 +514,7 @@ static int wiic_connect_single(struct wiimote_t* wm, char* address)
 	// FIXME - see if it is possible
 
 	NSAutoreleasePool *pool = [[NSAutoreleasePool alloc] init];
-	WiiConnect* connect = [[WiiConnect alloc] init];
+	WiiConnect* connect = [[[WiiConnect alloc] init] autorelease];
 	if([connect connectToWiimote:wm] == kIOReturnSuccess) {
 		WIIC_INFO("Connected to wiimote [id %i].", wm->unid);
 		// This is stored to retrieve incoming data
@@ -525,10 +525,10 @@ static int wiic_connect_single(struct wiimote_t* wm, char* address)
 		wiic_handshake(wm, NULL, 0);
 		wiic_set_report_type(wm);
 		
-		[pool release];
+		[pool drain];
 	}
 	else {
-		[pool release];
+		[pool drain];
 		return 0;
 	}
 	
@@ -585,7 +585,7 @@ int wiic_connect(struct wiimote_t** wm, int wiimotes)
  *	@see wiic_connect_single()
  *	@see wiic_disconnect()
  *
- *	Up to version 0.53, it is possible to register the MAC address of your 
+ *	From version 0.53, it is possible to register the MAC address of your 
  *  Wii devices. This allows to automatically load them, without waiting for any
  *  search timeout. To register a new device, go to: <HOME_DIR>/.wiic/ and
  *  edit the file wiimotes.config, by adding the MAC address of the device 
@@ -630,7 +630,7 @@ int wiic_load(struct wiimote_t** wm)
 		WIIMOTE_ENABLE_STATE(wm[i], WIIMOTE_STATE_DEV_FOUND);
 		WIIC_INFO("Loaded Wiimote (%s) [id %i].",CFStringGetCStringPtr(wm[i]->address, kCFStringEncodingMacRoman),wm[i]->unid);
 	}
-	[pool release];
+	[pool drain];
 
 	return loaded;
 }
@@ -643,10 +643,17 @@ int wiic_io_read(struct wiimote_t* wm)
     /* If this wiimote is not connected, skip it */
     if (!WIIMOTE_IS_CONNECTED(wm))
             return 0;
-
+			
 	NSAutoreleasePool *pool = [[NSAutoreleasePool alloc] init];
 
-	WiiConnect* deviceHandler = (WiiConnect*)(wm->connectionHandler);
+	WiiConnect* deviceHandler = 0;
+	deviceHandler = (WiiConnect*)(wm->connectionHandler);
+
+	/* If this wiimote is disconnecting, skip it */
+	if (!deviceHandler || [deviceHandler isDisconnecting]) {
+		[pool drain];
+		return 0;
+	}
 
     // Run the main loop to get bt data
 	[deviceHandler setReading:YES];
@@ -654,26 +661,38 @@ int wiic_io_read(struct wiimote_t* wm)
 
 	// We start the thread which manages the timeout to implement a non-blocking read 
 	[NSThread detachNewThreadSelector:@selector(startTimerThread) toTarget:deviceHandler withObject:nil];
-	
+
 	NSRunLoop *theRL = [NSRunLoop currentRunLoop];
-	// Two possible events: we receive and incoming message or there is a timeour
+	// Two possible events: we receive and incoming message or there is a timeout
 	while([deviceHandler isReading] && ![deviceHandler isTimeout])
 		[theRL runMode:NSDefaultRunLoopMode beforeDate:[NSDate distantFuture]];
 
 	// In this case we have no incoming data (TIMEOUT)
-	if([deviceHandler isTimeout])
-		return 0;
-	
-	if(!(wm->connectionHandler)) {
-		WIIC_ERROR("Unable to find the connection handler (id %i).", wm->unid);
+	if([deviceHandler isTimeout]) {
+		[pool drain];
 		return 0;
 	}
-	byte* buffer = [deviceHandler getNextMsg];
-	unsigned int length = [deviceHandler getMsgLength];
-		
-	if(!buffer || !length)
+
+	if(!(wm->connectionHandler)) {
+		WIIC_ERROR("Unable to find the connection handler (id %i).", wm->unid);
+		[pool drain];
 		return 0;
-		
+	}
+
+	// Read next message
+	byte* buffer = 0;
+	unsigned int length = 0;
+	if(![deviceHandler isDisconnecting]) {
+		buffer = [deviceHandler getNextMsg];
+		length = [deviceHandler getMsgLength];
+	}
+
+	if(!buffer || !length) {
+		[pool drain];
+		return 0;
+	}
+
+	// Forward to WiiC
 	if(length < sizeof(wm->event_buf)) 
 		memcpy(wm->event_buf,buffer,length);
 	else {
@@ -681,7 +700,10 @@ int wiic_io_read(struct wiimote_t* wm)
 		memcpy(wm->event_buf,buffer,sizeof(wm->event_buf));
 	}
 
-	[pool release];
+	// Release the consumed message
+	[deviceHandler deleteMsg];
+
+	[pool drain];
 		
     return 1;
 }
@@ -706,7 +728,7 @@ int wiic_io_write(struct wiimote_t* wm, byte* buf, int len)
 		WIIC_ERROR("Unable to write over the output channel (id %i).", wm->unid);		
     usleep(10000);
 	
-    [pool release];
+    [pool drain];
 
 	return (error == kIOReturnSuccess ? len : 0);
 }

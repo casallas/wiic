@@ -280,11 +280,16 @@ void MLData::generateTrainingAndValidationData(float perc)  // genera random per
 	cout << "Training samples = " << ts << ", Validation samples = " << vs << endl;
 	
 	// alloc mem
-	train_in = cvCreateMat( ts, nfeatures, CV_32FC1 );
-	train_out = cvCreateMat( ts, 1, CV_32FC1 );
-	validation_in = cvCreateMat( vs, nfeatures, CV_32FC1 );
-	validation_out = cvCreateMat( vs, 1, CV_32FC1 );
-
+	if(ts != 0) {
+		train_in = cvCreateMat( ts, nfeatures, CV_32FC1 );
+		train_out = cvCreateMat( ts, 1, CV_32FC1 );
+	}
+	
+	if(vs != 0) {
+		validation_in = cvCreateMat( vs, nfeatures, CV_32FC1 );
+		validation_out = cvCreateMat( vs, 1, CV_32FC1 );
+	}
+	
 	vector<bool> forvalidation; forvalidation.reserve(nsamples);
 	for (int k=0; k<nsamples; k++) forvalidation[k]=false;
 	// random selection of validation samples

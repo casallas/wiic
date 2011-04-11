@@ -85,6 +85,7 @@
 	wiimote* _wm;
 	BOOL isReading;
 	BOOL timeout;
+	BOOL disconnecting;
 }
 
 - (IOBluetoothL2CAPChannel *) openL2CAPChannelWithPSM:(BluetoothL2CAPPSM) psm device:(IOBluetoothDevice*) device delegate:(id) delegate;
@@ -92,14 +93,15 @@
 - (void) l2capChannelData:(IOBluetoothL2CAPChannel*) channel data:(byte *) data length:(NSUInteger) length;
 - (byte*) getNextMsg;
 - (unsigned int) getMsgLength;
+- (void) deleteMsg;
 - (void) disconnected:(IOBluetoothUserNotification*) notification fromDevice:(IOBluetoothDevice*) device;
 - (BOOL) isReading;
 - (void) setReading:(BOOL) flag;
-- (void) timeout:(NSTimer *) timer; 
 - (BOOL) isTimeout;
 - (void) setTimeout:(BOOL) flag;
 - (void) startTimerThread;
 - (void) wakeUpMainThreadRunloop:(id)arg;
+- (BOOL) isDisconnecting;
 @end
 
 #endif /* IO_MAC_H */
