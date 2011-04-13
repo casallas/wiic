@@ -101,16 +101,12 @@ void calculate_orientation(struct accel_t* ac, struct vec3b_t* accel, struct ori
 		orient->a_roll = x;
 	}
 
-	if (abs(accel->z - ac->cal_zero.z) <= ac->cal_g.z) {
+	if (abs(accel->y - ac->cal_zero.y) <= ac->cal_g.y) {
 		/* pitch */
-		float z_tmp = asin(z);
-		if(isnan(z_tmp))
-			z = 0.0;
-		else
-			z = RAD_TO_DEGREE(z_tmp);
+		y = RAD_TO_DEGREE(atan2f(y, z));
 
-		orient->pitch = z;
-		orient->a_pitch = z;
+		orient->pitch = y;
+		orient->a_pitch = y;
 	}
 
 	/* smooth the angles if enabled */
