@@ -443,7 +443,6 @@ public:
     };
 
     static const int EVENT_BUFFER_LENGTH = MAX_PAYLOAD;
-    static const float ORIENT_PRECISION = WIIC_ORIENT_PRECISION;
 
     CWiimote();
     CWiimote(struct wiimote_t *wmPtr);

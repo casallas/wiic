@@ -55,7 +55,7 @@
 #include "definitions.h"
 
 /* WiiC version */
-#define WIIC_VERSION					"1.0"
+#define WIIC_VERSION					"1.1"
 
 /********************
  *
@@ -210,7 +210,7 @@
  *		St = St_last + (alpha * (tilt - St_last))
  *	alpha is between 0 and 1
  */
-#define WIIC_DEFAULT_SMOOTH_ALPHA		0.07f
+#define WIIC_DEFAULT_SMOOTH_ALPHA			0.1f
 
 #define SMOOTH_ROLL						0x01
 #define SMOOTH_PITCH					0x02

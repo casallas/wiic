@@ -145,8 +145,6 @@
 #define WIIC_ORIENT_THRESH			0x04
 #define WIIC_INIT_FLAGS				(WIIC_SMOOTHING | WIIC_ORIENT_THRESH)
 
-#define WIIC_ORIENT_PRECISION			100.0f
-
 /* expansion codes */
 #define EXP_NONE						0
 #define EXP_NUNCHUK						1
