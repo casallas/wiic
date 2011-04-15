@@ -210,7 +210,7 @@ void apply_smoothing(struct accel_t* ac, struct orient_t* orient, int type) {
 			if (((ac->st_roll < 0) && (orient->roll > 0)) || ((ac->st_roll > 0) && (orient->roll < 0))) {
 				ac->st_roll = orient->roll;
 			} else {
-				orient->roll = ac->st_roll + (ac->st_alpha * (orient->a_roll - ac->st_roll));
+				orient->roll = orient->a_roll + (ac->st_alpha * (ac->st_roll - orient->a_roll));
 				ac->st_roll = orient->roll;
 			}
 
@@ -225,7 +225,7 @@ void apply_smoothing(struct accel_t* ac, struct orient_t* orient, int type) {
 			if (((ac->st_pitch < 0) && (orient->pitch > 0)) || ((ac->st_pitch > 0) && (orient->pitch < 0))) {
 				ac->st_pitch = orient->pitch;
 			} else {
-				orient->pitch = ac->st_pitch + (ac->st_alpha * (orient->a_pitch - ac->st_pitch));
+				orient->pitch = orient->a_pitch + (ac->st_alpha * (ac->st_pitch - orient->a_pitch));
 				ac->st_pitch = orient->pitch;
 			}
 
