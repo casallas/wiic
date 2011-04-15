@@ -63,7 +63,6 @@
 void calculate_orientation(struct accel_t* ac, struct vec3b_t* accel, struct orient_t* orient, int smooth) {
 	float xg, yg, zg;
 	float x, y, z;
-//	float tmpX, tmpY, tmpZ;
 
 	/*
 	 *	roll	- use atan(z / x)		[ ranges from -180 to 180 ]
@@ -92,7 +91,7 @@ void calculate_orientation(struct accel_t* ac, struct vec3b_t* accel, struct ori
 	if (z < -1.0f)			z = -1.0f;
 	else if (z > 1.0f)		z = 1.0f;
 
-	/* if it is over 1g then it is probably accelerating and not reliable */
+	/* if it is over 1g then it is probably accelerating and the gravity vector cannot be identified */
 	if (abs(accel->x - ac->cal_zero.x) <= ac->cal_g.x) {
 		/* roll */
 		x = -RAD_TO_DEGREE(atan2f(x, z));
