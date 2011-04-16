@@ -188,12 +188,32 @@ void CAccelerometer::SetAccelThreshold(int Threshold)
     *mpAccelThresholdPtr = Threshold;
 }
 
+/**
+ *
+ * @brief Retrieves the smooth device attitude (pitch, roll, and yaw) computed with an
+ * exponential moving average.
+ *
+ * @param Pitch		[out] Reference variable where the smooth device pitch will be set.
+ * @param Roll		[out] Reference variable where the smooth device roll will be set.
+ * @param Yaw		[out] Reference variable where the smooth device yaw will be set. Please,
+ *						  note that without IR enabled, yaw cannot be retrieved.
+ */
 void CAccelerometer::GetOrientation(float &Pitch, float &Roll, float &Yaw)
 {
     Pitch = mpOrientPtr->pitch;
     Roll = mpOrientPtr->roll;
     Yaw = mpOrientPtr->yaw;
 }
+
+/**
+ *
+ * @brief Retrieves the unsmooth (raw) device attitude (pitch, roll, and yaw) computed with an
+ * exponential moving average.
+ *
+ * @param Pitch		[out] Reference variable where the device pitch will be set.
+ * @param Roll		[out] Reference variable where the device roll will be set.
+ * @param Yaw		[out] Reference variable where the device yaw will be set.
+ */
 void CAccelerometer::GetRawOrientation(float &Pitch, float &Roll)
 {
     Pitch = mpOrientPtr->a_pitch;
