@@ -664,9 +664,12 @@ int wiic_io_read(struct wiimote_t* wm)
 
 	NSRunLoop *theRL = [NSRunLoop currentRunLoop];
 	// Two possible events: we receive and incoming message or there is a timeout
-	while([deviceHandler isReading] && ![deviceHandler isTimeout])
+	while([deviceHandler isReading] && ![deviceHandler isTimeout]) {
+		NSAutoreleasePool *pool_loop = [[NSAutoreleasePool alloc] init]; // This is used for fast release of NSDate, otherwise it leaks
 		[theRL runMode:NSDefaultRunLoopMode beforeDate:[NSDate distantFuture]];
-
+		[pool_loop drain];
+	}
+	
 	// In this case we have no incoming data (TIMEOUT)
 	if([deviceHandler isTimeout]) {
 		[pool drain];

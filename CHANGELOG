@@ -8,6 +8,17 @@ http://wiic.sf.net
 
 
 ---------------------------
+v1.1  --  17 Apr 2011
+---------------------------
+
+	Changed:
+		-[Mac/Linux] Changed pitch and roll computation
+		-[Mac/Linux] Changed the default smooth parameter for pitch and roll computation
+
+	Fixed:
+		-[Mac] Memory leak in Wiimote read
+
+---------------------------
 v1.00 --  11 Apr 2011
 ---------------------------
 
