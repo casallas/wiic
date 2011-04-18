@@ -641,6 +641,11 @@ void CWiimote::ToggleRumble()
     wiic_toggle_rumble(mpWiimotePtr);
 }
 
+bool CWiimote::isRumbleEnabled()
+{
+    return WIIMOTE_IS_SET(mpWiimotePtr,WIIMOTE_STATE_RUMBLE);
+}
+
 int CWiimote::GetLEDs()
 {
     return mpWiimotePtr->leds;

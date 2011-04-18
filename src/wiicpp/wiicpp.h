@@ -452,6 +452,7 @@ public:
 
     void SetRumbleMode(OnOffSelection State);
     void ToggleRumble();
+    bool isRumbleEnabled();
 
     int GetLEDs();
     void SetLEDs(int LEDs);
