@@ -130,11 +130,16 @@ void train(int argc, char** argv, MLAlg& mlalg, MLData& mldata)
 
 void validation(int argc, char** argv, MLAlg& mlalg, MLData& mldata)
 {
+	if(argc < 5)
+		return;
+		
 	// Load the model
 	mlalg.load(argv[3]);
 	
+	int i = 4;
 	// Load category names, if any
-	if(argc > 5) {
+	string cmd = string(argv[4]);
+	if(cmd == string("categories")) {
 		ifstream in("categories");
 		vector<string> categories;
 		
@@ -145,12 +150,15 @@ void validation(int argc, char** argv, MLAlg& mlalg, MLData& mldata)
 		}
 		in.close();
     	mlalg.setCategoryNames(categories);
-	}	
+		i = 5;
+	}
 	
     vector<string> vf;
-	for(int i = 4 ; i < argc ; i++) 
+	while(i < argc) { 
     	vf.push_back(string(argv[i]));
-
+		i++;
+	}
+	
     if(!mldata.open(vf)) {
 		cout << "Unable to parse input files" << endl;
 		return;
@@ -197,12 +205,12 @@ int main(int argc, char **argv) {
 		cout << "wiic-ml allows to recognize a set of gestures using OpenCV machine learning library." << endl;
 		cout << "wiic-ml is part of WiiC (http://wiic.sf.net)" << endl << endl;
 		cout << "Usage:  " << argv[0] << " train <KNN|Bayes|SVN|DT|ANN|Boost|RT> <training_data_ratio> <data_file1> ... <data_fileN>" << endl;
-		cout << "        " << argv[0] << " val <KNN|Bayes|SVN|DT|ANN|Boost|RT> <model_file> <val_file1> ... <val_fileN>" << endl;
-		cout << "        " << argv[0] << " rec <KNN|Bayes|SVN|DT|ANN|Boost|RT> <model_file> [category_names]" << endl;
+		cout << "        " << argv[0] << " val <KNN|Bayes|SVN|DT|ANN|Boost|RT> <model_file> [categories] <val_file1> ... <val_fileN>" << endl;
+		cout << "        " << argv[0] << " rec <KNN|Bayes|SVN|DT|ANN|Boost|RT> <model_file> [categories]" << endl;
 		cout << "        " << argv[0] << " convert <data_file1> ... <data_fileN>" << endl;
 		cout << "e.g. " << argv[0] << " train KNN 0.75 file1.log file2.log" << endl;
-		cout << "e.g. " << argv[0] << " val KNN KNN_model.xml file1.log file2.log" << endl;
-		cout << "e.g. " << argv[0] << " rec KNN KNN_model.xml [category_names.txt]" << endl;
+		cout << "e.g. " << argv[0] << " val KNN KNN_model.xml [categories] file1.log file2.log" << endl;
+		cout << "e.g. " << argv[0] << " rec KNN KNN_model.xml [categories]" << endl;
 		cout << "e.g. " << argv[0] << " convert file1.log file2.log" << endl;
 		cout << "======= Supported Algorithms =======" << endl;
 		cout << "KNN: k-nearest neighbor" << endl;
