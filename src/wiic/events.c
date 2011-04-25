@@ -210,8 +210,7 @@ static void idle_cycle(struct wiimote_t* wm) {
 	 *	angle of the device.
 	 */
 	if (WIIC_USING_ACC(wm) && WIIMOTE_IS_FLAG_SET(wm, WIIC_SMOOTHING)) {
-		apply_smoothing(&wm->accel_calib, &wm->orient, SMOOTH_ROLL);
-		apply_smoothing(&wm->accel_calib, &wm->orient, SMOOTH_PITCH);
+		apply_smoothing(&wm->gforce, wm->accel_calib.st_alpha);
 	}
 
 	/* clear out any old read requests */
@@ -264,12 +263,12 @@ void propagate_event(struct wiimote_t* wm, byte event, byte* msg) {
 			wm->accel.x = msg[2];
 			wm->accel.y = msg[3];
 			wm->accel.z = msg[4];
-			
-			/* calculate the remote orientation */
-			calculate_orientation(&wm->accel_calib, &wm->accel, &wm->orient, WIIMOTE_IS_FLAG_SET(wm, WIIC_SMOOTHING));
 
 			/* calculate the gforces on each axis */
-			calculate_gforce(&wm->accel_calib, &wm->accel, &wm->gforce);
+			calculate_gforce(&wm->accel_calib, &wm->accel, &wm->gforce, WIIMOTE_IS_FLAG_SET(wm, WIIC_SMOOTHING));
+						
+			/* calculate the remote orientation */
+			calculate_orientation(&wm->gforce, &wm->orient, WIIMOTE_IS_FLAG_SET(wm, WIIC_SMOOTHING));
 
 			break;
 		}
@@ -306,8 +305,8 @@ void propagate_event(struct wiimote_t* wm, byte event, byte* msg) {
 			wm->accel.y = msg[3];
 			wm->accel.z = msg[4];
 
-			calculate_orientation(&wm->accel_calib, &wm->accel, &wm->orient, WIIMOTE_IS_FLAG_SET(wm, WIIC_SMOOTHING));
-			calculate_gforce(&wm->accel_calib, &wm->accel, &wm->gforce);
+			calculate_gforce(&wm->accel_calib, &wm->accel, &wm->gforce, WIIMOTE_IS_FLAG_SET(wm, WIIC_SMOOTHING));
+			calculate_orientation(&wm->gforce, &wm->orient, WIIMOTE_IS_FLAG_SET(wm, WIIC_SMOOTHING));
 
 			handle_expansion(wm, msg+5);
 
@@ -321,9 +320,9 @@ void propagate_event(struct wiimote_t* wm, byte event, byte* msg) {
 			wm->accel.x = msg[2];
 			wm->accel.y = msg[3];
 			wm->accel.z = msg[4];
-
-			calculate_orientation(&wm->accel_calib, &wm->accel, &wm->orient, WIIMOTE_IS_FLAG_SET(wm, WIIC_SMOOTHING));
-			calculate_gforce(&wm->accel_calib, &wm->accel, &wm->gforce);
+			
+			calculate_gforce(&wm->accel_calib, &wm->accel, &wm->gforce, WIIMOTE_IS_FLAG_SET(wm, WIIC_SMOOTHING));
+			calculate_orientation(&wm->gforce, &wm->orient, WIIMOTE_IS_FLAG_SET(wm, WIIC_SMOOTHING));
 
 			/* ir */
 			calculate_extended_ir(wm, msg+5);
@@ -350,8 +349,8 @@ void propagate_event(struct wiimote_t* wm, byte event, byte* msg) {
 			wm->accel.y = msg[3];
 			wm->accel.z = msg[4];
 
-			calculate_orientation(&wm->accel_calib, &wm->accel, &wm->orient, WIIMOTE_IS_FLAG_SET(wm, WIIC_SMOOTHING));
-			calculate_gforce(&wm->accel_calib, &wm->accel, &wm->gforce);
+			calculate_gforce(&wm->accel_calib, &wm->accel, &wm->gforce, WIIMOTE_IS_FLAG_SET(wm, WIIC_SMOOTHING));
+			calculate_orientation(&wm->gforce, &wm->orient, WIIMOTE_IS_FLAG_SET(wm, WIIC_SMOOTHING));
 
 			handle_expansion(wm, msg+15);
 
@@ -792,12 +791,12 @@ static void save_state(struct wiimote_t* wm) {
 			wm->lstate.mp_raw_gyro.y = wm->exp.mp.raw_gyro.y;
 			break;
 			
-	/*	case EXP_BALANCE_BOARD:
+		case EXP_BALANCE_BOARD:
 			wm->lstate.pressure_raw_data.top_left = wm->exp.bb.pressure_raw_data.top_left;
 			wm->lstate.pressure_raw_data.top_right = wm->exp.bb.pressure_raw_data.top_right;
 			wm->lstate.pressure_raw_data.bottom_left = wm->exp.bb.pressure_raw_data.bottom_left;
 			wm->lstate.pressure_raw_data.bottom_right = wm->exp.bb.pressure_raw_data.bottom_right;
-			break;*/
+			break;
 
 		case EXP_NONE:
 			break;

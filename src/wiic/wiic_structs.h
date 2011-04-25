@@ -121,7 +121,8 @@ typedef struct orient_t {
  *	@brief Gravity force struct.
  */
 typedef struct gforce_t {
-	float x, y, z;
+	float x, y, z; 		/**< gforce, this may be smoothed if enabled 	*/
+	float ax, ay, az;	/**< absolute gforce, unsmoothed				*/	
 } gforce_t;
 
 
@@ -132,9 +133,6 @@ typedef struct gforce_t {
 typedef struct accel_t {
 	struct vec3b_t cal_zero;		/**< zero calibration					*/
 	struct vec3b_t cal_g;			/**< 1g difference around 0cal			*/
-
-	float st_roll;					/**< last smoothed roll value			*/
-	float st_pitch;					/**< last smoothed roll pitch			*/
 	float st_alpha;					/**< alpha value for smoothing [0-1]	*/
 } accel_t;
 
@@ -309,12 +307,16 @@ typedef struct balance_board_t {
  *	@brief Motion Plus expansion device.
  */
 typedef struct motion_plus_t {
-	struct ang3s_t raw_gyro;			/**< current raw gyroscope data */
+	struct ang3s_t a_raw_gyro;			/**< current raw gyroscope data (unsmoothed) */
+	struct ang3s_t raw_gyro;			/**< current raw gyroscope data (smoothed, if enabled) */
 	struct ang3s_t cal_gyro;			/**< calibration raw gyroscope data */
-	struct ang3f_t angle_rate_gyro;		/**< current gyro angle rate */
+	struct ang3f_t a_gyro_rate;		/**< current gyro angle rate (unsmoothed) */
+	struct ang3f_t gyro_rate;		/**< current gyro angle rate (smoothed, if enabled) */
 	struct orient_t orient;				/**< current orientation on each axis using Motion Plus gyroscopes */
 	byte acc_mode;						/**< Fast/slow rotation mode for roll, pitch and yaw (0 if rotating fast, 1 if slow or still) */
 	int raw_gyro_threshold;			/**< threshold for gyroscopes to generate an event */
+	int smooth;					/**< smoothing enabled/disabled */
+	float smooth_alpha;				/**< smoothness alpha parameter*/
 } motion_plus_t;
 
 
@@ -363,9 +365,9 @@ typedef struct wiimote_state_t {
 	int ir_ay;
 	float ir_distance;
 
+	/* wiimote_t */
 	struct orient_t orient;
 	unsigned short btns;
-
 	struct vec3b_t accel;
 } wiimote_state_t;
 
@@ -415,32 +417,29 @@ typedef struct wiimote_t {
 		WCONST int in_sock;					/**< input socket 							*/	
 	#endif
 
+	WCONST struct wiimote_state_t lstate;	/**< last saved state						*/
 	WCONST int state;						/**< various state flags					*/
+	WCONST int flags;						/**< options flag							*/
+	WCONST byte handshake_state;			/**< the state of the connection handshake	*/
+	
 	WCONST byte leds;						/**< currently lit leds						*/
 	WCONST float battery_level;				/**< battery level							*/
 
-	WCONST int flags;						/**< options flag							*/
-
-	WCONST byte handshake_state;			/**< the state of the connection handshake	*/
-
 	WCONST struct read_req_t* read_req;		/**< list of data read requests				*/
-	WCONST struct accel_t accel_calib;		/**< wiimote accelerometer calibration		*/
 	WCONST struct expansion_t exp;			/**< wiimote expansion device				*/
 
+	WCONST struct accel_t accel_calib;		/**< wiimote accelerometer calibration		*/
 	WCONST struct vec3b_t accel;			/**< current raw acceleration data			*/
-	WCONST struct orient_t orient;			/**< current orientation on each axis		*/
-	WCONST struct gforce_t gforce;			/**< current gravity forces on each axis	*/
+	WCONST struct orient_t orient;			/**< current orientation on each axis (smoothed and unsmoothed)		*/
+	WCONST struct gforce_t gforce;			/**< current gravity forces on each axis (smoothed and unsmoothed)	*/
+	WCONST float orient_threshold;			/**< threshold for orient to generate an event */
+	WCONST int accel_threshold;				/**< threshold for accel to generate an event */
 
 	WCONST struct ir_t ir;					/**< IR data								*/
 
 	WCONST unsigned short btns;				/**< what buttons have just been pressed	*/
 	WCONST unsigned short btns_held;		/**< what buttons are being held down		*/
 	WCONST unsigned short btns_released;	/**< what buttons were just released this	*/
-
-	WCONST float orient_threshold;			/**< threshold for orient to generate an event */
-	WCONST int accel_threshold;				/**< threshold for accel to generate an event */
-
-	WCONST struct wiimote_state_t lstate;	/**< last saved state						*/
 
 	WCONST WIIC_EVENT_TYPE event;			/**< type of event that occured				*/
 	WCONST byte event_buf[MAX_PAYLOAD];		/**< event buffer							*/

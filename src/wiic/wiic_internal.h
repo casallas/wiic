@@ -210,10 +210,7 @@
  *		St = St_last + (alpha * (tilt - St_last))
  *	alpha is between 0 and 1
  */
-#define WIIC_DEFAULT_SMOOTH_ALPHA			0.1f
-
-#define SMOOTH_ROLL						0x01
-#define SMOOTH_PITCH					0x02
+#define WIIC_DEFAULT_SMOOTH_ALPHA			0.9f
 
 #include "wiic.h"
 

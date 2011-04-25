@@ -451,13 +451,13 @@ std::vector<CIRDot>& CIR::GetDots()
     // Empty the array of irdots before reloading
     mpIRDotsVector.clear();
 
-    for(index = 0; index < mpWiimotePtr->ir.num_dots; index++)
+    for(index = 0 ; index < 4 ; index++)
     {
         CIRDot dot((struct ir_dot_t *) (&(mpWiimotePtr->ir.dot[index])));
-        mpIRDotsVector.push_back(dot);
+		if(dot.isVisible())
+        	mpIRDotsVector.push_back(dot);
     }
 
-    //return numConnected;
     return mpIRDotsVector;
 }
 
@@ -564,7 +564,7 @@ float CGuitarHero3::GetWhammyBar()
  * CMotionPlus class methods.
  */
 CMotionPlus::CMotionPlus(struct expansion_t *ExpPtr):
-	Gyroscope(&(ExpPtr->mp.raw_gyro),&(ExpPtr->mp.cal_gyro),&(ExpPtr->mp.angle_rate_gyro),(unsigned char*)&(ExpPtr->mp.acc_mode),&(ExpPtr->mp),
+	Gyroscope(&(ExpPtr->mp.raw_gyro),&(ExpPtr->mp.cal_gyro),&(ExpPtr->mp.gyro_rate),(unsigned char*)&(ExpPtr->mp.acc_mode),&(ExpPtr->mp),
 	&(ExpPtr->mp.raw_gyro_threshold))
 {
 	mpMPPtr = &(ExpPtr->mp);

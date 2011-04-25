@@ -60,8 +60,7 @@
  *	Given the raw acceleration data from the accelerometer struct, calculate
  *	the orientation of the device and set it in the \a orient parameter.
  */
-void calculate_orientation(struct accel_t* ac, struct vec3b_t* accel, struct orient_t* orient, int smooth) {
-	float xg, yg, zg;
+void calculate_orientation(struct gforce_t* gforce, struct orient_t* orient, int smooth) {
 	float x, y, z;
 
 	/*
@@ -73,15 +72,10 @@ void calculate_orientation(struct accel_t* ac, struct vec3b_t* accel, struct ori
 	/* yaw - set to 0, IR will take care of it if it's enabled */
 	orient->yaw = 0.0f;
 
-	/* find out how much it has to move to be 1g */
-	xg = (int)ac->cal_g.x;
-	yg = (int)ac->cal_g.y;
-	zg = (int)ac->cal_g.z;
-
 	/* find out how much it actually moved and normalize to +/- 1g */
-	x = ((int)accel->x - (int)ac->cal_zero.x) / xg;
-	y = ((int)accel->y - (int)ac->cal_zero.y) / yg;
-	z = ((int)accel->z - (int)ac->cal_zero.z) / zg;
+	x = gforce->x;
+	y = gforce->y;
+	z = gforce->z;
 
 	/* make sure x,y,z are between -1 and 1 for the tan functions */
 	if (x < -1.0f)			x = -1.0f;
@@ -92,26 +86,49 @@ void calculate_orientation(struct accel_t* ac, struct vec3b_t* accel, struct ori
 	else if (z > 1.0f)		z = 1.0f;
 
 	/* if it is over 1g then it is probably accelerating and the gravity vector cannot be identified */
-	if (abs(accel->x - ac->cal_zero.x) <= ac->cal_g.x) {
+	if (abs(gforce->x) <= 1.0) {
 		/* roll */
 		x = -RAD_TO_DEGREE(atan2f(x, z));
 
 		orient->roll = x;
-		orient->a_roll = x;
 	}
 
-	if (abs(accel->y - ac->cal_zero.y) <= ac->cal_g.y) {
+	if (abs(gforce->y) <= 1.0) {
 		/* pitch */
 		y = RAD_TO_DEGREE(atan2f(y, z));
 
 		orient->pitch = y;
-		orient->a_pitch = y;
 	}
 
-	/* smooth the angles if enabled */
-	if (smooth) {
-		apply_smoothing(ac, orient, SMOOTH_ROLL);
-		apply_smoothing(ac, orient, SMOOTH_PITCH);
+	if(smooth) {	// Same stuff, but this time using unsmoothed gforce
+		x = gforce->ax;
+		y = gforce->ay;
+		z = gforce->az;
+
+		if (x < -1.0f)			x = -1.0f;
+		else if (x > 1.0f)		x = 1.0f;
+		if (y < -1.0f)			y = -1.0f;
+		else if (y > 1.0f)		y = 1.0f;
+		if (z < -1.0f)			z = -1.0f;
+		else if (z > 1.0f)		z = 1.0f;
+
+		if (abs(gforce->ax) <= 1.0) {
+			/* roll */
+			x = -RAD_TO_DEGREE(atan2f(x, z));
+
+			orient->a_roll = x;
+		}
+
+		if (abs(gforce->ay) <= 1.0) {
+			/* pitch */
+			y = RAD_TO_DEGREE(atan2f(y, z));
+
+			orient->a_pitch = y;
+		}		
+	}
+	else {	// Same values
+		orient->a_roll = x;
+		orient->a_pitch = y;		
 	}
 }
 
@@ -123,7 +140,7 @@ void calculate_orientation(struct accel_t* ac, struct vec3b_t* accel, struct ori
  *	@param accel		[in] Pointer to a vec3b_t structure that holds the raw acceleration data.
  *	@param gforce		[out] Pointer to a gforce_t structure that will hold the gravity force data.
  */
-void calculate_gforce(struct accel_t* ac, struct vec3b_t* accel, struct gforce_t* gforce) {
+void calculate_gforce(struct accel_t* ac, struct vec3b_t* accel, struct gforce_t* gforce, int smooth) {
 	float xg, yg, zg;
 
 	/* find out how much it has to move to be 1g */
@@ -132,9 +149,18 @@ void calculate_gforce(struct accel_t* ac, struct vec3b_t* accel, struct gforce_t
 	zg = (int)ac->cal_g.z;
 
 	/* find out how much it actually moved and normalize to +/- 1g */
-	gforce->x = ((int)accel->x - (int)ac->cal_zero.x) / xg;
-	gforce->y = ((int)accel->y - (int)ac->cal_zero.y) / yg;
-	gforce->z = ((int)accel->z - (int)ac->cal_zero.z) / zg;
+	gforce->ax = ((int)accel->x - (int)ac->cal_zero.x) / xg;
+	gforce->ay = ((int)accel->y - (int)ac->cal_zero.y) / yg;
+	gforce->az = ((int)accel->z - (int)ac->cal_zero.z) / zg;
+	
+	if(smooth) {
+		apply_smoothing(gforce, ac->st_alpha);
+	}
+	else {
+		gforce->x = gforce->ax;
+		gforce->y = gforce->ay;
+		gforce->z = gforce->az;		
+	}
 }
 
 
@@ -191,45 +217,12 @@ void calc_joystick_state(struct joystick_t* js, float x, float y) {
  *
  * @brief Apply a smooth factor to accelerometer angles.
  *
- * @param ac		[out] An accelerometer (accel_t) structure.
- * @param orient	Pointer to a orient_t structure that will hold the non-smoothed orientation data.
- * @param type		Flag that controls the angle to smooth (possible values are SMOOTH_ROLL or SMOOTH_PITCH).
+ * @param accel		Last acceleration measured and normalized to +/-g.
+ * @param gforce	[out] gravity vector after smoothing
  */
-void apply_smoothing(struct accel_t* ac, struct orient_t* orient, int type) {
-	switch (type) {
-		case SMOOTH_ROLL:
-		{
-			/* it's possible last iteration was nan or inf, so set it to 0 if that happened */
-			if (isnan(ac->st_roll) || isinf(ac->st_roll))
-				ac->st_roll = 0.0f;
-
-			/*
-			 *	If the sign changes (which will happen if going from -180 to 180)
-			 *	or from (-1 to 1) then don't smooth, just use the new angle.
-			 */
-			if (((ac->st_roll < 0) && (orient->roll > 0)) || ((ac->st_roll > 0) && (orient->roll < 0))) {
-				ac->st_roll = orient->roll;
-			} else {
-				orient->roll = orient->a_roll + (ac->st_alpha * (ac->st_roll - orient->a_roll));
-				ac->st_roll = orient->roll;
-			}
-
-			return;
-		}
-
-		case SMOOTH_PITCH:
-		{
-			if (isnan(ac->st_pitch) || isinf(ac->st_pitch))
-				ac->st_pitch = 0.0f;
-
-			if (((ac->st_pitch < 0) && (orient->pitch > 0)) || ((ac->st_pitch > 0) && (orient->pitch < 0))) {
-				ac->st_pitch = orient->pitch;
-			} else {
-				orient->pitch = orient->a_pitch + (ac->st_alpha * (ac->st_pitch - orient->a_pitch));
-				ac->st_pitch = orient->pitch;
-			}
-
-			return;
-		}
-	}
+void apply_smoothing(struct gforce_t* gforce, float alpha) {
+	
+	gforce->x = alpha*gforce->x + (1.0-alpha)*gforce->ax;
+	gforce->y = alpha*gforce->y + (1.0-alpha)*gforce->ay;
+	gforce->z = alpha*gforce->z + (1.0-alpha)*gforce->az;
 }

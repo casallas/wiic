@@ -59,7 +59,7 @@ int exiting = 0;
  *	event occurs on the specified wiimote.
  */
 void handle_event(struct wiimote_t* wm) {
-	printf("\n\n--- EVENT [id %i] ---\n", wm->unid);
+//	printf("\n\n--- EVENT [id %i] ---\n", wm->unid);
 
 	/* if a button is pressed, report it */
 	if (IS_PRESSED(wm, WIIMOTE_BUTTON_A))		printf("A pressed\n");
@@ -113,9 +113,9 @@ void handle_event(struct wiimote_t* wm) {
 
 	/* if the Motion Plus is turned on then print angle rates */
 	if (WIIC_USING_MOTION_PLUS(wm)) {
-		printf("motion plus roll rate = %f\n", wm->exp.mp.angle_rate_gyro.r);
-		printf("motion plus pitch rate = %f\n", wm->exp.mp.angle_rate_gyro.p);
-		printf("motion plus yaw rate = %f\n", wm->exp.mp.angle_rate_gyro.y);
+		printf("motion plus roll rate = %f [%f]\n", wm->exp.mp.gyro_rate.r, wm->exp.mp.a_gyro_rate.r);
+		printf("motion plus pitch rate = %f [%f]\n", wm->exp.mp.gyro_rate.p, wm->exp.mp.a_gyro_rate.p);
+		printf("motion plus yaw rate = %f [%f]\n", wm->exp.mp.gyro_rate.y, wm->exp.mp.a_gyro_rate.y);
 	}
 
 	/*
