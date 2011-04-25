@@ -177,12 +177,12 @@ public:
     void SetAccelThreshold(int Threshold);
 
     void GetOrientation(float &Pitch, float &Roll, float &Yaw);
-    void GetRawOrientation(float &Pitch, float &Roll);
 
     void GetGravityCalVector(float &X, float &Y, float &Z);
     void SetGravityCalVector(float X, float Y, float Z);
 
     void GetGravityVector(float &X, float &Y, float &Z);
+	void GetRawGravityVector(float &X, float &Y, float &Z);
 
 private:
     struct accel_t *mpAccelCalibPtr;

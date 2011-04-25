@@ -205,21 +205,6 @@ void CAccelerometer::GetOrientation(float &Pitch, float &Roll, float &Yaw)
     Yaw = mpOrientPtr->angle.yaw;
 }
 
-/**
- *
- * @brief Retrieves the unsmooth (raw) device attitude (pitch, roll, and yaw) computed with an
- * exponential moving average.
- *
- * @param Pitch		[out] Reference variable where the device pitch will be set.
- * @param Roll		[out] Reference variable where the device roll will be set.
- * @param Yaw		[out] Reference variable where the device yaw will be set.
- */
-void CAccelerometer::GetRawOrientation(float &Pitch, float &Roll)
-{
-    Pitch = mpOrientPtr->a_angle.pitch;
-    Roll = mpOrientPtr->a_angle.roll;
-}
-
 void CAccelerometer::GetGravityCalVector(float &X, float &Y, float &Z)
 {
     X = mpAccelCalibPtr->cal_g.x;
@@ -239,6 +224,13 @@ void CAccelerometer::GetGravityVector(float &X, float &Y, float &Z)
     X = mpGForcePtr->vec.x;
     Y = mpGForcePtr->vec.y;
     Z = mpGForcePtr->vec.z;
+}
+
+void CAccelerometer::GetRawGravityVector(float &X, float &Y, float &Z)
+{
+    X = mpGForcePtr->a_vec.x;
+    Y = mpGForcePtr->a_vec.y;
+    Z = mpGForcePtr->a_vec.z;
 }
 
 /*

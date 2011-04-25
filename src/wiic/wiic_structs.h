@@ -57,6 +57,7 @@ struct read_req_t {
 	struct read_req_t* next;	/**< next read request in the queue								*/
 };
 
+/*** COMMON STRUCTURES ***/
 
 /**
  *	@struct vec2b_t
@@ -107,9 +108,27 @@ typedef struct ang3f_t {
  */
 typedef struct orient_t {
 	struct ang3f_t angle;	/**< roll, pitch and yaw (this may be smoothed if enabled)	*/
-	struct ang3f_t a_angle;	/**< roll, pitch and yaw (unsmoothed)	*/
 } orient_t;
 
+/**
+ *	@struct ang_rate_t
+ *	@brief Angular rate struct.
+ *
+ *	Yaw, pitch, and roll rate from -180 to 180 degrees.
+ */
+typedef struct ang_rate_t {
+	struct ang3f_t rate;	/**< roll, pitch and yaw rate (this may be smoothed if enabled)	*/
+	struct ang3f_t a_rate;	/**< roll, pitch and yaw rate (unsmoothed)	*/
+} ang_rate_t;
+
+/**
+ *	@struct vel_t
+ *	@brief Velocity struct.
+ */
+typedef struct vel_t {
+	struct ang3s_t vel;		/**< raw rate, this may be smoothed if enabled 	*/
+	struct ang3s_t a_vel;	/**< raw rate (unsmoothed)	*/
+} vel_t;
 
 /**
  *	@struct gforce_t
@@ -130,6 +149,15 @@ typedef struct accel_t {
 	struct vec3b_t cal_g;			/**< 1g difference around 0cal			*/
 	float st_alpha;					/**< alpha value for smoothing [0-1]	*/
 } accel_t;
+
+/**
+ *	@struct gyro_t
+ *	@brief Gyro struct. For any device with a gyroscope.
+ */
+typedef struct gyro_t {
+	struct vec3b_t cal_zero;		/**< zero calibration					*/
+	float st_alpha;					/**< alpha value for smoothing [0-1]	*/
+} gyro_t;
 
 /**
  *  @struct pressure_t

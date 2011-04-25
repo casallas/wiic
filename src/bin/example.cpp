@@ -137,11 +137,10 @@ void HandleEvent(CWiimote &wm)
     // if the accelerometer is turned on then print angles
     if(wm.isUsingACC())
     {
-        float pitch, roll, yaw, a_pitch, a_roll;
+        float pitch, roll, yaw;
         wm.Accelerometer.GetOrientation(pitch, roll, yaw);
-        wm.Accelerometer.GetRawOrientation(a_pitch, a_roll);
-        printf("%s wiimote roll = %f [%f]\n", prefixString, roll, a_roll);
-        printf("%s wiimote pitch = %f [%f]\n", prefixString, pitch, a_pitch);
+        printf("%s wiimote roll = %f\n", prefixString, roll);
+        printf("%s wiimote pitch = %f\n", prefixString, pitch);
         printf("%s wiimote yaw = %f\n", prefixString, yaw);
     }
 
@@ -202,9 +201,8 @@ void HandleEvent(CWiimote &wm)
         }
 
         nc.Accelerometer.GetOrientation(pitch, roll, yaw);
-        nc.Accelerometer.GetRawOrientation(a_pitch, a_roll);
-        printf("%s roll = %f [%f]\n", prefixString, roll, a_roll);
-        printf("%s pitch = %f [%f]\n", prefixString, pitch, a_pitch);
+        printf("%s roll = %f\n", prefixString, roll);
+        printf("%s pitch = %f\n", prefixString, pitch);
         printf("%s yaw = %f\n", prefixString, yaw);
 
         nc.Joystick.GetPosition(angle, magnitude);

@@ -106,8 +106,8 @@ void handle_event(struct wiimote_t* wm) {
 
 	/* if the accelerometer is turned on then print angles */
 	if (WIIC_USING_ACC(wm)) {
-		printf("wiimote roll  = %f [%f]\n", wm->orient.angle.roll, wm->orient.a_angle.roll);
-		printf("wiimote pitch = %f [%f]\n", wm->orient.angle.pitch, wm->orient.a_angle.pitch);
+		printf("wiimote roll  = %f\n", wm->orient.angle.roll);
+		printf("wiimote pitch = %f\n", wm->orient.angle.pitch);
 		printf("wiimote yaw   = %f\n", wm->orient.angle.yaw);
 	}
 

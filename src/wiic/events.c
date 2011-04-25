@@ -269,7 +269,6 @@ void propagate_event(struct wiimote_t* wm, byte event, byte* msg) {
 						
 			/* calculate the remote orientation */
 			calculate_orientation(&wm->gforce.vec, &wm->orient.angle);
-			calculate_orientation(&wm->gforce.a_vec, &wm->orient.a_angle);
 
 			break;
 		}
@@ -308,7 +307,6 @@ void propagate_event(struct wiimote_t* wm, byte event, byte* msg) {
 
 			calculate_gforce(&wm->accel_calib, &wm->accel, &wm->gforce, WIIMOTE_IS_FLAG_SET(wm, WIIC_SMOOTHING));
 			calculate_orientation(&wm->gforce.vec, &wm->orient.angle);
-			calculate_orientation(&wm->gforce.a_vec, &wm->orient.a_angle);
 
 			handle_expansion(wm, msg+5);
 
@@ -325,7 +323,6 @@ void propagate_event(struct wiimote_t* wm, byte event, byte* msg) {
 			
 			calculate_gforce(&wm->accel_calib, &wm->accel, &wm->gforce, WIIMOTE_IS_FLAG_SET(wm, WIIC_SMOOTHING));
 			calculate_orientation(&wm->gforce.vec, &wm->orient.angle);
-			calculate_orientation(&wm->gforce.a_vec, &wm->orient.a_angle);
 
 			/* ir */
 			calculate_extended_ir(wm, msg+5);
@@ -354,7 +351,6 @@ void propagate_event(struct wiimote_t* wm, byte event, byte* msg) {
 
 			calculate_gforce(&wm->accel_calib, &wm->accel, &wm->gforce, WIIMOTE_IS_FLAG_SET(wm, WIIC_SMOOTHING));
 			calculate_orientation(&wm->gforce.vec, &wm->orient.angle);
-			calculate_orientation(&wm->gforce.a_vec, &wm->orient.a_angle);
 
 			handle_expansion(wm, msg+15);
 
