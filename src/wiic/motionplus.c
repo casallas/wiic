@@ -55,9 +55,9 @@ void calculate_gyro_rates(struct motion_plus_t* mp, struct ang3s_t* in, struct a
 	float tmp_roll, tmp_pitch, tmp_yaw;
 	
 	// We consider calibration data
-	tmp_r = in->r - mp->cal_gyro.r;
-	tmp_p = in->p - mp->cal_gyro.p;
-	tmp_y = in->y - mp->cal_gyro.y;
+	tmp_r = in->roll - mp->cal_gyro.roll;
+	tmp_p = in->pitch - mp->cal_gyro.pitch;
+	tmp_y = in->yaw - mp->cal_gyro.yaw;
 
 	// We convert to degree/sec according to fast/slow mode
 	if(mp->acc_mode & 0x04)
@@ -75,9 +75,9 @@ void calculate_gyro_rates(struct motion_plus_t* mp, struct ang3s_t* in, struct a
 	else
 		tmp_yaw = tmp_y / 4.0;
 	
-	out->r = tmp_roll;
-	out->p = tmp_pitch;
-	out->y = tmp_yaw;
+	out->roll = tmp_roll;
+	out->pitch = tmp_pitch;
+	out->yaw = tmp_yaw;
 }
 
 /**
@@ -91,22 +91,22 @@ void motion_plus_event(struct motion_plus_t* mp, byte* msg)
 	// Check if the gyroscope is in fast or slow mode (0 if rotating fast, 1 if slow or still)
 	mp->acc_mode = ((msg[4] & 0x2) << 1) | ((msg[3] & 0x1) << 1) | ((msg[3] & 0x2) >> 1); 
 	
-	mp->a_raw_gyro.r = ((msg[4] & 0xFC) << 6) | msg[1];
-	mp->a_raw_gyro.p = ((msg[5] & 0xFC) << 6) | msg[2];
-	mp->a_raw_gyro.y = ((msg[3] & 0xFC) << 6) | msg[0];
+	mp->a_raw_gyro.roll = ((msg[4] & 0xFC) << 6) | msg[1];
+	mp->a_raw_gyro.pitch = ((msg[5] & 0xFC) << 6) | msg[2];
+	mp->a_raw_gyro.yaw = ((msg[3] & 0xFC) << 6) | msg[0];
 
 	// First calibration
-	if((mp->a_raw_gyro.r > 5000) && (mp->a_raw_gyro.p > 5000) && (mp->a_raw_gyro.y > 5000) && 
-		!(mp->cal_gyro.r) && !(mp->cal_gyro.p) && !(mp->cal_gyro.y)) {
+	if((mp->a_raw_gyro.roll > 5000) && (mp->a_raw_gyro.pitch > 5000) && (mp->a_raw_gyro.yaw > 5000) && 
+		!(mp->cal_gyro.roll) && !(mp->cal_gyro.pitch) && !(mp->cal_gyro.yaw)) {
 		wiic_calibrate_motion_plus(mp);	
 	}
 	
 	if(mp->smooth)
 		motion_plus_apply_smoothing(mp);
 	else {
-		mp->raw_gyro.r = mp->a_raw_gyro.r;
-		mp->raw_gyro.p = mp->a_raw_gyro.p;
-		mp->raw_gyro.y = mp->a_raw_gyro.y;
+		mp->raw_gyro.roll = mp->a_raw_gyro.roll;
+		mp->raw_gyro.pitch = mp->a_raw_gyro.pitch;
+		mp->raw_gyro.yaw = mp->a_raw_gyro.yaw;
 	}
 				
 	// Calculate angular rates in deg/sec and performs some simple filtering (both unsmoothed and smoothed)
@@ -124,9 +124,9 @@ void motion_plus_apply_smoothing(struct motion_plus_t *mp)
 {
 	float alpha = mp->smooth_alpha;
 	
-	mp->raw_gyro.r = alpha*mp->raw_gyro.r + (1.0-alpha)*mp->a_raw_gyro.r;
-	mp->raw_gyro.p = alpha*mp->raw_gyro.p + (1.0-alpha)*mp->a_raw_gyro.p;
-	mp->raw_gyro.y = alpha*mp->raw_gyro.y + (1.0-alpha)*mp->a_raw_gyro.y;
+	mp->raw_gyro.roll = alpha*mp->raw_gyro.roll + (1.0-alpha)*mp->a_raw_gyro.roll;
+	mp->raw_gyro.pitch = alpha*mp->raw_gyro.pitch + (1.0-alpha)*mp->a_raw_gyro.pitch;
+	mp->raw_gyro.yaw = alpha*mp->raw_gyro.yaw + (1.0-alpha)*mp->a_raw_gyro.yaw;
 }
 
 /**
@@ -155,18 +155,18 @@ int motion_plus_handshake(struct wiimote_t* wm, byte* data, unsigned short len)
 		WIIMOTE_ENABLE_STATE(wm,WIIMOTE_STATE_MOTION_PLUS);
 		
 		// Init gyroscopes
-		wm->exp.mp.cal_gyro.r = 0;
-		wm->exp.mp.cal_gyro.p = 0;
-		wm->exp.mp.cal_gyro.y = 0;
-		wm->exp.mp.orient.roll = 0.0;
-		wm->exp.mp.orient.pitch = 0.0;
-		wm->exp.mp.orient.yaw = 0.0;
-		wm->exp.mp.raw_gyro.r = wm->exp.mp.a_raw_gyro.r = 0;
-		wm->exp.mp.raw_gyro.p = wm->exp.mp.a_raw_gyro.p = 0;
-		wm->exp.mp.raw_gyro.y = wm->exp.mp.a_raw_gyro.y = 0;
-		wm->exp.mp.gyro_rate.r = wm->exp.mp.a_gyro_rate.r = 0.0;
-		wm->exp.mp.gyro_rate.p = wm->exp.mp.a_gyro_rate.p = 0.0;
-		wm->exp.mp.gyro_rate.y = wm->exp.mp.a_gyro_rate.y = 0.0;
+		wm->exp.mp.cal_gyro.roll = 0;
+		wm->exp.mp.cal_gyro.pitch = 0;
+		wm->exp.mp.cal_gyro.yaw = 0;
+		wm->exp.mp.orient.angle.roll = 0.0;
+		wm->exp.mp.orient.angle.pitch = 0.0;
+		wm->exp.mp.orient.angle.yaw = 0.0;
+		wm->exp.mp.raw_gyro.roll = wm->exp.mp.a_raw_gyro.roll = 0;
+		wm->exp.mp.raw_gyro.pitch = wm->exp.mp.a_raw_gyro.pitch = 0;
+		wm->exp.mp.raw_gyro.yaw = wm->exp.mp.a_raw_gyro.yaw = 0;
+		wm->exp.mp.gyro_rate.roll = wm->exp.mp.a_gyro_rate.roll = 0.0;
+		wm->exp.mp.gyro_rate.pitch = wm->exp.mp.a_gyro_rate.pitch = 0.0;
+		wm->exp.mp.gyro_rate.yaw = wm->exp.mp.a_gyro_rate.yaw = 0.0;
 		wm->exp.mp.raw_gyro_threshold = 15;
 		wm->exp.mp.smooth = 1;
 		wm->exp.mp.smooth_alpha = MP_SMOOTH_ALPHA;
@@ -236,9 +236,9 @@ void wiic_set_motion_plus(struct wiimote_t *wm, int status)
  */
 void wiic_calibrate_motion_plus(struct motion_plus_t *mp)
 {
-	mp->cal_gyro.r = mp->raw_gyro.r = mp->a_raw_gyro.r ;
-	mp->cal_gyro.p = mp->raw_gyro.p = mp->a_raw_gyro.p ;
-	mp->cal_gyro.y = mp->raw_gyro.y = mp->a_raw_gyro.y ;
+	mp->cal_gyro.roll = mp->raw_gyro.roll = mp->a_raw_gyro.roll ;
+	mp->cal_gyro.pitch = mp->raw_gyro.pitch = mp->a_raw_gyro.pitch ;
+	mp->cal_gyro.yaw = mp->raw_gyro.yaw = mp->a_raw_gyro.yaw ;
 }
 
 

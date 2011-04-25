@@ -154,7 +154,8 @@ void nunchuk_event(struct nunchuk_t* nc, byte* msg) {
 	nc->accel.z = msg[4];
 
 	calculate_gforce(&nc->accel_calib, &nc->accel, &nc->gforce, NUNCHUK_IS_FLAG_SET(nc, WIIC_SMOOTHING));
-	calculate_orientation(&nc->gforce, &nc->orient, NUNCHUK_IS_FLAG_SET(nc, WIIC_SMOOTHING));
+	calculate_orientation(&nc->gforce.vec, &nc->orient.angle);
+	calculate_orientation(&nc->gforce.a_vec, &nc->orient.a_angle);
 }
 
 

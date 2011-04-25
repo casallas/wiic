@@ -383,7 +383,7 @@ static void interpret_ir_data(struct wiimote_t* wm) {
 	int last_num_dots = wm->ir.num_dots;
 
 	if (WIIMOTE_IS_SET(wm, WIIMOTE_STATE_ACC))
-		roll = wm->orient.roll;
+		roll = wm->orient.angle.roll;
 
 	/* count visible dots */
 	wm->ir.num_dots = 0;
@@ -453,7 +453,7 @@ static void interpret_ir_data(struct wiimote_t* wm) {
 
 						wm->ir.ax = x;
 						wm->ir.ay = y;
-						wm->orient.yaw = calc_yaw(&wm->ir);
+						wm->orient.angle.yaw = calc_yaw(&wm->ir);
 
 						if (ir_correct_for_bounds(&x, &y, wm->ir.aspect, wm->ir.offset[0], wm->ir.offset[1])) {
 							ir_convert_to_vres(&x, &y, wm->ir.aspect, wm->ir.vres[0], wm->ir.vres[1]);
@@ -495,7 +495,7 @@ static void interpret_ir_data(struct wiimote_t* wm) {
 
 			wm->ir.ax = x;
 			wm->ir.ay = y;
-			wm->orient.yaw = calc_yaw(&wm->ir);
+			wm->orient.angle.yaw = calc_yaw(&wm->ir);
 
 			if (ir_correct_for_bounds(&x, &y, wm->ir.aspect, wm->ir.offset[0], wm->ir.offset[1])) {
 				ir_convert_to_vres(&x, &y, wm->ir.aspect, wm->ir.vres[0], wm->ir.vres[1]);

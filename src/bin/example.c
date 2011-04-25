@@ -106,16 +106,16 @@ void handle_event(struct wiimote_t* wm) {
 
 	/* if the accelerometer is turned on then print angles */
 	if (WIIC_USING_ACC(wm)) {
-		printf("wiimote roll  = %f [%f]\n", wm->orient.roll, wm->orient.a_roll);
-		printf("wiimote pitch = %f [%f]\n", wm->orient.pitch, wm->orient.a_pitch);
-		printf("wiimote yaw   = %f\n", wm->orient.yaw);
+		printf("wiimote roll  = %f [%f]\n", wm->orient.angle.roll, wm->orient.a_angle.roll);
+		printf("wiimote pitch = %f [%f]\n", wm->orient.angle.pitch, wm->orient.a_angle.pitch);
+		printf("wiimote yaw   = %f\n", wm->orient.angle.yaw);
 	}
 
 	/* if the Motion Plus is turned on then print angle rates */
 	if (WIIC_USING_MOTION_PLUS(wm)) {
-		printf("motion plus roll rate = %f [%f]\n", wm->exp.mp.gyro_rate.r, wm->exp.mp.a_gyro_rate.r);
-		printf("motion plus pitch rate = %f [%f]\n", wm->exp.mp.gyro_rate.p, wm->exp.mp.a_gyro_rate.p);
-		printf("motion plus yaw rate = %f [%f]\n", wm->exp.mp.gyro_rate.y, wm->exp.mp.a_gyro_rate.y);
+		printf("motion plus roll rate = %f [%f]\n", wm->exp.mp.gyro_rate.roll, wm->exp.mp.a_gyro_rate.roll);
+		printf("motion plus pitch rate = %f [%f]\n", wm->exp.mp.gyro_rate.pitch, wm->exp.mp.a_gyro_rate.pitch);
+		printf("motion plus yaw rate = %f [%f]\n", wm->exp.mp.gyro_rate.yaw, wm->exp.mp.a_gyro_rate.yaw);
 	}
 
 	/*
@@ -146,9 +146,9 @@ void handle_event(struct wiimote_t* wm) {
 		if (IS_PRESSED(nc, NUNCHUK_BUTTON_C))		printf("Nunchuk: C pressed\n");
 		if (IS_PRESSED(nc, NUNCHUK_BUTTON_Z))		printf("Nunchuk: Z pressed\n");
 
-		printf("nunchuk roll  = %f\n", nc->orient.roll);
-		printf("nunchuk pitch = %f\n", nc->orient.pitch);
-		printf("nunchuk yaw   = %f\n", nc->orient.yaw);
+		printf("nunchuk roll  = %f\n", nc->orient.angle.roll);
+		printf("nunchuk pitch = %f\n", nc->orient.angle.pitch);
+		printf("nunchuk yaw   = %f\n", nc->orient.angle.yaw);
 
 		printf("nunchuk joystick angle:     %f\n", nc->js.ang);
 		printf("nunchuk joystick magnitude: %f\n", nc->js.mag);

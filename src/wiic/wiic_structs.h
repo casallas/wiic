@@ -76,22 +76,6 @@ typedef struct vec3b_t {
 } vec3b_t;
 
 /**
- *	@struct ang3s_t
- *	@brief RPY short angles.
- */
-typedef struct ang3s_t {
-	short r, p, y;
-} ang3s_t;
-
-/**
- *	@struct ang3f_t
- *	@brief RPY float angles.
- */
-typedef struct ang3f_t {
-	float r, p, y;
-} ang3f_t;
-
-/**
  *	@struct vec3f_t
  *	@brief Signed x,y,z float struct.
  */
@@ -99,6 +83,21 @@ typedef struct vec3f_t {
 	float x, y, z;
 } vec3f_t;
 
+/**
+ *	@struct ang3s_t
+ *	@brief RPY short int angles.
+ */
+typedef struct ang3s_t {
+	short roll, pitch, yaw;
+} ang3s_t;
+
+/**
+ *	@struct ang3f_t
+ *	@brief RPY float angles.
+ */
+typedef struct ang3f_t {
+	float roll, pitch, yaw;
+} ang3f_t;
 
 /**
  *	@struct orient_t
@@ -107,12 +106,8 @@ typedef struct vec3f_t {
  *	Yaw, pitch, and roll range from -180 to 180 degrees.
  */
 typedef struct orient_t {
-	float roll;						/**< roll, this may be smoothed if enabled	*/
-	float pitch;					/**< pitch, this may be smoothed if enabled	*/
-	float yaw;
-
-	float a_roll;					/**< absolute roll, unsmoothed				*/
-	float a_pitch;					/**< absolute pitch, unsmoothed				*/
+	struct ang3f_t angle;	/**< roll, pitch and yaw (this may be smoothed if enabled)	*/
+	struct ang3f_t a_angle;	/**< roll, pitch and yaw (unsmoothed)	*/
 } orient_t;
 
 
@@ -121,8 +116,8 @@ typedef struct orient_t {
  *	@brief Gravity force struct.
  */
 typedef struct gforce_t {
-	float x, y, z; 		/**< gforce, this may be smoothed if enabled 	*/
-	float ax, ay, az;	/**< absolute gforce, unsmoothed				*/	
+	struct vec3f_t vec;		/**< gforce, this may be smoothed if enabled 	*/
+	struct vec3f_t a_vec;	/**< gforce (unsmoothed)	*/
 } gforce_t;
 
 
@@ -255,7 +250,9 @@ typedef struct nunchuk_t {
 
 	struct vec3b_t accel;			/**< current raw acceleration data			*/
 	struct orient_t orient;			/**< current orientation on each axis		*/
+	struct orient_t a_orient;		/**< current orientation on each axis (unsmoothed)		*/
 	struct gforce_t gforce;			/**< current gravity forces on each axis	*/
+	struct gforce_t a_gforce;		/**< current gravity forces on each axis (unsmoothed)	*/
 } nunchuk_t;
 
 

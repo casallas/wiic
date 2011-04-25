@@ -200,9 +200,9 @@ void CAccelerometer::SetAccelThreshold(int Threshold)
  */
 void CAccelerometer::GetOrientation(float &Pitch, float &Roll, float &Yaw)
 {
-    Pitch = mpOrientPtr->pitch;
-    Roll = mpOrientPtr->roll;
-    Yaw = mpOrientPtr->yaw;
+    Pitch = mpOrientPtr->angle.pitch;
+    Roll = mpOrientPtr->angle.roll;
+    Yaw = mpOrientPtr->angle.yaw;
 }
 
 /**
@@ -216,8 +216,8 @@ void CAccelerometer::GetOrientation(float &Pitch, float &Roll, float &Yaw)
  */
 void CAccelerometer::GetRawOrientation(float &Pitch, float &Roll)
 {
-    Pitch = mpOrientPtr->a_pitch;
-    Roll = mpOrientPtr->a_roll;
+    Pitch = mpOrientPtr->a_angle.pitch;
+    Roll = mpOrientPtr->a_angle.roll;
 }
 
 void CAccelerometer::GetGravityCalVector(float &X, float &Y, float &Z)
@@ -236,9 +236,9 @@ void CAccelerometer::SetGravityCalVector(float X, float Y, float Z)
 
 void CAccelerometer::GetGravityVector(float &X, float &Y, float &Z)
 {
-    X = mpGForcePtr->x;
-    Y = mpGForcePtr->y;
-    Z = mpGForcePtr->z;
+    X = mpGForcePtr->vec.x;
+    Y = mpGForcePtr->vec.y;
+    Z = mpGForcePtr->vec.z;
 }
 
 /*
@@ -257,16 +257,16 @@ CGyroscope::CGyroscope(struct ang3s_t* RawGyro, struct ang3s_t* CalGyro, struct 
 
 void CGyroscope::GetRawRates(int& Roll, int& Pitch, int& Yaw)
 {
-	Roll = mpRawGyro->r;
-	Pitch = mpRawGyro->p;
-	Yaw = mpRawGyro->y;
+	Roll = mpRawGyro->roll;
+	Pitch = mpRawGyro->pitch;
+	Yaw = mpRawGyro->yaw;
 }
 
 void CGyroscope::GetRates(float& Roll, float& Pitch, float& Yaw)
 {
-	Roll = mpAngleRate->r;
-	Pitch = mpAngleRate->p;
-	Yaw = mpAngleRate->y;
+	Roll = mpAngleRate->roll;
+	Pitch = mpAngleRate->pitch;
+	Yaw = mpAngleRate->yaw;
 }
 
 void CGyroscope::Calibrate()

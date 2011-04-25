@@ -268,7 +268,8 @@ void propagate_event(struct wiimote_t* wm, byte event, byte* msg) {
 			calculate_gforce(&wm->accel_calib, &wm->accel, &wm->gforce, WIIMOTE_IS_FLAG_SET(wm, WIIC_SMOOTHING));
 						
 			/* calculate the remote orientation */
-			calculate_orientation(&wm->gforce, &wm->orient, WIIMOTE_IS_FLAG_SET(wm, WIIC_SMOOTHING));
+			calculate_orientation(&wm->gforce.vec, &wm->orient.angle);
+			calculate_orientation(&wm->gforce.a_vec, &wm->orient.a_angle);
 
 			break;
 		}
@@ -306,7 +307,8 @@ void propagate_event(struct wiimote_t* wm, byte event, byte* msg) {
 			wm->accel.z = msg[4];
 
 			calculate_gforce(&wm->accel_calib, &wm->accel, &wm->gforce, WIIMOTE_IS_FLAG_SET(wm, WIIC_SMOOTHING));
-			calculate_orientation(&wm->gforce, &wm->orient, WIIMOTE_IS_FLAG_SET(wm, WIIC_SMOOTHING));
+			calculate_orientation(&wm->gforce.vec, &wm->orient.angle);
+			calculate_orientation(&wm->gforce.a_vec, &wm->orient.a_angle);
 
 			handle_expansion(wm, msg+5);
 
@@ -322,7 +324,8 @@ void propagate_event(struct wiimote_t* wm, byte event, byte* msg) {
 			wm->accel.z = msg[4];
 			
 			calculate_gforce(&wm->accel_calib, &wm->accel, &wm->gforce, WIIMOTE_IS_FLAG_SET(wm, WIIC_SMOOTHING));
-			calculate_orientation(&wm->gforce, &wm->orient, WIIMOTE_IS_FLAG_SET(wm, WIIC_SMOOTHING));
+			calculate_orientation(&wm->gforce.vec, &wm->orient.angle);
+			calculate_orientation(&wm->gforce.a_vec, &wm->orient.a_angle);
 
 			/* ir */
 			calculate_extended_ir(wm, msg+5);
@@ -350,7 +353,8 @@ void propagate_event(struct wiimote_t* wm, byte event, byte* msg) {
 			wm->accel.z = msg[4];
 
 			calculate_gforce(&wm->accel_calib, &wm->accel, &wm->gforce, WIIMOTE_IS_FLAG_SET(wm, WIIC_SMOOTHING));
-			calculate_orientation(&wm->gforce, &wm->orient, WIIMOTE_IS_FLAG_SET(wm, WIIC_SMOOTHING));
+			calculate_orientation(&wm->gforce.vec, &wm->orient.angle);
+			calculate_orientation(&wm->gforce.a_vec, &wm->orient.a_angle);
 
 			handle_expansion(wm, msg+15);
 
@@ -786,9 +790,9 @@ static void save_state(struct wiimote_t* wm) {
 			
 		case EXP_MOTION_PLUS:
 			wm->lstate.mp_acc_mode = wm->exp.mp.acc_mode;
-			wm->lstate.mp_raw_gyro.r = wm->exp.mp.raw_gyro.r;
-			wm->lstate.mp_raw_gyro.p = wm->exp.mp.raw_gyro.p;
-			wm->lstate.mp_raw_gyro.y = wm->exp.mp.raw_gyro.y;
+			wm->lstate.mp_raw_gyro.roll = wm->exp.mp.raw_gyro.roll;
+			wm->lstate.mp_raw_gyro.pitch = wm->exp.mp.raw_gyro.pitch;
+			wm->lstate.mp_raw_gyro.yaw = wm->exp.mp.raw_gyro.yaw;
 			break;
 			
 		case EXP_BALANCE_BOARD:
@@ -849,17 +853,17 @@ static int state_changed(struct wiimote_t* wm) {
 	#define CROSS_THRESH_RATE(last, now, thresh)								\
 				do {															\
 					if (WIIMOTE_IS_FLAG_SET(wm, WIIC_ORIENT_THRESH)) {		\
-						if ((diff_f(last.r, now.r) >= thresh) ||				\
-							(diff_f(last.p, now.p) >= thresh) ||				\
-							(diff_f(last.y, now.y) >= thresh))					\
+						if ((diff_f(last.roll, now.roll) >= thresh) ||				\
+							(diff_f(last.pitch, now.pitch) >= thresh) ||				\
+							(diff_f(last.yaw, now.yaw) >= thresh))					\
 						{														\
 							last = now;											\
 							return 1;											\
 						}														\
 					} else {													\
-						if (last.r != now.r)		return 1;					\
-						if (last.p != now.p)		return 1;					\
-						if (last.y != now.y)		return 1;					\
+						if (last.roll != now.roll)		return 1;					\
+						if (last.pitch != now.pitch)		return 1;					\
+						if (last.yaw != now.yaw)		return 1;					\
 					}															\
 				} while (0)
 				
@@ -876,7 +880,7 @@ static int state_changed(struct wiimote_t* wm) {
 		CROSS_THRESH_XYZ(wm->lstate.accel, wm->accel, wm->accel_threshold);
 
 		/* orientation */
- 		CROSS_THRESH(wm->lstate.orient, wm->orient, wm->orient_threshold);
+ 		CROSS_THRESH(wm->lstate.orient.angle, wm->orient.angle, wm->orient_threshold);
 	}
 
 	/* expansion */
@@ -887,7 +891,7 @@ static int state_changed(struct wiimote_t* wm) {
 			STATE_CHANGED(wm->lstate.exp_ljs_mag, wm->exp.nunchuk.js.mag);
 			STATE_CHANGED(wm->lstate.exp_btns, wm->exp.nunchuk.btns);
 
-			CROSS_THRESH(wm->lstate.exp_orient, wm->exp.nunchuk.orient, wm->exp.nunchuk.orient_threshold);
+			CROSS_THRESH(wm->lstate.exp_orient.angle, wm->exp.nunchuk.orient.angle, wm->exp.nunchuk.orient_threshold);
 			CROSS_THRESH_XYZ(wm->lstate.exp_accel, wm->exp.nunchuk.accel, wm->exp.nunchuk.accel_threshold);
 			break;
 		}

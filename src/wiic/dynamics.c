@@ -60,7 +60,7 @@
  *	Given the raw acceleration data from the accelerometer struct, calculate
  *	the orientation of the device and set it in the \a orient parameter.
  */
-void calculate_orientation(struct gforce_t* gforce, struct orient_t* orient, int smooth) {
+void calculate_orientation(struct vec3f_t* in, struct ang3f_t* out) {
 	float x, y, z;
 
 	/*
@@ -70,12 +70,12 @@ void calculate_orientation(struct gforce_t* gforce, struct orient_t* orient, int
 	 */
 
 	/* yaw - set to 0, IR will take care of it if it's enabled */
-	orient->yaw = 0.0f;
+	out->yaw = 0.0f;
 
 	/* find out how much it actually moved and normalize to +/- 1g */
-	x = gforce->x;
-	y = gforce->y;
-	z = gforce->z;
+	x = in->x;
+	y = in->y;
+	z = in->z;
 
 	/* make sure x,y,z are between -1 and 1 for the tan functions */
 	if (x < -1.0f)			x = -1.0f;
@@ -86,49 +86,18 @@ void calculate_orientation(struct gforce_t* gforce, struct orient_t* orient, int
 	else if (z > 1.0f)		z = 1.0f;
 
 	/* if it is over 1g then it is probably accelerating and the gravity vector cannot be identified */
-	if (abs(gforce->x) <= 1.0) {
+	if (abs(in->x) <= 1.0) {
 		/* roll */
 		x = -RAD_TO_DEGREE(atan2f(x, z));
 
-		orient->roll = x;
+		out->roll = x;
 	}
 
-	if (abs(gforce->y) <= 1.0) {
+	if (abs(in->y) <= 1.0) {
 		/* pitch */
 		y = RAD_TO_DEGREE(atan2f(y, z));
 
-		orient->pitch = y;
-	}
-
-	if(smooth) {	// Same stuff, but this time using unsmoothed gforce
-		x = gforce->ax;
-		y = gforce->ay;
-		z = gforce->az;
-
-		if (x < -1.0f)			x = -1.0f;
-		else if (x > 1.0f)		x = 1.0f;
-		if (y < -1.0f)			y = -1.0f;
-		else if (y > 1.0f)		y = 1.0f;
-		if (z < -1.0f)			z = -1.0f;
-		else if (z > 1.0f)		z = 1.0f;
-
-		if (abs(gforce->ax) <= 1.0) {
-			/* roll */
-			x = -RAD_TO_DEGREE(atan2f(x, z));
-
-			orient->a_roll = x;
-		}
-
-		if (abs(gforce->ay) <= 1.0) {
-			/* pitch */
-			y = RAD_TO_DEGREE(atan2f(y, z));
-
-			orient->a_pitch = y;
-		}		
-	}
-	else {	// Same values
-		orient->a_roll = x;
-		orient->a_pitch = y;		
+		out->pitch = y;
 	}
 }
 
@@ -149,17 +118,17 @@ void calculate_gforce(struct accel_t* ac, struct vec3b_t* accel, struct gforce_t
 	zg = (int)ac->cal_g.z;
 
 	/* find out how much it actually moved and normalize to +/- 1g */
-	gforce->ax = ((int)accel->x - (int)ac->cal_zero.x) / xg;
-	gforce->ay = ((int)accel->y - (int)ac->cal_zero.y) / yg;
-	gforce->az = ((int)accel->z - (int)ac->cal_zero.z) / zg;
+	gforce->vec.x = ((int)accel->x - (int)ac->cal_zero.x) / xg;
+	gforce->vec.y = ((int)accel->y - (int)ac->cal_zero.y) / yg;
+	gforce->vec.z = ((int)accel->z - (int)ac->cal_zero.z) / zg;
 	
 	if(smooth) {
 		apply_smoothing(gforce, ac->st_alpha);
 	}
 	else {
-		gforce->x = gforce->ax;
-		gforce->y = gforce->ay;
-		gforce->z = gforce->az;		
+		gforce->vec.x = gforce->a_vec.x;
+		gforce->vec.y = gforce->a_vec.y;
+		gforce->vec.z = gforce->a_vec.z;		
 	}
 }
 
@@ -222,7 +191,7 @@ void calc_joystick_state(struct joystick_t* js, float x, float y) {
  */
 void apply_smoothing(struct gforce_t* gforce, float alpha) {
 	
-	gforce->x = alpha*gforce->x + (1.0-alpha)*gforce->ax;
-	gforce->y = alpha*gforce->y + (1.0-alpha)*gforce->ay;
-	gforce->z = alpha*gforce->z + (1.0-alpha)*gforce->az;
+	gforce->vec.x = alpha*gforce->vec.x + (1.0-alpha)*gforce->a_vec.x;
+	gforce->vec.y = alpha*gforce->vec.y + (1.0-alpha)*gforce->a_vec.y;
+	gforce->vec.z = alpha*gforce->vec.z + (1.0-alpha)*gforce->a_vec.z;
 }
