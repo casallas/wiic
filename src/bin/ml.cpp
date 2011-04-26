@@ -204,9 +204,9 @@ int main(int argc, char **argv) {
     if (argc<3) {
 		cout << "wiic-ml allows to recognize a set of gestures using OpenCV machine learning library." << endl;
 		cout << "wiic-ml is part of WiiC (http://wiic.sf.net)" << endl << endl;
-		cout << "Usage:  " << argv[0] << " train <KNN|Bayes|SVN|DT|ANN|Boost|RT> <training_data_ratio> <data_file1> ... <data_fileN>" << endl;
-		cout << "        " << argv[0] << " val <KNN|Bayes|SVN|DT|ANN|Boost|RT> <model_file> [categories] <val_file1> ... <val_fileN>" << endl;
-		cout << "        " << argv[0] << " rec <KNN|Bayes|SVN|DT|ANN|Boost|RT> <model_file> [categories]" << endl;
+		cout << "Usage:  " << argv[0] << " train <KNN|Bayes|SVM|DT|ANN|Boost|RT> <training_data_ratio> <data_file1> ... <data_fileN>" << endl;
+		cout << "        " << argv[0] << " val <KNN|Bayes|SVM|DT|ANN|Boost|RT> <model_file> [categories] <val_file1> ... <val_fileN>" << endl;
+		cout << "        " << argv[0] << " rec <KNN|Bayes|SVM|DT|ANN|Boost|RT> <model_file> [categories]" << endl;
 		cout << "        " << argv[0] << " convert <data_file1> ... <data_fileN>" << endl;
 		cout << "e.g. " << argv[0] << " train KNN 0.75 file1.log file2.log" << endl;
 		cout << "e.g. " << argv[0] << " val KNN KNN_model.xml [categories] file1.log file2.log" << endl;
@@ -215,7 +215,7 @@ int main(int argc, char **argv) {
 		cout << "======= Supported Algorithms =======" << endl;
 		cout << "KNN: k-nearest neighbor" << endl;
 		cout << "Bayes: normal Bayes classifier" << endl;
-		cout << "SVN: support vector machines" << endl;
+		cout << "SVM: support vector machines" << endl;
 		cout << "DT: decision trees" << endl;
 		cout << "ANN: artificial neural networks" << endl;
 		cout << "Boost: two-class discrete AdaBoost" << endl;
