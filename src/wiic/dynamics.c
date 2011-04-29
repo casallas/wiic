@@ -118,9 +118,9 @@ void calculate_gforce(struct accel_t* ac, struct vec3b_t* accel, struct gforce_t
 	zg = (int)ac->cal_g.z;
 
 	/* find out how much it actually moved and normalize to +/- 1g */
-	gforce->vec.x = ((int)accel->x - (int)ac->cal_zero.x) / xg;
-	gforce->vec.y = ((int)accel->y - (int)ac->cal_zero.y) / yg;
-	gforce->vec.z = ((int)accel->z - (int)ac->cal_zero.z) / zg;
+	gforce->a_vec.x = ((int)accel->x - (int)ac->cal_zero.x) / xg;
+	gforce->a_vec.y = ((int)accel->y - (int)ac->cal_zero.y) / yg;
+	gforce->a_vec.z = ((int)accel->z - (int)ac->cal_zero.z) / zg;
 	
 	if(smooth) {
 		apply_smoothing(gforce, ac->st_alpha);
