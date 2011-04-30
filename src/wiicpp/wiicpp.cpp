@@ -190,7 +190,7 @@ void CAccelerometer::SetAccelThreshold(int Threshold)
 
 /**
  *
- * @brief Retrieves the smooth device attitude (pitch, roll, and yaw) computed with an
+ * @brief Retrieves the smoothed device attitude (pitch, roll, and yaw) computed with an
  * exponential moving average.
  *
  * @param Pitch		[out] Reference variable where the smooth device pitch will be set.
@@ -729,6 +729,14 @@ int CWiimote::GetFlags()
 int CWiimote::SetFlags(int Enable, int Disable)
 {
     return wiic_set_flags(mpWiimotePtr, Enable, Disable);
+}
+
+void CWiimote::SetSmoothing(bool Smooth)
+{
+	if(Smooth)
+		wiic_set_flags(mpWiimotePtr, WIIC_SMOOTHING, 0);
+	else
+		wiic_set_flags(mpWiimotePtr, 0, WIIC_SMOOTHING);
 }
 
 void CWiimote::Resync()

@@ -464,6 +464,8 @@ public:
     EventTypes GetEvent();
     const unsigned char *GetEventBuffer();
 
+	void SetSmoothing(bool Smooth);
+
     void SetMotionSensingMode(OnOffSelection State);
     void EnableMotionPlus(OnOffSelection State);
 
