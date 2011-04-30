@@ -66,6 +66,7 @@
 #define WIIMOTE_DISABLE_STATE(wm, s)	(wm->state &= ~(s))
 #define WIIMOTE_TOGGLE_STATE(wm, s)		((wm->state & (s)) ? WIIMOTE_DISABLE_STATE(wm, s) : WIIMOTE_ENABLE_STATE(wm, s))
 
+/* macro to manage flags */
 #define WIIMOTE_IS_FLAG_SET(wm, s)		((wm->flags & (s)) == (s))
 #define WIIMOTE_ENABLE_FLAG(wm, s)		(wm->flags |= (s))
 #define WIIMOTE_DISABLE_FLAG(wm, s)		(wm->flags &= ~(s))

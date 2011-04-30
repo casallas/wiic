@@ -640,7 +640,7 @@ int wiic_set_flags(struct wiimote_t* wm, int enable, int disable) {
  *	The alpha value is between 0 and 1 and is used in an exponential
  *	smoothing algorithm.
  *
- *	Smoothing is only performed if the WIIMOTE_USE_SMOOTHING is set.
+ *	Smoothing is only performed if the WIIC_SMOOTHING is set.
  */
 float wiic_set_smooth_alpha(struct wiimote_t* wm, float alpha) {
 	float old;
