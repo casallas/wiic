@@ -107,6 +107,41 @@ void randomAcquisition(CWii& wii, CWiimote& wiimote, const int samples, vector<s
 	cout << "That's it! Bye" << endl;
 }
 
+void timeAcquisition(CWii& wii, CWiimote& wiimote, const string logfile, const int start, const int length)
+{
+	int count = 0;
+	int tick = length*100;
+	Dataset* dataset = new Dataset();
+	Training* training = new Training(WiiC::LOG_ACC);
+	ofstream out("calib_log.txt");
+
+	cout << "Training will be stored in " << logfile << endl;
+	cout << "Logging will start in " << start << " seconds..." << endl;
+	sleep(start);
+
+	cout << "Logging for " << length << " seconds..." << endl;	
+	wii.Poll();
+		
+	//Inizio acquisizione dati
+	while(count < tick) {
+		float x, y, z;
+		wiimote.Accelerometer.GetRawGravityVector(x,y,z);
+		training->addSample(new AccSample(x,y,z));
+		out << x << " " << y << " " << z << endl;		
+	  	usleep(10000);
+		++count;
+		wii.Poll();					
+	}	
+	
+	out.close();
+	dataset->addTraining(training);
+	dataset->save(logfile.c_str());
+
+	if(dataset)
+		delete dataset;
+	dataset = 0;
+}
+
 void dataAcquisition(CWii& wii, CWiimote& wiimote, const string logfile)
 {
 	int enbAcq = 0;
@@ -178,18 +213,21 @@ int main(int argc, char** argv)
 		if(option == "help") {
 			cout << endl << "wiic-logger is a utility to collect accelerometer data in a log." << endl;
 			cout << "wiic-logger is part of WiiC (http://wiic.sf.net)" << endl << endl;
-			cout << "Usage: wiic-logger <log_filename>" << endl;
+			cout << "Usage: wiic-logger <filename>" << endl;
 			cout << "       wiic-logger RANDOM <num_samples> <filename1> ... <filenameN>" << endl;
-			cout << "   <log_filename>: full pathname of the output log file" << endl;
+			cout << "		wiic-logger TIME <start_time> <length> <filename>" << endl;
+			cout << "   <filename>: full pathname of the output log file" << endl;
 			cout << "   <num_samples>: number of samples for each file" << endl << endl;
 			cout << "   <filename1> ... <filenameN>: full pathname of each gesture file" << endl << endl;
+			cout << "	<start_time>: sleep time (in seconds) before automatic logging" << endl;
+			cout << "	<length>: log length (in seconds)" << endl;
 		
 			return 1;
 		}
 	}
 	else if(argc >= 3) {
 		option = string(argv[1]);
-		if(option != "RANDOM") {
+		if(option != "RANDOM" && option != "TIME") {
 			cout << endl << "Bad Syntax!" << endl;
 			cout << "Type wiic-logger help for a brief documentation." << endl << endl;
 		
@@ -243,6 +281,13 @@ int main(int argc, char** argv)
 			gestures.push_back(string(argv[i++]));
 		
 		randomAcquisition(wii, wiimote, numSamples, gestures);
+	}
+	else if(option == "TIME") {
+		// File name
+		int start = atoi(string(argv[2]).c_str());
+		int length = atoi(string(argv[3]).c_str()); 
+		string filename = string(argv[4]);
+		timeAcquisition(wii, wiimote, filename, start, length);
 	}
 	else
 		dataAcquisition(wii, wiimote, option);

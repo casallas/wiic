@@ -8,6 +8,20 @@ http://wiic.sf.net
 
 
 ---------------------------
+v1.2  --  
+---------------------------
+
+	Added:
+		-[Mac/Linux] Utility C++ method to enable/disable smoothing for accelerometers
+		-[Mac/Linux] wiic-logger now supports timed logging, without any button pressure (useful when you need the device to be still, as for calibration)
+ 
+	Changed:
+		-[Mac/Linux] Different smoothing algorithm, now directly applied to the raw acc values
+
+	Fixed:
+		-[Mac/Linux] Fixed raw gravity vector computation
+
+---------------------------
 v1.1  --  17 Apr 2011
 ---------------------------
 
