@@ -96,7 +96,7 @@ int main(int argc, char** argv)
 	}
 	
 	// Find and connect to the wiimotes
-    std::vector<CWiimote>& wiimotes = wii.FindAndConnect();
+    std::vector<CWiimote>& wiimotes = wii.FindAndConnect(1);
 	
 	if(!wiimotes.size()) {
 		cout << "Error: no connected Wiimote" << endl;
