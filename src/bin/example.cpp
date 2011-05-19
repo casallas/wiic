@@ -417,37 +417,18 @@ int main(int argc, char** argv)
     CWii wii; // Defaults to 4 remotes
     std::vector<CWiimote>::iterator i;
     int reloadWiimotes = 0;
-    int numFound;
-    int index;
-
-    cout << "Searching for wiimotes... Turn them on!" << endl;
-
-    //Find the wiimote
-    numFound = wii.Find(5);
-
-    // Search for up to five seconds;
-
-    cout << "Found " << numFound << " wiimotes" << endl;
-    cout << "Connecting to wiimotes..." << endl;
-
-    // Connect to the wiimote
-    std::vector<CWiimote>& wiimotes = wii.Connect();
-
-	cout << "Connected to " << (unsigned int)wiimotes.size() << " wiimotes" << endl;
+	int index;
+	
+    // Find and connect to the wiimotes
+    std::vector<CWiimote>& wiimotes = wii.FindAndConnect();
 
     // Setup the wiimotes
-    for(index = 0, i = wiimotes.begin(); i != wiimotes.end(); ++i, ++index)
-    {
+    for(index = 0, i = wiimotes.begin(); i != wiimotes.end(); ++i, ++index) {
         // Use a reference to make working with the iterator handy.
         CWiimote & wiimote = *i;
 
         //Set Leds
         wiimote.SetLEDs(LED_MAP[index]);
-
-        //Rumble for 0.2 seconds as a connection ack
-        wiimote.SetRumbleMode(CWiimote::ON);
-        usleep(200000);
-        wiimote.SetRumbleMode(CWiimote::OFF);
     }
 
 	cout << "\nPress PLUS (MINUS) to enable (disable) Motion Sensing Report (only accelerometers)" << endl;

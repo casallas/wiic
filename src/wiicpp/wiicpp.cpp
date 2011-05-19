@@ -909,6 +909,48 @@ std::vector<CWiimote>& CWii::Connect()
     return mpWiimotesVector;
 }
 
+/**
+ *
+ * @brief Finds up to five devices and automatically connect to all of them.
+ *
+ * @param timeout	[in] Timeout for the discovery step (default is 5 seconds) 
+ * @param rumbleAck	[in] Each found and connected device will receive a small rumble ack (deafult is enabled)
+ */
+std::vector<CWiimote>& CWii::FindAndConnect(int timeout, bool rumbleAck)
+{
+    std::vector<CWiimote>::iterator i;
+    int numFound;
+    int index;
+
+    //Find the wiimote
+    Find(timeout);
+
+    // Search for up to five seconds;
+    cout << "Found " << numFound << " wiimotes" << endl;
+    cout << "Connecting to wiimotes..." << endl;
+
+    // Connect to the wiimote
+    Connect();
+
+	cout << "Connected to " << (unsigned int)mpWiimotesVector.size() << " wiimotes" << endl;
+
+    // Setup the wiimotes
+    for(index = 0, i = mpWiimotesVector.begin(); i != mpWiimotesVector.end(); ++i, ++index)
+    {
+        // Use a reference to make working with the iterator handy.
+        CWiimote & wiimote = *i;
+
+        //Rumble for 0.2 seconds as a connection ack
+		if(rumbleAck) {
+        	wiimote.SetRumbleMode(CWiimote::ON);
+        	usleep(200000);
+        	wiimote.SetRumbleMode(CWiimote::OFF);
+		}
+    }
+
+	return mpWiimotesVector;
+}
+
 int CWii::Poll()
 {
     return wiic_poll((struct wiimote_t**) mpWiimoteArray, mpWiimoteArraySize);

@@ -201,10 +201,6 @@ void dataAcquisition(CWii& wii, CWiimote& wiimote, const string logfile)
 int main(int argc, char** argv)
 {
     CWii wii; // Defaults to 4 remotes
-    std::vector<CWiimote>::iterator i;
-    int reloadWiimotes = 0;
-    int numFound;
-    int index;
     bool help = false;
 
 	string option; 
@@ -241,34 +237,14 @@ int main(int argc, char** argv)
 		return 1;	
 	}
 
-    cout << "Searching for wiimotes... Turn them on!" << endl;
-
-    //Find the wiimote
-    numFound = wii.Find(1);
-
-    // Search for up to five seconds;
-
-    cout << "Found " << numFound << " wiimotes" << endl;
-    cout << "Connecting to wiimotes..." << endl;
-
-    // Connect to the wiimote
-    std::vector<CWiimote>& wiimotes = wii.Connect();
-
-	cout << "Connected to " << (unsigned int)wiimotes.size() << " wiimotes" << endl;
-
-	if(wiimotes.size() == 0) {
-		cout << "Error: no connected Wiimote" << endl;
-		return 1;
-	}
+	// Find and connect to the wiimotes
+    std::vector<CWiimote>& wiimotes = wii.FindAndConnect();
 	
-    // Use a reference to make working with the iterator handy.
-    CWiimote & wiimote = wiimotes[0];
-
-    //Rumble for 0.2 seconds as a connection ack
-    wiimote.SetRumbleMode(CWiimote::ON);
-    usleep(200000);
-    wiimote.SetRumbleMode(CWiimote::OFF);
-	wiimote.SetMotionSensingMode(CWiimote::ON);
+	if(!wiimotes.size()) {
+		cout << "Error: no connected Wiimote" << endl;
+		return 1;		
+	}
+	CWiimote& wiimote = wiimotes[0];
 
 	if(option == "RANDOM") {
 		// Num of samples for each file

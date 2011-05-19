@@ -29,35 +29,15 @@ void recognize(int argc, char** argv, MLAlg& mlalg)
     for(int i = 1 ; i <= 8 ; i++) 
 	    mask.push_back(i);
 	
-    cout << "Searching for wiimotes... Turn them on!" << endl;
-
-    //Find the wiimote
-    numFound = wii.Find(1);
-
-    // Search for up to five seconds;
-
-    cout << "Found " << numFound << " wiimotes" << endl;
-    cout << "Connecting to wiimotes..." << endl;
-
-    // Connect to the wiimote
-    std::vector<CWiimote>& wiimotes = wii.Connect();
-
-	cout << "Connected to " << (unsigned int)wiimotes.size() << " wiimotes" << endl;
-
-	if(wiimotes.size() == 0) {
+	// Find and connect to the wiimotes
+    std::vector<CWiimote>& wiimotes = wii.FindAndConnect();
+	
+	if(!wiimotes.size()) {
 		cout << "Error: no connected Wiimote" << endl;
-		return;
+		return;		
 	}
-	
-    // Use a reference to make working with the iterator handy.
-    CWiimote & wiimote = wiimotes[0];
-
-    //Rumble for 0.2 seconds as a connection ack
-    wiimote.SetRumbleMode(CWiimote::ON);
-    usleep(200000);
-    wiimote.SetRumbleMode(CWiimote::OFF);
-	wiimote.SetMotionSensingMode(CWiimote::ON);	
-	
+	CWiimote& wiimote = wiimotes[0];
+		
 	int enbAcq = 2;
 
 	while(enbAcq) {

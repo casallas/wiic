@@ -526,6 +526,7 @@ public:
     int Find(int timeout);
 	int LoadRegisteredWiimotes();
     std::vector<CWiimote>& Connect();
+	std::vector<CWiimote>& FindAndConnect(int timeout =5, bool rumbleAck = true);
 
     int Poll();
 
