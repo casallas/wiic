@@ -15,6 +15,10 @@ ADD_EXECUTABLE(wiic-logger logger.cpp)
 TARGET_LINK_LIBRARIES(wiic-logger wiicpp)
 INSTALL(TARGETS wiic-logger DESTINATION /usr/local/bin)
 
+ADD_EXECUTABLE(wiic-robot robot.cpp)
+TARGET_LINK_LIBRARIES(wiic-robot wiicpp)
+INSTALL(TARGETS wiic-robot DESTINATION /usr/local/bin)
+
 IF(OpenCV_FOUND)
 	INCLUDE_DIRECTORIES(${OpenCV_INCLUDE_DIR})
 	ADD_EXECUTABLE(wiic-ml ml.cpp)

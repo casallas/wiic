@@ -215,7 +215,7 @@ int main(int argc, char** argv)
 			cout << "wiic-logger is part of WiiC (http://wiic.sf.net)" << endl << endl;
 			cout << "Usage: wiic-logger <filename>" << endl;
 			cout << "       wiic-logger RANDOM <num_samples> <filename1> ... <filenameN>" << endl;
-			cout << "		wiic-logger TIME <start_time> <length> <filename>" << endl;
+			cout << "       wiic-logger TIME <start_time> <length> <filename>" << endl;
 			cout << "   <filename>: full pathname of the output log file" << endl;
 			cout << "   <num_samples>: number of samples for each file" << endl << endl;
 			cout << "   <filename1> ... <filenameN>: full pathname of each gesture file" << endl << endl;
