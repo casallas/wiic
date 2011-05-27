@@ -9,8 +9,8 @@
 class Dataset
 {
 public:
-	Dataset() {}
-	Dataset(const string& filename) { loadDataset(filename); }
+	Dataset() : loaded(false) { }
+	Dataset(const string& filename) : loaded(false) { loadDataset(filename); }
 	~Dataset();
 
 	/** 
@@ -48,7 +48,7 @@ public:
 	 *
 	 * @param dataset filename
 	 */
-	void loadDataset(const string& nomefile);
+	bool loadDataset(const string& nomefile);
 	
 	/**
 	 * Save training onto dataset
@@ -62,17 +62,29 @@ public:
 	 * Save the dataset into a file for training and recognition
 	 *
 	 * @param file name
+	 * @param addr Wii device mac address
 	 */
-	bool save(const char* file) const;
+	bool save(const char* file, const char* addr) const;
+
+	/**
+	 * Save the dataset header into a file
+	 *
+	 * @param out opened log file
+	 * @param addr Wii device mac address
+	 */	
+	void saveHeader(ofstream& out, const char* addr) const;
 
 	/**
 	 * Delete all trainings and clear the buffer
 	 */
 	void clear() ;
+	
+	inline bool isValid() { return loaded; }
 
 
 private:
 	vector<Training*> trainings;
+	bool loaded;
 };
 
 #endif

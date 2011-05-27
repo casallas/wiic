@@ -37,6 +37,7 @@ void recognize(int argc, char** argv, MLAlg& mlalg)
 		return;		
 	}
 	CWiimote& wiimote = wiimotes[0];
+	wiimote.SetMotionSensingMode(CWiimote::ON);
 		
 	int enbAcq = 2;
 
@@ -66,7 +67,7 @@ void recognize(int argc, char** argv, MLAlg& mlalg)
 				mlalg.recognize(gestureIn, gestureOut);
 				delete training;
 			}
-			training = new Training(WiiC::LOG_ACC);
+			training = new Training();
 		}
 		
 		if((wiimote.GetEvent() == CWiimote::EVENT_DISCONNECT) ||					
@@ -166,6 +167,10 @@ void convert(int argc, char** argv, MLAlg& mlalg)
 
 	for(int i = 0 ; i < vf.size() ; i++) {
 		Dataset dataset(vf[i]);
+		if(!dataset.isValid()) {
+			cout << "Unable to convert " << vf[i] << endl;
+			continue;
+		}
 		string outputFile = vf[i] + "_features" ;
 		for(int j = 0 ; j < dataset.size() ; j++) {
 			Training* t = dataset.trainingAt(j);

@@ -5,17 +5,11 @@
 #include <iostream>
 #include <vector>
 #include <sstream>
+#include "sample.h"
 #include "accsample.h"
-
-namespace WiiC {
-	enum LogType {
-		LOG_NONE,
-		LOG_ACC
-	};
-}
+#include "gyrosample.h"
 
 using namespace std;
-using namespace WiiC;
 
 /**
  * Class Training to save the individual training of a gesture  
@@ -26,11 +20,10 @@ public:
 	/**
 	 * Constructor void
 	 */
-	Training() { logType = LOG_ACC; }
-	Training(LogType l) { logType = l; }
+	Training() { }
 	~Training();
 
-	void loadTraining(ifstream&);
+	bool loadTraining(ifstream&);
 	void save(ofstream&) const;
 	void addSample(Sample*);
 	void clear();
@@ -52,18 +45,12 @@ public:
 			return 0;
 		}
 	}
-	
-	inline void setLogType(LogType l) { logType = l; }
-	inline LogType getLogType() const { return logType; }
 
 	inline unsigned int size() const { return samples.size(); }
-	
-protected:
-	void loadAccTraining(ifstream& infile);
 
 private:
 	vector<Sample*> samples;
-	LogType logType;
+	struct timeval timestamp; // Training timestamp (beginning of the gesture)
 };
 
 #endif

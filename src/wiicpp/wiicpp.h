@@ -479,6 +479,7 @@ public:
     void UpdateStatus();
 
     int GetID();
+    const char* GetAddress();
 
     int GetState();
 

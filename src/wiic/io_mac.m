@@ -151,6 +151,10 @@ static int max_num_wiimotes = 0;
 	// We set the device reference (we must retain it to use it after the search)
 	wiimotes[foundWiimotes]->device = [[device retain] getDeviceRef];
 	wiimotes[foundWiimotes]->address = (CFStringRef)[[device getAddressString] retain];
+	
+	// C String (common for Mac and Linux)
+	CFStringGetCString(wiimotes[foundWiimotes]->address,wiimotes[foundWiimotes]->bdaddr_str,18,kCFStringEncodingMacRoman);
+	
 	WIIMOTE_ENABLE_STATE(wiimotes[foundWiimotes], WIIMOTE_STATE_DEV_FOUND);
 	WIIC_INFO("Found Wiimote (%s) [id %i].",CFStringGetCStringPtr(wiimotes[foundWiimotes]->address, kCFStringEncodingMacRoman),wiimotes[foundWiimotes]->unid);
 	++foundWiimotes;

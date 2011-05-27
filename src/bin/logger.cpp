@@ -65,10 +65,11 @@ void randomAcquisition(CWii& wii, CWiimote& wiimote, const int samples, vector<s
 	cout << "samples per " << files.size() << " files "
 		 << " = " << totSamples << " total samples" << endl << endl;
 	
-	// Open output streams
-	vector<ofstream*> outs;
+	// Open datasets
+	vector<Dataset*> outs;
+//	vector<ofstream*> outs;
 	for(int i = 0 ; i < files.size() ; i++) 
-		outs.push_back(new ofstream(files[i].c_str(), ios::app));		
+		outs.push_back(new Dataset());		
 		
 	// Number of samples per file
 	vector<int> fileSamples;
@@ -81,20 +82,21 @@ void randomAcquisition(CWii& wii, CWiimote& wiimote, const int samples, vector<s
 
 		// Gesture acquisition
 		cout << "Selected gesture: " << files[selection] << endl;
-		Training* training = new Training(WiiC::LOG_ACC);
+		Training* training = new Training();
 		acquireGesture(wii, wiimote, training);
 		cout << "Training " << (i+1) << " acquired" << endl;
 		
-		// Gesture save
-		training->save(*(outs[selection]));
-		if(training) {
+		// Gesture sadd
+		outs[selection]->addTraining(training);
+		//training->save(*(outs[selection]));
+		/*if(training) {
 			delete training;
 			training = 0;
-		}
+		}*/
 		
 		// Sample decrement and check whether to close the file
 		if(!(--fileSamples[selection])) {
-			outs[selection]->close(); // Stream close
+			outs[selection]->save(files[selection].c_str(),wiimote.GetAddress()); // Stream close
 			if(outs[selection])
 				delete outs[selection]; // Stream deallocation
 			outs.erase(outs.begin() + selection); // Stream erase
@@ -102,9 +104,6 @@ void randomAcquisition(CWii& wii, CWiimote& wiimote, const int samples, vector<s
 			fileSamples.erase(fileSamples.begin() + selection); // File sample erase
 		}
 	}	
-	
-	cout << "=======================================" << endl;
-	cout << "That's it! Bye" << endl;
 }
 
 void timeAcquisition(CWii& wii, CWiimote& wiimote, const string logfile, const int start, const int length)
@@ -112,8 +111,7 @@ void timeAcquisition(CWii& wii, CWiimote& wiimote, const string logfile, const i
 	int count = 0;
 	int tick = length*100;
 	Dataset* dataset = new Dataset();
-	Training* training = new Training(WiiC::LOG_ACC);
-	ofstream out("calib_log.txt");
+	Training* training = new Training();
 
 	cout << "Training will be stored in " << logfile << endl;
 	cout << "Logging will start in " << start << " seconds..." << endl;
@@ -126,16 +124,14 @@ void timeAcquisition(CWii& wii, CWiimote& wiimote, const string logfile, const i
 	while(count < tick) {
 		float x, y, z;
 		wiimote.Accelerometer.GetRawGravityVector(x,y,z);
-		training->addSample(new AccSample(x,y,z));
-		out << x << " " << y << " " << z << endl;		
+		training->addSample(new AccSample(x,y,z));		
 	  	usleep(10000);
 		++count;
 		wii.Poll();					
 	}	
 	
-	out.close();
 	dataset->addTraining(training);
-	dataset->save(logfile.c_str());
+	dataset->save(logfile.c_str(),wiimote.GetAddress());
 
 	if(dataset)
 		delete dataset;
@@ -150,7 +146,7 @@ void dataAcquisition(CWii& wii, CWiimote& wiimote, const string logfile)
 	string fileacc;
 	
 	Dataset* dataset = new Dataset();
-	Training* training = new Training(WiiC::LOG_ACC);
+	Training* training = new Training();
 
 	cout << "Trainings will be stored in " << logfile << endl;
 	cout << "  - Press PLUS button to acquire the training" << endl;
@@ -179,11 +175,11 @@ void dataAcquisition(CWii& wii, CWiimote& wiimote, const string logfile)
 			cout << "  - Release PLUS button to end the training acquisition" << endl;
 			cout << "  - Press HOME button to go back to the main menu" << endl;
 			enbAcq = 1;		
-			training = new Training(WiiC::LOG_ACC);
+			training = new Training();
 		}
 
 		if(enbAcq == 1 && wiimote.Buttons.isJustPressed(CButtons::BUTTON_HOME)) {
-			dataset->save(logfile.c_str());
+			dataset->save(logfile.c_str(),wiimote.GetAddress());
 			enbAcq = 0;
 		}
 	}
@@ -245,6 +241,7 @@ int main(int argc, char** argv)
 		return 1;		
 	}
 	CWiimote& wiimote = wiimotes[0];
+	wiimote.SetMotionSensingMode(CWiimote::ON);
 
 	if(option == "RANDOM") {
 		// Num of samples for each file
@@ -267,6 +264,9 @@ int main(int argc, char** argv)
 	}
 	else
 		dataAcquisition(wii, wiimote, option);
+
+	cout << "=======================================" << endl;
+	cout << "Bye!" << endl;
 
     return 0;
 }

@@ -437,11 +437,11 @@ typedef struct wiimote_t {
 		WCONST void* connectionHandler; /** Wiimote connection handler for MACOSX **/
 	#elif LINUX
 		WCONST bdaddr_t bdaddr;				/**< bt address								*/
-		WCONST char bdaddr_str[18];			/**< readable bt address					*/
 		WCONST int out_sock;				/**< output socket							*/
 		WCONST int in_sock;					/**< input socket 							*/	
 	#endif
-
+	
+	WCONST char bdaddr_str[18];			/**< readable bt address					*/
 	WCONST struct wiimote_state_t lstate;	/**< last saved state						*/
 	WCONST int state;						/**< various state flags					*/
 	WCONST int flags;						/**< options flag							*/

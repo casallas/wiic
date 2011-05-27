@@ -716,6 +716,11 @@ int CWiimote::GetID()
     return mpWiimotePtr->unid;
 }
 
+const char* CWiimote::GetAddress()
+{
+    return mpWiimotePtr->bdaddr_str;
+}
+
 int CWiimote::GetState()
 {
     return mpWiimotePtr->state;
@@ -919,11 +924,11 @@ std::vector<CWiimote>& CWii::Connect()
 std::vector<CWiimote>& CWii::FindAndConnect(int timeout, bool rumbleAck)
 {
     std::vector<CWiimote>::iterator i;
-    int numFound;
+    int numFound = 0;
     int index;
 
     //Find the wiimote
-    Find(timeout);
+    numFound = Find(timeout);
 
     // Search for up to five seconds;
     cout << "Found " << numFound << " wiimotes" << endl;
