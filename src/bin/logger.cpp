@@ -67,7 +67,6 @@ void randomAcquisition(CWii& wii, CWiimote& wiimote, const int samples, vector<s
 	
 	// Open datasets
 	vector<Dataset*> outs;
-//	vector<ofstream*> outs;
 	for(int i = 0 ; i < files.size() ; i++) 
 		outs.push_back(new Dataset());		
 		
@@ -88,11 +87,6 @@ void randomAcquisition(CWii& wii, CWiimote& wiimote, const int samples, vector<s
 		
 		// Gesture sadd
 		outs[selection]->addTraining(training);
-		//training->save(*(outs[selection]));
-		/*if(training) {
-			delete training;
-			training = 0;
-		}*/
 		
 		// Sample decrement and check whether to close the file
 		if(!(--fileSamples[selection])) {
