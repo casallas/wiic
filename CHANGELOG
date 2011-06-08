@@ -16,6 +16,7 @@ v1.2  --
 		-[Mac/Linux] wiic-logger now supports timed logging, without any button pressure (useful when you need the device to be still, as for calibration)
 		-[Mac/Linux] Added a new C++ method to find and connect to wiimote devices Wii::FindAndConnect()
 		-[Mac/Linux] New logging format and support for gyroscope logging		
+		-[Mac/Linux] New support for gyroscope logging 
  
 	Changed:
 		-[Mac/Linux] Different smoothing algorithm, now directly applied to the raw acc values
