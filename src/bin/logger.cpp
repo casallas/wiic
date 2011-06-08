@@ -132,12 +132,19 @@ void timeAcquisition(CWii& wii, CWiimote& wiimote, const string logfile, const i
 	dataset = 0;
 }
 
-void dataAcquisition(CWii& wii, CWiimote& wiimote, const string logfile)
+void dataAcquisition(CWii& wii, CWiimote& wiimote, const string logfile, const string mp)
 {
 	int enbAcq = 0;
 	int count = 0;
 	
 	string fileacc;
+	
+	// Manage Motion Plus
+	bool mpEnabled = false;
+	if(mp == "mp") {
+		wiimote.EnableMotionPlus(CWiimote::ON);
+		mpEnabled = true;
+	}
 	
 	Dataset* dataset = new Dataset();
 	Training* training = new Training();
@@ -156,6 +163,11 @@ void dataAcquisition(CWii& wii, CWiimote& wiimote, const string logfile)
 			float x, y, z;
 			wiimote.Accelerometer.GetGravityVector(x,y,z);
 			training->addSample(new AccSample(x,y,z));	
+			if(mpEnabled) {
+				float r, p, y;
+		    	wiimote.ExpansionDevice.MotionPlus.Gyroscope.GetRates(r,p,y);
+				training->addSample(new GyroSample(r,p,y));
+			}
 		  	enbAcq = 2;		
 		  	usleep(10000);
 			wii.Poll();					
@@ -193,13 +205,13 @@ int main(int argc, char** argv)
     CWii wii; // Defaults to 4 remotes
     bool help = false;
 
-	string option; 
+	string option, mp; 
 	if(argc == 2) {
 		option = string(argv[1]);
 		if(option == "help") {
 			cout << endl << "wiic-logger is a utility to collect accelerometer data in a log." << endl;
 			cout << "wiic-logger is part of WiiC (http://wiic.sf.net)" << endl << endl;
-			cout << "Usage: wiic-logger <filename>" << endl;
+			cout << "Usage: wiic-logger <filename> [mp]" << endl;
 			cout << "       wiic-logger RANDOM <num_samples> <filename1> ... <filenameN>" << endl;
 			cout << "       wiic-logger TIME <start_time> <length> <filename>" << endl;
 			cout << "   <filename>: full pathname of the output log file" << endl;
@@ -207,13 +219,15 @@ int main(int argc, char** argv)
 			cout << "   <filename1> ... <filenameN>: full pathname of each gesture file" << endl << endl;
 			cout << "	<start_time>: sleep time (in seconds) before automatic logging" << endl;
 			cout << "	<length>: log length (in seconds)" << endl;
+			cout << "	[mp]: enable Motion Plus logging (gyro)" << endl;
 		
 			return 1;
 		}
 	}
 	else if(argc >= 3) {
 		option = string(argv[1]);
-		if(option != "RANDOM" && option != "TIME") {
+		mp = string(argv[2]);
+		if(option != "RANDOM" && option != "TIME" && mp != "mp") {
 			cout << endl << "Bad Syntax!" << endl;
 			cout << "Type wiic-logger help for a brief documentation." << endl << endl;
 		
@@ -256,9 +270,13 @@ int main(int argc, char** argv)
 		string filename = string(argv[4]);
 		timeAcquisition(wii, wiimote, filename, start, length);
 	}
-	else
-		dataAcquisition(wii, wiimote, option);
-
+	else {
+		string mp = "";
+		if(argc > 2)
+			mp = string(argv[2]);
+		dataAcquisition(wii, wiimote, option, mp);
+	}
+	
 	cout << "=======================================" << endl;
 	cout << "Bye!" << endl;
 
