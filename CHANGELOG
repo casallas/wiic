@@ -20,6 +20,7 @@ v1.2  --
  
 	Changed:
 		-[Mac/Linux] Different smoothing algorithm, now directly applied to the raw acc values
+		-[Mac/Linux] Support for OpenCV 2.2
 
 	Fixed:
 		-[Mac/Linux] Fixed raw gravity vector computation

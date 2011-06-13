@@ -1,8 +1,14 @@
 #ifndef _MLDATA_H_
 #define _MLDATA_H_
 
-#include <cv.h>
-#include <ml.h>
+#ifdef CV_OLD // Support for old OpenCV versions (less than 2.2)
+	#include <cv.h>
+	#include <ml.h>
+#else
+	#include "opencv2/highgui/highgui.hpp"
+	#include <opencv2/core/core.hpp>
+	#include <opencv2/ml/ml.hpp>
+#endif
 #include <vector>
 #include <string>
 #include <dataset.h>
