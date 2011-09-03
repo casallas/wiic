@@ -36,6 +36,7 @@
 #include "wiicpp.h"
 
 using namespace std;
+using namespace WiiC;
 
 /*
  * CButtonBase class methods.
@@ -600,10 +601,11 @@ CWiimote::CWiimote(struct wiimote_t *wmPtr):
     IR(wmPtr), Buttons((void *) &(wmPtr->btns), (void *) &(wmPtr->btns_held), (void *) &(wmPtr->btns_released)),
             Accelerometer((accel_t*) &(wmPtr->accel_calib), (vec3b_t*) &(wmPtr->accel),
                           (int*) &(wmPtr->accel_threshold), (orient_t*) &(wmPtr->orient),
-                          (float*) &(wmPtr->orient_threshold), (gforce_t*) &(wmPtr->gforce)),
+                          (float*) &(wmPtr->orient_threshold), (gforce_t*) &(wmPtr->gforce)), 
             ExpansionDevice((struct expansion_t*) &(wmPtr->exp))
 {
     mpWiimotePtr = wmPtr;
+    logger.SetDeviceAddress(string(GetAddress()));
 }
 
 CWiimote::CWiimote(const CWiimote &copyin) : // Copy constructor to handle pass by value.
@@ -613,9 +615,10 @@ CWiimote::CWiimote(const CWiimote &copyin) : // Copy constructor to handle pass 
             Accelerometer((accel_t*) &(copyin.mpWiimotePtr->accel_calib), (vec3b_t*) &(copyin.mpWiimotePtr->accel),
                           (int*) &(copyin.mpWiimotePtr->accel_threshold), (orient_t*) &(copyin.mpWiimotePtr->orient),
                           (float*) &(copyin.mpWiimotePtr->orient_threshold), (gforce_t*) &(copyin.mpWiimotePtr->gforce)),
-            ExpansionDevice((struct expansion_t*) &(copyin.mpWiimotePtr->exp))
+            ExpansionDevice((struct expansion_t*) &(copyin.mpWiimotePtr->exp)), logger(copyin.logger)
 {
     mpWiimotePtr = copyin.mpWiimotePtr;
+    logger = copyin.logger;
 }
 
 void CWiimote::Disconnected()
@@ -666,6 +669,23 @@ CWiimote::EventTypes CWiimote::GetEvent()
 const unsigned char *CWiimote::GetEventBuffer()
 {
     return mpWiimotePtr->event_buf;
+}
+
+void CWiimote::Log()
+{
+	logger.InitLog();
+	
+	if(logType & WIIC_LOG_ACC) {
+		float x, y, z;
+		Accelerometer.GetGravityVector(x,y,z);
+		logger.LogAcc(x,y,z);
+	}
+	
+	if(logType & WIIC_LOG_GYRO) {			
+		float roll, pitch, yaw;
+		ExpansionDevice.MotionPlus.Gyroscope.GetRates(roll,pitch,yaw);
+		logger.LogGyro(roll,pitch,yaw);
+	}			
 }
 
 void CWiimote::SetMotionSensingMode(CWiimote::OnOffSelection State)
@@ -896,14 +916,20 @@ int CWii::LoadRegisteredWiimotes()
 	return wiic_load((struct wiimote_t**) mpWiimoteArray);
 }
 
-std::vector<CWiimote>& CWii::Connect()
+/**
+ *
+ * @brief Connects to the found Wii devices.
+ *
+ * @param autoreconnect	[in] Automatically attempt to re-connect a Wii device in case of unexpected disconnection (default is disabled)
+ */
+std::vector<CWiimote>& CWii::Connect(bool autoreconnect)
 {
     int numConnected = 0;
     int index;
 
     mpWiimotesVector.clear();
 
-    numConnected = wiic_connect((struct wiimote_t**) mpWiimoteArray, mpWiimoteArraySize);
+    numConnected = wiic_connect((struct wiimote_t**) mpWiimoteArray, mpWiimoteArraySize, autoreconnect);
 
     for(index = 0; index < numConnected; index++)
     {
@@ -920,8 +946,9 @@ std::vector<CWiimote>& CWii::Connect()
  *
  * @param timeout	[in] Timeout for the discovery step (default is 5 seconds) 
  * @param rumbleAck	[in] Each found and connected device will receive a small rumble ack (deafult is enabled)
+ * @param autoreconnect	[in] Automatically attempt to re-connect a Wii device in case of unexpected disconnection (default is disabled)
  */
-std::vector<CWiimote>& CWii::FindAndConnect(int timeout, bool rumbleAck)
+std::vector<CWiimote>& CWii::FindAndConnect(int timeout, bool rumbleAck, bool autoreconnect)
 {
     std::vector<CWiimote>::iterator i;
     int numFound = 0;
@@ -935,7 +962,7 @@ std::vector<CWiimote>& CWii::FindAndConnect(int timeout, bool rumbleAck)
     cout << "Connecting to wiimotes..." << endl;
 
     // Connect to the wiimote
-    Connect();
+    Connect(autoreconnect);
 
 	cout << "Connected to " << (unsigned int)mpWiimotesVector.size() << " wiimotes" << endl;
 
@@ -958,5 +985,12 @@ std::vector<CWiimote>& CWii::FindAndConnect(int timeout, bool rumbleAck)
 
 int CWii::Poll()
 {
-    return wiic_poll((struct wiimote_t**) mpWiimoteArray, mpWiimoteArraySize);
+	int events = wiic_poll((struct wiimote_t**) mpWiimoteArray, mpWiimoteArraySize);
+
+	// Logging
+	for(std::vector<CWiimote>::iterator i = mpWiimotesVector.begin() ; i != mpWiimotesVector.end() ; ++i)
+		if((*i).isLogEnabled())
+			(*i).Log();
+		
+	return events;
 }

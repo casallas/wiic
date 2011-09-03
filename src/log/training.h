@@ -18,7 +18,7 @@ class Training
 {
 public:
 	/**
-	 * Constructor void
+	 * Default constructor.
 	 */
 	Training() { }
 	~Training();
@@ -28,6 +28,11 @@ public:
 	void addSample(Sample*);
 	void clear();
 
+	/** 
+	 * Returns the i-th sample of the training as a constant pointer. 
+	 * 
+	 * @param i Sample index in the training set
+	 */
 	inline const Sample* sampleAt(unsigned int i) const { 
 		if(i < samples.size())
 			return samples[i]; 
@@ -37,6 +42,11 @@ public:
 		}
 	}
 
+	/** 
+	 * Returns the i-th sample of the training as a pointer. 
+	 * 
+	 * @param i Sample index in the training set
+	 */
 	inline Sample* sampleAt(unsigned int i) { 
 		if(i < samples.size())
 			return samples[i]; 
@@ -45,12 +55,17 @@ public:
 			return 0;
 		}
 	}
-
+	
+	/** 
+	 * Number of samples in the current training. 
+	 */
 	inline unsigned int size() const { return samples.size(); }
+	
+	inline void setTimestampFromMidnight(unsigned long ts) { timestamp = ts; }
 
 private:
 	vector<Sample*> samples;
-	struct timeval timestamp; // Training timestamp (beginning of the gesture)
+	unsigned long timestamp; // Training timestamp (beginning of the gesture)
 };
 
 #endif

@@ -330,7 +330,7 @@ int main(int argc, char** argv) {
 	 *
 	 *	This will return the number of established connections to the found wiimotes.
 	 */
-	connected = wiic_connect(wiimotes, found);
+	connected = wiic_connect(wiimotes, found, 0);
 	if (connected)
 		printf("Connected to %i wiimotes (of %i found).\n", connected, found);
 	else {

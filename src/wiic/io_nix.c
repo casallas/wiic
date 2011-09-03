@@ -49,8 +49,6 @@
 #include "wiic_internal.h"
 #include "io.h"
 
-static int wiic_connect_single(struct wiimote_t* wm, char* address);
-
 /**
  *	@brief Find a wiimote or wiimotes.
  *
@@ -97,7 +95,12 @@ int wiic_find(struct wiimote_t** wm, int max_wiimotes, int timeout) {
 	memset(&scan_info_arr, 0, sizeof(scan_info_arr));
 
 	/* scan for bluetooth devices for 'timeout' seconds */
-	found_devices = hci_inquiry(device_id, timeout, 128, NULL, &scan_info, IREQ_CACHE_FLUSH);
+	if(timeout)
+		found_devices = hci_inquiry(device_id, timeout, 128, NULL, &scan_info, IREQ_CACHE_FLUSH);
+	else {
+		while(!(found_devices = hci_inquiry(device_id, 5, 128, NULL, &scan_info, IREQ_CACHE_FLUSH))) ; // Unlimited inquiry
+	}
+		
 	if (found_devices < 0) {
 		perror("hci_inquiry");
 		return 0;
@@ -134,6 +137,7 @@ int wiic_find(struct wiimote_t** wm, int max_wiimotes, int timeout) {
  *
  *	@param wm			An array of wiimote_t structures.
  *	@param wiimotes		The number of wiimote structures in \a wm.
+ *  @param autoreconnect	Re-connects the device in case of unexpected disconnection.
  *
  *	@return The number of wiimotes that successfully connected.
  *
@@ -145,7 +149,8 @@ int wiic_find(struct wiimote_t** wm, int max_wiimotes, int timeout) {
  *	in the wiimote_t structures.  These addresses are normally set
  *	by the wiic_find() function, but can also be set manually.
  */
-int wiic_connect(struct wiimote_t** wm, int wiimotes) {
+int wiic_connect(struct wiimote_t** wm, int wiimotes, int autoreconnect) 
+{
 	int connected = 0;
 	int i = 0;
 
@@ -154,7 +159,7 @@ int wiic_connect(struct wiimote_t** wm, int wiimotes) {
 			/* if the device address is not set, skip it */
 			continue;
 		
-		if (wiic_connect_single(wm[i], NULL)) {
+		if (wiic_connect_single(wm[i], NULL, autoreconnect)) {
 			++connected;
 		}
 	}
@@ -227,10 +232,11 @@ int wiic_load(struct wiimote_t** wm)
  *	@param wm		Pointer to a wiimote_t structure.
  *	@param address	The address of the device to connect to.
  *					If NULL, use the address in the struct set by wiic_find().
+ *	@param autoreconnect	Re-connect to the device in case of unexpected disconnection.
  *
  *	@return 1 on success, 0 on failure
  */
-static int wiic_connect_single(struct wiimote_t* wm, char* address) {
+int wiic_connect_single(struct wiimote_t* wm, char* address, int autoreconnect) {
 	struct sockaddr_l2 addr;
 	memset(&addr, 0, sizeof(addr));
 
@@ -280,6 +286,9 @@ static int wiic_connect_single(struct wiimote_t* wm, char* address) {
 		wm->out_sock = -1;
 		return 0;
 	}
+	
+	/* autoreconnect flag */
+	wm->autoreconnect = autoreconnect;
 
 	WIIC_INFO("Connected to wiimote [id %i].", wm->unid);
 

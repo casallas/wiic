@@ -3,21 +3,32 @@
 
 #include "training.h"
 
-/**
- * Class Dataset for manage data from wiimote for a neural net application
- */
 class Dataset
 {
 public:
+	/** 
+	 * Default constructor.
+	 */
 	Dataset() : loaded(false) { }
+	
+	/** 
+	 * Creates a Dataset object by loading a dataset stored in a file.
+	 * 
+	 * @param filename Pathname of the dataset to load
+	 */
 	Dataset(const string& filename) : loaded(false) { loadDataset(filename); }
 	~Dataset();
 
 	/** 
-	 * Number of trainings in the current dataset 
+	 * Returns the number of trainings in the current dataset. 
 	 */
 	inline int size() const { return trainings.size(); }
 
+	/** 
+	 * Returns the i-th training of the dataset as a constant pointer. 
+	 * 
+	 * @param i Training index in the dataset
+	 */
 	inline const Training* trainingAt(unsigned int i) const { 
 		if(i < trainings.size())
 			return trainings[i]; 
@@ -27,6 +38,11 @@ public:
 		}
 	}
 
+	/** 
+	 * Returns the i-th training of the dataset as a pointer. 
+	 * 
+	 * @param i Training index in the dataset
+	 */
 	inline Training* trainingAt(unsigned int i) { 
 		if(i < trainings.size())
 			return trainings[i]; 
@@ -37,50 +53,39 @@ public:
 	}
 
 	/** 
-	 * Add a new training to the dataset 
+	 * Adds a training to the dataset. 
 	 * 
-	 * @param training to add to the dataset
+	 * @param training Training to add
 	 */
-	void addTraining(Training*);
+	void addTraining(Training* training);
 
-	/**
-	 * Load training values from a file
-	 *
-	 * @param dataset filename
-	 */
-	bool loadDataset(const string& nomefile);
-	
-	/**
-	 * Save training onto dataset
+	/** 
+	 * Loads a new dataset from file, erasing the current one (if not saved on file). 
 	 * 
-	 * @param input file stream
-	 * @param training
+	 * @param filename Filename of the dataset to load
 	 */
-	void getDataTraining(ifstream& infile, Training* training);
+	bool loadDataset(const string& filename);
 	
-	/**
-	 * Save the dataset into a file for training and recognition
-	 *
-	 * @param file name
-	 * @param addr Wii device mac address
+	/** 
+	 * Saves the current dataset in a file. 
+	 * 
+	 * @param filename Filename for the dataset to save
+	 * @param addr MAC address of the source device for the dataset
 	 */
-	bool save(const char* file, const char* addr) const;
-
-	/**
-	 * Save the dataset header into a file
-	 *
-	 * @param out opened log file
-	 * @param addr Wii device mac address
-	 */	
-	void saveHeader(ofstream& out, const char* addr) const;
-
-	/**
-	 * Delete all trainings and clear the buffer
+	bool save(const char* filename, const char* addr) const;
+	
+	/** 
+	 * Erases the current elements of the dataset.
 	 */
 	void clear() ;
-	
-	inline bool isValid() { return loaded; }
 
+	/**
+	 * Checks if the instance has a valid dataset loaded.
+	 */
+	inline bool isValid() const { return loaded; }
+
+protected:
+	void saveHeader(ofstream& out, const char* addr) const;
 
 private:
 	vector<Training*> trainings;

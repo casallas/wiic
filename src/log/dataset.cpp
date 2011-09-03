@@ -1,16 +1,18 @@
 #include "dataset.h"
 #include "wiic_internal.h"
 
-/**
- * Dataset methods
+/** 
+ * Dataset destructor, which calls clear.
  */
 Dataset::~Dataset()
 {
 	clear();
 }
 
-/**
- *  Add a new training to the dataset
+/** 
+ * Add a new training to the dataset.
+ * 
+ * @param training Add a training to the dataset.
  */
 void Dataset::addTraining(Training* t)
 {
@@ -21,16 +23,18 @@ void Dataset::addTraining(Training* t)
 }
 
 /**
- * Load dataset from a file into a class Dataset
+ * Load a dataset stored in a file.
+ *
+ * @param filename Dataset filename
  */
 bool Dataset::loadDataset(const string& nomefile)
 {
-	int size, version; 
+	int version; 
 	string line, dummy;
 	ifstream infile(nomefile.c_str());
 
 	if(!infile.is_open()) {
-		cout<<"[Error] Unable to open the dataset file"<<endl;
+		cout << "[Error] Unable to open the dataset file" << endl;
 		return false;
 	}
 	else {
@@ -48,21 +52,21 @@ bool Dataset::loadDataset(const string& nomefile)
 			cout << "[Error] Unsupported WiiC log version." << endl;
 			return false;
 		}
-		getline(infile,line); // Date (we don't need this...)
-		getline(infile,line); // Wiimote address (we don't need this...)
-		
-		// Number of trainings	
-		getline(infile,line); 	
-		iline.str(line);
-		iline >> size;
+		getline(infile,line); // Date (we should load this as well...)
 		
 		// For each training
-		for(int i = 0 ; i < size ; i++) {
+		int counter = 0;
+		while(!infile.eof()) {
 			getline(infile,line);
-			if(line == "START") {
+			istringstream iline(line);
+			string cmd; 
+			unsigned long ts;
+			iline >> cmd >> ts;
+			if(cmd == "START") {
 				// Each training is inserted in the training vector	
 				trainings.push_back(new Training());
-				if(!(trainings[i]->loadTraining(infile))) {
+				trainings[counter]->setTimestampFromMidnight(ts);
+				if(!(trainings[counter++]->loadTraining(infile))) {
 					cout << "[Error] Unable to load a training in the dataset" << endl ;
 					return false;
 				}
@@ -75,9 +79,14 @@ bool Dataset::loadDataset(const string& nomefile)
 	return loaded;
 }
 
+/**
+ * Delete all trainings and clear the buffer. This method will take 
+ * care of freeing the memory of each training in the dataset, 
+ * hence you don't need to free them in your code.
+ */
 void Dataset::clear()
 {
-	for(int i = 0 ; i < trainings.size() ; i++) {
+	for(unsigned int i = 0 ; i < trainings.size() ; i++) {
 		if(trainings[i]) {
 			delete trainings[i];
 			trainings[i] = 0;
@@ -88,9 +97,10 @@ void Dataset::clear()
 }
 
 /**
- * Save data vector for recognition or acquisition into a file
+ * Save the dataset into a file for training and recognition.
  *
- * @param file name
+ * @param filename Pathname of the destination file
+ * @param addr Wii device mac address
  */
 bool Dataset::save(const char* file, const char* addr) const
 {
@@ -116,6 +126,12 @@ bool Dataset::save(const char* file, const char* addr) const
 	return true;
 }
 
+/**
+ * Save the dataset header into a file.
+ *
+ * @param out Output file stream
+ * @param addr Wii device MAC address
+ */	
 void Dataset::saveHeader(ofstream& out, const char* addr) const
 {
 	// Log Version
@@ -129,7 +145,6 @@ void Dataset::saveHeader(ofstream& out, const char* addr) const
 	
 	// Mac Address
 	out << addr << endl;
-	out << size() << endl;		
 }
 
 

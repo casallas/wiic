@@ -6,34 +6,28 @@
 #include <iostream>
 #include <sstream>
 
-namespace WiiC {
-	enum LogType {
-		LOG_NONE,
-		LOG_ACC,
-		LOG_GYRO
-	};
-}
+#define WIIC_LOG_NONE	0x0
+#define WIIC_LOG_ACC	0x1
+#define WIIC_LOG_GYRO	0x2
 
 using namespace std;
-using namespace WiiC;
 
 class Sample
 {
 public:
-	Sample() { gettimeofday(&timestamp,0); }
+	Sample() : relTimestamp(0) { }
 	~Sample() {}
 	virtual void save(ofstream& out) =0;
 	
-	inline void setLogType(LogType l) { logType = l; }
-	inline LogType getLogType() const { return logType; }
-	inline void setTimestampMs(double t) { relTimestamp = t; }
-	inline double getTimestampMs() { return relTimestamp; }
+	inline void setLogType(int l) { logType = l; }
+	inline int getLogType() const { return logType; }
+	inline void setTimestampFromGestureStart(unsigned long t) { relTimestamp = t; }
+	inline unsigned long getTimestampFromGestureStart() const { return relTimestamp; }
 	
 protected:	
 
-	struct timeval timestamp; // Absolute
-	double relTimestamp; // msec (from the beginning of the gesture)
-	LogType logType;
+	unsigned long relTimestamp; // msec (from the beginning of the gesture)
+	int logType;
 };
 
 #endif

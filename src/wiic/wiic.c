@@ -41,6 +41,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <unistd.h>
+#include <sys/time.h>
 
 #include "definitions.h"
 #include "wiic_internal.h"
@@ -136,7 +137,7 @@ struct wiimote_t** wiic_init(int wiimotes) {
 
 		wm[i]->state = WIIMOTE_INIT_STATES;
 		wm[i]->flags = WIIC_INIT_FLAGS;
-
+		wm[i]->autoreconnect = 0;
 		wm[i]->event = WIIC_NONE;
 
 		wm[i]->exp.type = EXP_NONE;
@@ -148,6 +149,8 @@ struct wiimote_t** wiic_init(int wiimotes) {
 		wm[i]->accel_threshold = 5;
 
 		wm[i]->accel_calib.st_alpha = WIIC_DEFAULT_SMOOTH_ALPHA;
+		
+		gettimeofday(&(wm[i]->timestamp),0);
 	}
 
 	return wm;
@@ -161,7 +164,11 @@ struct wiimote_t** wiic_init(int wiimotes) {
  */
 void wiic_disconnected(struct wiimote_t* wm) {
 	if (!wm)	return;
-
+	
+	// Auto-reconnect?
+	if(wm->autoreconnect && wiic_connect_single(wm,NULL,1))
+		return;
+		
 	WIIC_INFO("Wiimote disconnected [id %i].", wm->unid);
 
 	/* disable the connected flag */
@@ -701,3 +708,13 @@ void wiic_resync(struct wiimote_t* wm) {
 	wiic_handshake(wm, NULL, 0);
 }
 
+/**
+ *	@brief Update the relative timestamp of a wiimote device
+ *
+ *	@param wm			Pointer to a wiimote_t structure.
+ */
+void wiic_update_timestamp(struct wiimote_t* wm)
+{
+	// We retrieve the overall gesture timestamp
+	gettimeofday(&(wm->timestamp),0);
+}

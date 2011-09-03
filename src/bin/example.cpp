@@ -422,6 +422,11 @@ int main(int argc, char** argv)
     // Find and connect to the wiimotes
     std::vector<CWiimote>& wiimotes = wii.FindAndConnect();
 
+	if (!wiimotes.size()) {
+		cout << "No wiimotes found." << endl;
+		return 0;
+	}
+
     // Setup the wiimotes
     for(index = 0, i = wiimotes.begin(); i != wiimotes.end(); ++i, ++index) {
         // Use a reference to make working with the iterator handy.

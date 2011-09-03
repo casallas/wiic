@@ -60,11 +60,13 @@ WIIC_EXPORT extern float wiic_set_smooth_alpha(struct wiimote_t* wm, float alpha
 WIIC_EXPORT extern void wiic_set_orient_threshold(struct wiimote_t* wm, float threshold);
 WIIC_EXPORT extern void wiic_resync(struct wiimote_t* wm);
 WIIC_EXPORT extern void wiic_set_accel_threshold(struct wiimote_t* wm, int threshold);
+WIIC_EXPORT extern void wiic_update_timestamp(struct wiimote_t* wm);
 
 /* connect.c */
 WIIC_EXPORT extern int wiic_find(struct wiimote_t** wm, int max_wiimotes, int timeout);
 WIIC_EXPORT extern int wiic_load(struct wiimote_t** wm);
-WIIC_EXPORT extern int wiic_connect(struct wiimote_t** wm, int wiimotes);
+WIIC_EXPORT extern int wiic_connect(struct wiimote_t** wm, int wiimotes, int autoreconnect);
+WIIC_EXPORT extern int wiic_connect_single(struct wiimote_t* wm, char* address, int autoreconnect);
 WIIC_EXPORT extern void wiic_disconnect(struct wiimote_t* wm);
 
 /* events.c */

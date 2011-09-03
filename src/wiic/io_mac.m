@@ -108,7 +108,9 @@ static int max_num_wiimotes = 0;
 
 	inquiry = [IOBluetoothDeviceInquiry inquiryWithDelegate:self];
 	// We set the search timeout
-	if(timeout && timeout < 20)
+	if(timeout == 0)
+		[inquiry setInquiryLength:5];
+	else if(timeout < 20)
 		[inquiry setInquiryLength:timeout];
 	else
 		[inquiry setInquiryLength:20];
@@ -187,7 +189,6 @@ static int max_num_wiimotes = 0;
 	}
 	
 	foundWiimotes = [[inquiry foundDevices] count];
-	WIIC_INFO("Found %i Wiimote device(s).", foundWiimotes);
 }
 
 @end
@@ -417,13 +418,29 @@ int wiic_find(struct wiimote_t** wm, int max_wiimotes, int timeout)
 	NSAutoreleasePool *pool = [[NSAutoreleasePool alloc] init];
 	WiiSearch* search = [[WiiSearch alloc] init];
 	[search setWiimoteStruct:wm];
-	[search start:timeout maxWiimotes:max_wiimotes];
 	
-	NSRunLoop *theRL = [NSRunLoop currentRunLoop];
-	while ([search isDiscovering] && [theRL runMode:NSDefaultRunLoopMode beforeDate:[NSDate distantFuture]]);
+	if(timeout) { // Single search
+		[search start:timeout maxWiimotes:max_wiimotes];
 	
-	found_wiimotes = [search getFoundWiimotes];
-
+		NSRunLoop *theRL = [NSRunLoop currentRunLoop];
+		while ([search isDiscovering] && [theRL runMode:NSDefaultRunLoopMode beforeDate:[NSDate distantFuture]]);
+	
+		found_wiimotes = [search getFoundWiimotes];
+	}
+	else { // Unlimited search
+		found_wiimotes = 0;
+		while(!found_wiimotes) {
+			[search start:timeout maxWiimotes:max_wiimotes];
+	
+			NSRunLoop *theRL = [NSRunLoop currentRunLoop];
+			while ([search isDiscovering] && [theRL runMode:NSDefaultRunLoopMode beforeDate:[NSDate distantFuture]]);
+	
+			found_wiimotes = [search getFoundWiimotes];	
+		}
+	}
+	
+	WIIC_INFO("Found %i Wiimote device(s).", found_wiimotes);
+	
 	[search release];
 	[pool drain];
 	
@@ -503,10 +520,11 @@ void wiic_disconnect(struct wiimote_t* wm)
  *	@param wm		Pointer to a wiimote_t structure.
  *	@param address	The address of the device to connect to.
  *					If NULL, use the address in the struct set by wiic_find().
+ *  @param autoreconnect	Re-connects the device in case of unexpected disconnection.
  *
  *	@return 1 on success, 0 on failure
  */
-static int wiic_connect_single(struct wiimote_t* wm, char* address) 
+int wiic_connect_single(struct wiimote_t* wm, char* address, int autoreconnect) 
 {
 	// Skip if already connected or device not found
 	if(!wm || WIIMOTE_IS_CONNECTED(wm) || wm->device == 0) {
@@ -529,6 +547,9 @@ static int wiic_connect_single(struct wiimote_t* wm, char* address)
 		wiic_handshake(wm, NULL, 0);
 		wiic_set_report_type(wm);
 		
+		/* autoreconnect flag */
+		wm->autoreconnect = autoreconnect;
+		
 		[pool drain];
 	}
 	else {
@@ -544,6 +565,7 @@ static int wiic_connect_single(struct wiimote_t* wm, char* address)
  *
  *	@param wm			An array of wiimote_t structures.
  *	@param wiimotes		The number of wiimote structures in \a wm.
+ *	@param autoreconnect	Re-connect to the device in case of unexpected disconnection.
  *
  *	@return The number of wiimotes that successfully connected.
  *
@@ -555,7 +577,7 @@ static int wiic_connect_single(struct wiimote_t* wm, char* address)
  *	in the wiimote_t structures.  These addresses are normally set
  *	by the wiic_find() function, but can also be set manually.
  */
-int wiic_connect(struct wiimote_t** wm, int wiimotes) 
+int wiic_connect(struct wiimote_t** wm, int wiimotes, int autoreconnect) 
 {
 	int connected = 0;
 	int i = 0;
@@ -570,7 +592,7 @@ int wiic_connect(struct wiimote_t** wm, int wiimotes)
 			// If the device address is not set, skip it 
 			continue;
 
-		if (wiic_connect_single(wm[i], NULL))
+		if (wiic_connect_single(wm[i], NULL, autoreconnect))
 			++connected;
 	}
 

@@ -246,6 +246,7 @@ void clear_dirty_reads(struct wiimote_t* wm) {
  *	Pass the event to the registered event callback.
  */
 void propagate_event(struct wiimote_t* wm, byte event, byte* msg) {
+	wiic_update_timestamp(wm);
 	save_state(wm);
 
 	switch (event) {

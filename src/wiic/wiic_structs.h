@@ -445,6 +445,7 @@ typedef struct wiimote_t {
 	WCONST struct wiimote_state_t lstate;	/**< last saved state						*/
 	WCONST int state;						/**< various state flags					*/
 	WCONST int flags;						/**< options flag							*/
+	WCONST int autoreconnect;				/**< auto-reconnect the device in case of unexpected disconnection */
 	WCONST byte handshake_state;			/**< the state of the connection handshake	*/
 	
 	WCONST byte leds;						/**< currently lit leds						*/
@@ -468,4 +469,6 @@ typedef struct wiimote_t {
 
 	WCONST WIIC_EVENT_TYPE event;			/**< type of event that occured				*/
 	WCONST byte event_buf[MAX_PAYLOAD];		/**< event buffer							*/
+	
+	struct timeval timestamp; 				/**< Absolute timestamp (relative to the most recent data) */
 } wiimote;

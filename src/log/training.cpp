@@ -1,12 +1,17 @@
 #include "training.h"
 
+/** 
+ * Dataset destructor, which calls clear.
+ */
 Training::~Training()
 {
 	clear();
 }
 
-/***
- * Load data into a single training
+/**
+ * Load a training stored in a file.
+ *
+ * @param training File stream of the contained training
  */
 bool Training::loadTraining(ifstream& training)
 {
@@ -20,7 +25,6 @@ bool Training::loadTraining(ifstream& training)
 	sStr >> cmd;
 	
 	while(!training.eof() && cmd != "END" && cmd != "") {	
-		//cout << "comando " << cmd << endl;
 		if(cmd == "ACC") 
 			addSample(new AccSample(sStr.str()));
 		else if(cmd == "GYRO") 
@@ -38,41 +42,52 @@ bool Training::loadTraining(ifstream& training)
 	return true;
 }
 
+/**
+ * Save the training into a file for training and recognition.
+ *
+ * @param out Stream of the destination file
+ */
 void Training::save(ofstream& out) const
 {	
 	// Training Header
-	out << "START" << endl;
+	out << "START " << timestamp << endl;
 	
 	// Samples
-	for(int i = 0 ; i < samples.size() ; i++)
+	for(unsigned int i = 0 ; i < samples.size() ; i++)
 		samples[i]->save(out);
 		
 	out << "END" << endl;
 }
 
-void Training::addSample(Sample* s)
+/** 
+ * Add a new training to the dataset.
+ * 
+ * @param sample Add a sample to the training set.
+ */
+void Training::addSample(Sample* sample)
 {
 	// We retrieve the overall gesture timestamp
 	struct timeval t;
-	if(!samples.size()) {
-		gettimeofday(&timestamp,0);
-		t = timestamp;
-	}
-	else
-		gettimeofday(&t,0);
+	gettimeofday(&t,0);
+	unsigned long sampleTs = (t.tv_sec % 86400) * 1000 + t.tv_usec / 1000;
 		
 	// We compute the relative timestamp in msec
-	double t_msec = ((t.tv_sec*1000000.0 + t.tv_usec) - (timestamp.tv_sec*1000000.0 + timestamp.tv_usec))/1000.0;
+	unsigned long deltaT = sampleTs - timestamp;
 	
-	if(s) {
-		s->setTimestampMs(t_msec);
-		samples.push_back(s);
+	if(sample) {
+		sample->setTimestampFromGestureStart(deltaT);
+		samples.push_back(sample);
 	}
 }
 
+/**
+ * Delete all samples and clear the buffer. This method will take 
+ * care of freeing the memory of each sample in the training set, 
+ * hence you don't need to free them in your code.
+ */
 void Training::clear()
 {
-	for(int i = 0 ; i < samples.size() ; i++) {
+	for(unsigned int i = 0 ; i < samples.size() ; i++) {
 		if(samples[i]) {
 			delete samples[i];
 			samples[i] = 0;

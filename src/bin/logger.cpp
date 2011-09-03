@@ -29,9 +29,12 @@
 #include <time.h>
 
 using namespace std;
+using namespace WiiC;
 
-void acquireGesture(CWii& wii, CWiimote& wiimote, Training* training)
+void acquireGesture(CWii& wii, CWiimote& wiimote, const string& logfile, bool resume)
 {
+	int type = WIIC_LOG_ACC;
+	
 	cout << "  - Press PLUS button to acquire the training" << endl;
 	cout << "  - Release PLUS button to end the training acquisition" << endl;
 	int enbAcq = 1;
@@ -39,17 +42,19 @@ void acquireGesture(CWii& wii, CWiimote& wiimote, Training* training)
 	while(enbAcq) {
 		wii.Poll();
 		
-		//Inizio acquisizione dati
+		// Activate logging
+		if(enbAcq == 1 && wiimote.Buttons.isJustPressed(CButtons::BUTTON_PLUS) && wiimote.Buttons.isPressed(CButtons::BUTTON_PLUS)) 
+			wiimote.LogStart(type, logfile);
+		
+		// Data acquisition
 		while(enbAcq && wiimote.Buttons.isPressed(CButtons::BUTTON_PLUS)) {
-			float x, y, z;
-			wiimote.Accelerometer.GetGravityVector(x,y,z);
-			training->addSample(new AccSample(x,y,z));	
 		  	enbAcq = 2;		
 		  	usleep(10000);
 			wii.Poll();					
 		}
 		
 		if(enbAcq == 2) {
+			wiimote.LogStop();
 			enbAcq = 0;		
 		}
 	}
@@ -60,19 +65,14 @@ void randomAcquisition(CWii& wii, CWiimote& wiimote, const int samples, vector<s
 	// Total iterations
 	int totSamples = samples*files.size();
 	srand(time(0));
-	cout << "=======================================" << endl;
-	cout << "You are going to acquire " << samples << endl;
-	cout << "samples per " << files.size() << " files "
-		 << " = " << totSamples << " total samples" << endl << endl;
-	
-	// Open datasets
-	vector<Dataset*> outs;
-	for(int i = 0 ; i < files.size() ; i++) 
-		outs.push_back(new Dataset());		
-		
+	cout << "=================================================" << endl;
+	cout << "You are going to acquire " << samples;
+	cout << "samples per " << files.size() << " files." << endl;
+	cout << "Total sample: " << totSamples << endl << endl;
+			
 	// Number of samples per file
 	vector<int> fileSamples;
-	for(int i = 0 ; i < files.size() ; i++)
+	for(unsigned int i = 0 ; i < files.size() ; i++)
 		fileSamples.push_back(samples);
 	
 	for(int i = 0 ; i < totSamples ; i++) {
@@ -81,19 +81,14 @@ void randomAcquisition(CWii& wii, CWiimote& wiimote, const int samples, vector<s
 
 		// Gesture acquisition
 		cout << "Selected gesture: " << files[selection] << endl;
-		Training* training = new Training();
-		acquireGesture(wii, wiimote, training);
+		if(samples - fileSamples[selection])
+			acquireGesture(wii, wiimote, files[selection],true);
+		else
+			acquireGesture(wii, wiimote, files[selection],false);
 		cout << "Training " << (i+1) << " acquired" << endl;
-		
-		// Gesture sadd
-		outs[selection]->addTraining(training);
-		
+				
 		// Sample decrement and check whether to close the file
 		if(!(--fileSamples[selection])) {
-			outs[selection]->save(files[selection].c_str(),wiimote.GetAddress()); // Stream close
-			if(outs[selection])
-				delete outs[selection]; // Stream deallocation
-			outs.erase(outs.begin() + selection); // Stream erase
 			files.erase(files.begin() + selection); // Filename erase
 			fileSamples.erase(fileSamples.begin() + selection); // File sample erase
 		}
@@ -104,50 +99,38 @@ void timeAcquisition(CWii& wii, CWiimote& wiimote, const string logfile, const i
 {
 	int count = 0;
 	int tick = length*100;
-	Dataset* dataset = new Dataset();
-	Training* training = new Training();
+	int type = WIIC_LOG_ACC;
 
 	cout << "Training will be stored in " << logfile << endl;
 	cout << "Logging will start in " << start << " seconds..." << endl;
 	sleep(start);
 
 	cout << "Logging for " << length << " seconds..." << endl;	
+	wiimote.LogStart(type, logfile);
 	wii.Poll();
 		
 	//Inizio acquisizione dati
 	while(count < tick) {
-		float x, y, z;
-		wiimote.Accelerometer.GetRawGravityVector(x,y,z);
-		training->addSample(new AccSample(x,y,z));		
 	  	usleep(10000);
 		++count;
 		wii.Poll();					
 	}	
-	
-	dataset->addTraining(training);
-	dataset->save(logfile.c_str(),wiimote.GetAddress());
-
-	if(dataset)
-		delete dataset;
-	dataset = 0;
+	wiimote.LogStop();	
 }
 
-void dataAcquisition(CWii& wii, CWiimote& wiimote, const string logfile, const string mp)
+void dataAcquisition(CWii& wii, CWiimote& wiimote, const string& logfile, const string& mp)
 {
 	int enbAcq = 0;
 	int count = 0;
-	
-	string fileacc;
-	
+	int type = WIIC_LOG_ACC;
+		
 	// Manage Motion Plus
 	bool mpEnabled = false;
 	if(mp == "mp") {
 		wiimote.EnableMotionPlus(CWiimote::ON);
+		type |= WIIC_LOG_GYRO;
 		mpEnabled = true;
 	}
-	
-	Dataset* dataset = new Dataset();
-	Training* training = new Training();
 
 	cout << "Trainings will be stored in " << logfile << endl;
 	cout << "  - Press PLUS button to acquire the training" << endl;
@@ -158,52 +141,42 @@ void dataAcquisition(CWii& wii, CWiimote& wiimote, const string logfile, const s
 	while(enbAcq) {
 		wii.Poll();
 		
-		//Inizio acquisizione dati
+		// Activate logging
+		if(enbAcq == 1 && wiimote.Buttons.isJustPressed(CButtons::BUTTON_PLUS) && wiimote.Buttons.isPressed(CButtons::BUTTON_PLUS)) {
+			if(!count) 
+				wiimote.LogStart(type, logfile);
+			else
+				wiimote.LogStart(type);
+		}
+
+		// Data acquisition
 		while(enbAcq && wiimote.Buttons.isPressed(CButtons::BUTTON_PLUS)) {
-			float x, y, z;
-			wiimote.Accelerometer.GetGravityVector(x,y,z);
-			training->addSample(new AccSample(x,y,z));	
-			if(mpEnabled) {
-				float r, p, y;
-		    	wiimote.ExpansionDevice.MotionPlus.Gyroscope.GetRates(r,p,y);
-				training->addSample(new GyroSample(r,p,y));
-			}
 		  	enbAcq = 2;		
 		  	usleep(10000);
 			wii.Poll();					
 		}
 		
+		// End of acquisition
 		if(enbAcq == 2) {
-			dataset->addTraining(training);
 			count++;
 			cout << "Training " << count << " acquired" << endl;
 			cout << "  - Press PLUS button to acquire the training" << endl;
 			cout << "  - Release PLUS button to end the training acquisition" << endl;
 			cout << "  - Press HOME button to go back to the main menu" << endl;
 			enbAcq = 1;		
-			training = new Training();
 		}
 
+		// End
 		if(enbAcq == 1 && wiimote.Buttons.isJustPressed(CButtons::BUTTON_HOME)) {
-			dataset->save(logfile.c_str(),wiimote.GetAddress());
+			wiimote.LogStop();
 			enbAcq = 0;
 		}
 	}
-	
-	if(training)
-		delete training;
-	training = 0;
-
-	if(dataset)
-		delete dataset;
-	dataset = 0;		
 }
-
 
 int main(int argc, char** argv)
 {
     CWii wii; // Defaults to 4 remotes
-    bool help = false;
 
 	string option, mp; 
 	if(argc == 2) {
